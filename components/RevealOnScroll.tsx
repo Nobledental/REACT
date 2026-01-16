@@ -2,7 +2,13 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
-export const RevealOnScroll = ({ children }: { children: React.ReactNode }) => {
+interface RevealProps {
+  children: React.ReactNode;
+  className?: string; // Added support for custom classes
+  delay?: number;     // Added support for animation delay
+}
+
+export const RevealOnScroll = ({ children, className = "", delay = 0 }: RevealProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -27,9 +33,10 @@ export const RevealOnScroll = ({ children }: { children: React.ReactNode }) => {
   return (
     <div
       ref={ref}
-      className={`transition-all duration-1000 transform ${
+      className={`transition-all duration-1000 transform ${className} ${
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
       }`}
+      style={{ transitionDelay: `${delay}ms` }}
     >
       {children}
     </div>
