@@ -2,11 +2,16 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Facebook, Instagram, Twitter, MapPin, Phone, Mail } from 'lucide-react';
+import { Facebook, Instagram, Twitter, MapPin, Phone, Mail, CalendarCheck } from 'lucide-react';
 
-const Footer = () => {
+// Define the interface for props
+interface FooterProps {
+  onBookClick?: () => void;
+}
+
+const Footer: React.FC<FooterProps> = ({ onBookClick }) => {
   return (
-    <footer className="bg-slate-900 text-white pt-20 pb-10 rounded-t-[3rem] mt-auto">
+    <footer className="bg-slate-900 text-white pt-20 pb-10 rounded-t-[3rem] mt-auto relative z-10">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           
@@ -29,6 +34,12 @@ const Footer = () => {
               <li><Link href="/treatments/root-canal" className="hover:text-blue-400 transition-colors">Microscopic RCT</Link></li>
               <li><Link href="/treatments/invisalign" className="hover:text-blue-400 transition-colors">Invisalign</Link></li>
               <li><Link href="/treatments/kids-dentistry" className="hover:text-blue-400 transition-colors">Kids Dentistry</Link></li>
+              {/* Added Book Button usage */}
+              <li>
+                <button onClick={onBookClick} className="hover:text-blue-400 transition-colors text-left flex items-center gap-2">
+                   <CalendarCheck size={14} /> Book Visit
+                </button>
+              </li>
             </ul>
           </div>
 
@@ -65,8 +76,8 @@ const Footer = () => {
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-slate-500">© 2024 Noble Dental Care. All rights reserved.</p>
           <div className="flex gap-6 text-xs text-slate-500">
-             <a href="#" className="hover:text-white">Privacy Policy</a>
-             <a href="#" className="hover:text-white">Terms of Service</a>
+             <Link href="#" className="hover:text-white">Privacy Policy</Link>
+             <Link href="#" className="hover:text-white">Terms of Service</Link>
           </div>
         </div>
       </div>
