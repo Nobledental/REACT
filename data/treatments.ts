@@ -1,4 +1,4 @@
-import { Clock, Ruler, Activity, Shield, Droplets, Star, Scan, Smile, ShieldCheck, HeartPulse, Award, Heart, Sparkles, Zap } from 'lucide-react';
+import { Clock, Ruler, Activity, Shield, Droplets, Star, Scan, Smile, ShieldCheck, HeartPulse, Award, Heart, Sparkles, Zap, Baby } from 'lucide-react';
 
 export interface TreatmentStep {
   title: string;
@@ -121,6 +121,36 @@ export const treatmentsData: Record<string, TreatmentData> = {
       { q: "Does it work for severe cases?", a: "Yes, modern aligners with smart-attachments can fix 90% of orthodontic issues including severe crowding." }
     ],
     keywords: ["straighten", "braces", "aligners", "invisible", "crooked teeth", "smile design"]
+  },
+  "braces": {
+    id: "braces",
+    title: "Metal & Ceramic Braces",
+    subtitle: "Precision Biomechanics.",
+    category: "Orthodontics",
+    heroImage: "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=1200",
+    description: "Traditional and ceramic orthodontics using smart-wire technology for complex bite correction.",
+    longDescription: "While aligners are great, fixed braces remain the gold standard for complex biometric movements. We use self-ligating Damon brackets that reduce friction and treatment time by 30%.",
+    stats: [
+      { label: "Duration", value: "18 Months", icon: Clock },
+      { label: "Type", value: "Self-Ligating", icon: Zap },
+      { label: "Comfort", value: "Low Friction", icon: Smile }
+    ],
+    process: [
+      { title: "Bonding", desc: "Placing brackets on teeth." },
+      { title: "Leveling", desc: "Aligning the arches." },
+      { title: "Bite Fix", desc: "Correcting the jaw relationship." },
+      { title: "Debonding", desc: "Revealing your new smile." }
+    ],
+    benefits: [
+      "Treats Complex Cases",
+      "No Compliance Issues",
+      "Cost Effective",
+      "Ceramic Options Available"
+    ],
+    faqs: [
+      { q: "Do they hurt?", a: "Modern brackets are smaller and smoother." }
+    ],
+    keywords: ["braces", "metal", "ceramic", "wire", "straight"]
   },
   "crowns-bridges": {
     id: "crowns-bridges",
