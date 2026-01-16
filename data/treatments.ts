@@ -1,4 +1,4 @@
-import { Zap, Activity, Shield, Smile, Sparkles, Clock, Heart, Scan, Star, HeartPulse, Award, ShieldCheck, Ruler, Droplets } from 'lucide-react';
+import { Clock, Ruler, Activity, Shield, Droplets, Star, Scan, Smile, ShieldCheck, HeartPulse, Award, Heart, Sparkles, Zap } from 'lucide-react';
 
 export interface TreatmentStep {
   title: string;
@@ -285,5 +285,37 @@ export const treatmentsData: Record<string, TreatmentData> = {
       { q: "How often?", a: "Every 6 months is the medical recommendation to maintain a healthy oral microbiome." }
     ],
     keywords: ["stains", "yellow teeth", "cleaning", "bad breath", "bleeding gums", "calculus"]
+  },
+  "teeth-whitening": {
+    id: "teeth-whitening",
+    title: "Laser Teeth Whitening",
+    subtitle: "Instant brightening with Philips Zoom.",
+    category: "Cosmetic",
+    heroImage: "https://images.unsplash.com/photo-1609840114035-1c29046a83ea?auto=format&fit=crop&q=80&w=1200",
+    description: "Safe, effective, and instant teeth whitening performed by dental professionals.",
+    longDescription: "Our in-office whitening procedure uses light-activated peroxide gels to break down deep-set stains from coffee, tea, and aging. Unlike home kits, we use gum barriers to protect soft tissues, ensuring maximum whitening power with zero gum irritation.",
+    stats: [
+      { label: "Time", value: "60 Mins", icon: Clock },
+      { label: "Shades", value: "Up to 8", icon: Sparkles },
+      { label: "Safety", value: "Gum-Safe", icon: Shield }
+    ],
+    process: [
+      { title: "Shade Assessment", desc: "Documenting your current tooth shade." },
+      { title: "Gum Barrier", desc: "Applying a protective gel to cover gums." },
+      { title: "Gel Application", desc: "Applying professional whitening agent." },
+      { title: "Light Activation", desc: "Using LED light to accelerate whitening." }
+    ],
+    benefits: [
+      "Instant Results in 1 Hour",
+      "Professional Strength Formula",
+      "Reduced Sensitivity Protocols",
+      "Long-Lasting Brightness",
+      "Boosts Self-Confidence"
+    ],
+    faqs: [
+      { q: "Does it damage enamel?", a: "No, professional whitening is safe for enamel when done correctly." },
+      { q: "How long does it last?", a: "Results can last 1-3 years depending on dietary habits (coffee/wine intake)." }
+    ],
+    keywords: ["white", "bleach", "stain", "yellow", "bright", "smile"]
   }
 };
