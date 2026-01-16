@@ -6,139 +6,6 @@ import { ArrowRight, Play, Pause, SkipBack, SkipForward, Heart, Share2, Sparkles
 import { RevealOnScroll } from '@/components/RevealOnScroll';
 import { filterBlogsWithAi } from '@/services/geminiService';
 
-// Refined CSS for Gallery & Blog Cards
-const cssStyles = `
-  .unified-player-card {
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-    border-radius: 40px;
-    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
-    max-width: 1200px;
-    margin: 0 auto;
-    position: relative;
-    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-    border: 1px solid rgba(0,0,0,0.05);
-  }
-  
-  :global(.dark) .unified-player-card {
-    background: #151b2b;
-    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(255,255,255,0.05);
-  }
-
-  @media (min-width: 1024px) {
-    .unified-player-card {
-      flex-direction: row;
-      height: 560px;
-    }
-  }
-
-  /* Left Media Section */
-  .player-media {
-    flex: 1.4;
-    position: relative;
-    overflow: hidden;
-    min-height: 300px;
-    background: #000;
-  }
-  
-  .player-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.85;
-    transition: scale 2s ease;
-  }
-  
-  .unified-player-card:hover .player-video {
-    scale: 1.05;
-  }
-
-  /* Right Content Section */
-  .player-content {
-    flex: 1;
-    padding: 40px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(248,250,252,1) 100%);
-  }
-  
-  :global(.dark) .player-content {
-    background: linear-gradient(135deg, #151b2b 0%, #0B1019 100%);
-  }
-
-  .track-title {
-    font-size: 2.5rem;
-    font-weight: 900;
-    line-height: 0.95;
-    margin-bottom: 20px;
-    letter-spacing: -0.04em;
-    color: #0f172a;
-  }
-  
-  :global(.dark) .track-title { color: #fff; }
-
-  /* Blog Grid Horizontal Scroll */
-  .blog-scroll-container {
-    display: flex;
-    overflow-x: auto;
-    gap: 24px;
-    padding: 20px 0 40px;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  
-  .blog-scroll-container::-webkit-scrollbar { display: none; }
-
-  .modern-blog-card {
-    flex: 0 0 340px;
-    scroll-snap-align: start;
-    background: #fff;
-    border-radius: 32px;
-    overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-    border: 1px solid rgba(0,0,0,0.05);
-    display: flex;
-    flex-direction: column;
-  }
-  
-  :global(.dark) .modern-blog-card {
-    background: #1e293b;
-    border: 1px solid rgba(255,255,255,0.05);
-  }
-  
-  .modern-blog-card:hover {
-    transform: translateY(-12px) scale(1.02);
-    box-shadow: 0 30px 60px -12px rgba(0,0,0,0.2);
-  }
-
-  .modern-blog-img {
-    height: 200px;
-    overflow: hidden;
-    position: relative;
-  }
-  
-  .modern-blog-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: scale 1s ease;
-  }
-  
-  .modern-blog-card:hover .modern-blog-img img { scale: 1.1; }
-
-  .modern-blog-content {
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-  }
-`;
-
 const Gallery = () => {
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isTimerPlaying, setIsTimerPlaying] = useState(false);
@@ -260,8 +127,6 @@ const Gallery = () => {
 
   return (
     <section id="gallery" className="py-24 relative transition-colors duration-500 overflow-hidden bg-slate-50 dark:bg-[#0B1019]">
-      <style jsx global>{cssStyles}</style>
-
       {/* Section Header */}
       <div className="max-w-7xl mx-auto px-6 mb-20">
         <RevealOnScroll>
@@ -425,4 +290,14 @@ const Gallery = () => {
 
            <div className="text-center mt-12">
               <Link href="/gallery" className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-blue-600 transition-colors group">
-                 Open Clinical Archives <ArrowRight size={16} className="group-hover:translate-
+                 Open Clinical Archives <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />
+              </Link>
+           </div>
+        </div>
+
+      </div>
+    </section>
+  );
+};
+
+export default Gallery;
