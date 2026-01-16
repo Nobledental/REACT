@@ -4,7 +4,7 @@
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
+  --background-start-rgb: 255, 255, 255;
   --background-end-rgb: 255, 255, 255;
 }
 
@@ -24,14 +24,9 @@ body {
 }
 
 @layer utilities {
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  
   .text-gradient {
     background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
     -webkit-background-clip: text;
@@ -39,7 +34,6 @@ body {
     background-clip: text;
   }
 
-  /* Marquee/Ticker Mask */
   .mask-gradient-x {
     mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
     -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
@@ -51,34 +45,268 @@ body {
   }
 }
 
-/* Custom Animations */
+/* --- ANIMATIONS --- */
 @keyframes scroll {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
-
-.animate-scroll {
-  animation: scroll 40s linear infinite;
-}
-
-.animate-scroll:hover {
-  animation-play-state: paused;
-}
+.animate-scroll { animation: scroll 40s linear infinite; }
+.animate-scroll:hover { animation-play-state: paused; }
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-20px); }
 }
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
+.animate-float { animation: float 6s ease-in-out infinite; }
 
 @keyframes fade-in-up {
   0% { opacity: 0; transform: translateY(20px); }
   100% { opacity: 1; transform: translateY(0); }
 }
+.animate-fade-in-up { animation: fade-in-up 1s ease-out forwards; }
 
-.animate-fade-in-up {
-  animation: fade-in-up 1s ease-out forwards;
+/* --- HERO SECTION & CARD STYLES --- */
+#heroCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.55;
+  transition: opacity 1s ease;
 }
+
+.dark #heroCanvas { opacity: 0.9; }
+
+.adidas-card {
+  position: relative;
+  border-radius: 20px;
+  box-shadow: -7px 7px 20px 0 rgba(0,0,0,0.40);
+  width: 400px;
+  background: #fff;
+  transition: transform 0.3s ease;
+  z-index: 20;
+}
+
+.dark .adidas-card {
+  background: #1e293b;
+  box-shadow: -7px 7px 40px 0 rgba(0,0,0,0.7);
+}
+
+.card-head {
+  border-radius: 20px 20px 0 0;
+  display: block;
+  width: 100%;
+  height: 300px;
+  background-image: linear-gradient(139deg, #04162E 10%, #95A2AD 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.surgical-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+}
+
+.card-head .logo {
+  width: 60px;
+  padding: 20px 0 0 20px; 
+  position: relative;
+  z-index: 30;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+}
+
+.card-head h2 {
+  font-size: 1.7rem;
+  color: #fff;
+  padding: 20px 0 0 20px;
+  letter-spacing: 3px;
+  position: relative;
+  z-index: 30;
+  font-weight: 700;
+  margin: 0;
+}
+
+.card-head .light { font-weight: 100; }
+
+.card-head .subtitle {
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: 100;
+  padding-left: 20px;
+  margin: 0;
+  letter-spacing: 3px;
+  font-size: 0.8rem;
+  position: relative;
+  z-index: 30;
+}
+
+.card-head .product-pop {
+  transform: rotate(-10deg);
+  width: 440px;
+  position: absolute;
+  top: 3.5rem;
+  right: -8rem;
+  z-index: 40;
+  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.adidas-card:hover .product-pop {
+  transform: rotate(-3deg) scale(1.05) translate(-10px, -10px);
+}
+
+.card-head .nmd {
+  font-size: 9rem;
+  color: #fff;
+  padding: 0;
+  margin: 0;
+  text-transform: uppercase;
+  opacity: .15;
+  letter-spacing: -10px;
+  padding-left: 10px;
+  position: absolute;
+  bottom: -15px;
+  left: 0;
+  font-weight: 900;
+  pointer-events: none;
+}
+
+.card-body { padding-bottom: 20px; }
+
+.card-body h3, .card-body p {
+  color: #132438;
+  padding-left: 20px;
+}
+
+.dark .card-body h3, .dark .card-body p { color: #fff; }
+
+.card-body h3 {
+  padding-top: 20px;
+  text-transform: uppercase;
+  font-size: 1.2rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-body .badge {
+  background: #ef4444;
+  color: #fff;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 900;
+}
+
+.card-body p {
+  padding-top: 5px;
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.rating {
+  padding: 10px 0 0 20px;
+  display: flex;
+  gap: 2px;
+  color: #132438;
+}
+
+.dark .rating { color: #fbbf24; }
+
+.size-label, .colours-label {
+  display: block;
+  color: #132438;
+  padding: 15px 0 8px 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 11px;
+  font-weight: 900;
+  opacity: 0.6;
+}
+
+.dark .size-label, .dark .colours-label { color: #94a3b8; }
+
+.number-options {
+  display: flex;
+  gap: 15px;
+  padding-left: 20px;
+}
+
+.number-options span {
+  font-size: 12px;
+  font-weight: 700;
+  color: #132438;
+  cursor: pointer;
+}
+
+.dark .number-options span { color: #fff; }
+
+.number-options .selected {
+  background: #132438;
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -6px;
+}
+
+.dark .number-options .selected { background: #3b82f6; }
+
+.colorway {
+  display: flex;
+  gap: 10px;
+  padding-left: 20px;
+}
+
+.dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.price-badge {
+  position: absolute;
+  background: #132438;
+  color: #fff;
+  width: 160px;
+  height: 50px;
+  border-radius: 10px;
+  right: 20px;
+  bottom: 20px;
+  box-shadow: 0px 7px 20px 0 rgba(0,0,0,0.40);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  font-weight: 300;
+  z-index: 50;
+}
+
+.dark .price-badge { background: #3b82f6; }
+
+.store-badges {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.store-badge {
+  height: 40px;
+  width: auto;
+  transition: transform 0.3s ease;
+}
+
+.store-badge:hover { transform: translateY(-3px); }
