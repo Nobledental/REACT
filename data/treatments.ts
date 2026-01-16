@@ -347,5 +347,128 @@ export const treatmentsData: Record<string, TreatmentData> = {
       { q: "How long does it last?", a: "Results can last 1-3 years depending on dietary habits (coffee/wine intake)." }
     ],
     keywords: ["white", "bleach", "stain", "yellow", "bright", "smile"]
+  },
+  "veneers": {
+    id: "veneers",
+    title: "E.max Porcelain Veneers",
+    subtitle: "The Hollywood Smile Makeover.",
+    category: "Cosmetic",
+    heroImage: "https://images.unsplash.com/photo-1600170311833-c2cf5280ce49?auto=format&fit=crop&q=80&w=1200",
+    description: "Ultra-thin ceramic shells customized to cover stains, chips, and gaps for a flawless smile.",
+    longDescription: "Veneers are the secret behind most celebrity smiles. We use Lithium Disilicate (E.max) ceramic, which is as thin as a contact lens (0.3mm) yet incredibly strong. This allows us to transform your smile with minimal to no drilling of your natural tooth structure.",
+    stats: [
+      { label: "Thickness", value: "0.3 mm", icon: Ruler },
+      { label: "Material", value: "E.max Press", icon: Shield },
+      { label: "Warranty", value: "15 Years", icon: Award }
+    ],
+    process: [
+      { title: "Digital Smile Design", desc: "We design your new smile digitally on your face photo." },
+      { title: "Mock-Up Trial", desc: "You 'test drive' the new smile with temporary material." },
+      { title: "Preparation", desc: "Minimally invasive polishing of the enamel surface." },
+      { title: "Bonding", desc: "Permanent adhesion of the ceramic shells." }
+    ],
+    benefits: [
+      "Stain Resistant Forever",
+      "Corrects Gaps & Crowding",
+      "Instant Orthodontic Effect",
+      "Custom Shade Matching"
+    ],
+    faqs: [
+      { q: "Do you shave my teeth?", a: "Minimal preparation is needed (0.3mm), but we offer 'No-Prep' veneers for suitable cases." }
+    ],
+    keywords: ["veneers", "smile makeover", "hollywood smile", "laminates", "gap closure"]
+  },
+
+  "laser-gum-surgery": {
+    id: "laser-gum-surgery",
+    title: "Laser Gum Therapy",
+    subtitle: "LANAP Protocol for Gum Disease.",
+    category: "Periodontics",
+    heroImage: "https://images.unsplash.com/photo-1609840112855-915d61d66623?auto=format&fit=crop&q=80&w=1200",
+    description: "Treat bleeding gums and loose teeth without blades or sutures using advanced laser energy.",
+    longDescription: "Gum disease is the #1 cause of tooth loss. Our LANAP (Laser Assisted New Attachment Procedure) specifically targets infected tissue while leaving healthy gum intact. The laser energy also stimulates stem cells to regenerate lost bone around the tooth.",
+    stats: [
+      { label: "Pain", value: "Zero", icon: Smile },
+      { label: "Healing", value: "24 Hours", icon: Clock },
+      { label: "Incision", value: "None", icon: ShieldCheck }
+    ],
+    process: [
+      { title: "Measurement", desc: "Mapping the depth of gum pockets." },
+      { title: "Laser Ablation", desc: "Vaporizing bacteria and diseased tissue." },
+      { title: "Calculus Removal", desc: "Ultrasonic cleaning of the root surface." },
+      { title: "Clot Formation", desc: "Sealing the gum pocket naturally." }
+    ],
+    benefits: [
+      "No Scalpels or Stitches",
+      "Regenerates Bone",
+      "Saves 'Hopeless' Teeth",
+      "Safe for Diabetics"
+    ],
+    faqs: [
+      { q: "Is it painful?", a: "Most patients return to work the very next day with minimal discomfort." }
+    ],
+    keywords: ["gums", "bleeding", "pyorrhea", "loose tooth", "laser", "lanap"]
+  },
+
+  "full-mouth-rehab": {
+    id: "full-mouth-rehab",
+    title: "Full Mouth Rehabilitation",
+    subtitle: "Restoring function to a collapsed bite.",
+    category: "Restorative",
+    heroImage: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=1200",
+    description: "A comprehensive protocol to rebuild worn-down, missing, or damaged teeth across the entire jaw.",
+    longDescription: "For patients with severe wear, multiple missing teeth, or jaw pain (TMJ), single fillings aren't enough. We use neuromuscular dentistry to find your jaw's most comfortable position, then rebuild every tooth to hold that position using crowns, onlays, and implants.",
+    stats: [
+      { label: "Jaw Balance", value: "T-Scan", icon: Activity },
+      { label: "Aesthetics", value: "10/10", icon: Sparkles },
+      { label: "Function", value: "100%", icon: Zap }
+    ],
+    process: [
+      { title: "TMJ Analysis", desc: "Determining the optimal jaw muscle position." },
+      { title: "Digital Mockup", desc: "Designing the new bite architecture." },
+      { title: "Temporization", desc: "Wearing prototypes to test comfort." },
+      { title: "Final Restoration", desc: "Placing permanent full-arch ceramics." }
+    ],
+    benefits: [
+      "Eliminates Headaches/TMJ Pain",
+      "Restores Facial Height (Anti-Aging)",
+      "Perfect Chewing Efficiency",
+      "Comprehensive Warranty"
+    ],
+    faqs: [
+      { q: "How long does it take?", a: "Typically 2-4 weeks depending on the complexity and implant integration times." }
+    ],
+    keywords: ["full mouth", "worn teeth", "tmj", "bite collapse", "reconstruction"]
+  },
+
+  "bps-dentures": {
+    id: "bps-dentures",
+    title: "BPS Suction Dentures",
+    subtitle: "Swiss bio-functional prosthetics.",
+    category: "Prosthodontics",
+    heroImage: "https://images.unsplash.com/photo-1551601651-2a8555f1a136?auto=format&fit=crop&q=80&w=1200",
+    description: "High-quality dentures that use suction mechanics to stay firm without adhesives.",
+    longDescription: "Traditional dentures float and cause sores. BPS (Biofunctional Prosthetic System) Dentures are engineered to work with your facial muscles. They create a suction seal against the gums, allowing you to eat apples and corn without the teeth moving.",
+    stats: [
+      { label: "Fit", value: "Suction", icon: Shield },
+      { label: "Material", value: "Ivoclar", icon: Star },
+      { label: "Look", value: "Natural", icon: Smile }
+    ],
+    process: [
+      { title: "Primary Impression", desc: "Mapping the muscle borders." },
+      { title: "Bite Registration", desc: "Recording how your jaws meet." },
+      { title: "Try-In", desc: "Checking aesthetics with wax teeth." },
+      { title: "Processing", desc: "High-pressure injection molding for density." }
+    ],
+    benefits: [
+      "No Messy Adhesives Needed",
+      "Restores Facial Volume",
+      "Chew Hard Foods",
+      "Stain Resistant"
+    ],
+    faqs: [
+      { q: "Are they unbreakable?", a: "They are high-impact acrylic, much stronger than regular dentures, but care is still needed." }
+    ],
+    keywords: ["dentures", "false teeth", "bps", "suction", "old age"]
   }
 };
