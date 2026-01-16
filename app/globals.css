@@ -11,18 +11,20 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 15, 23, 42; /* Matches dark.bg */
+    --background-start-rgb: 15, 23, 42;
     --background-end-rgb: 15, 23, 42;
   }
 }
 
 body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-start-rgb));
   font-family: var(--font-jakarta), sans-serif;
-  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden; /* Prevents horizontal scrollbar */
 }
 
-/* Custom Utilities from your HTML */
 @layer utilities {
+  /* Hides scrollbar but allows scrolling */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
@@ -31,10 +33,58 @@ body {
     scrollbar-width: none;
   }
 
+  /* Text Gradients */
   .text-gradient {
     background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+
+  /* Marquee/Ticker Mask - Crucial for Testimonials & News */
+  .mask-gradient-x {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 5%,
+      black 95%,
+      transparent
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 5%,
+      black 95%,
+      transparent
+    );
+  }
+
+  .ticker-fade {
+    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  }
+}
+
+/* Animations that might be missing from tailwind.config */
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); } /* Moves left */
+}
+
+.animate-scroll {
+  animation: scroll 40s linear infinite;
+}
+
+.animate-scroll:hover {
+  animation-play-state: paused;
+}
+
+/* Float Animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
