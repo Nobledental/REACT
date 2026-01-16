@@ -1,13 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',  // <--- Crucial for GitHub Pages
+  output: 'export',  // <--- Forces Next.js to produce static HTML files
   
-  // 1. If your repo name is "my-website", set this to "/my-website"
-  // 2. If your repo name is exactly "username.github.io", leave this empty or remove it.
-  basePath: '/your-repo-name', 
+  // IMPORTANT: 
+  // 1. If your repo is named 'my-dental-site', set this to '/my-dental-site'
+  // 2. If you don't know yet, you can leave it commented out, but your CSS might not load.
+  // basePath: '/your-repo-name', 
 
   images: {
-    unoptimized: true, // <--- Crucial: Next.js Image component doesn't work with static export by default
+    unoptimized: true, // <--- Required for GitHub Pages
     remotePatterns: [
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'dentcare-website-s3-bucket-01.s3.eu-north-1.amazonaws.com' },
