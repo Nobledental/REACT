@@ -12,6 +12,7 @@ const Credentials = () => {
     { code: 'IDA', label: 'Indian Dental Association' },
   ];
 
+  // Duplicate for infinite scroll
   const displayCreds = [...creds, ...creds, ...creds];
 
   return (
