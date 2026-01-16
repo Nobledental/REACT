@@ -1,4 +1,5 @@
-import { Clock, Ruler, Activity, Shield, Droplets, Star, Scan, Smile, ShieldCheck, HeartPulse, Award, Heart, Sparkles, Zap, Baby } from 'lucide-react';
+// REMOVE icon imports from 'lucide-react' at the top
+// You only need the types if you want them, but for data, just strings.
 
 export interface TreatmentStep {
   title: string;
@@ -18,7 +19,8 @@ export interface TreatmentData {
   heroImage: string;
   description: string;
   longDescription: string;
-  stats: { label: string; value: string; icon: any }[];
+  // CHANGE icon type to string
+  stats: { label: string; value: string; icon: string }[]; 
   process: TreatmentStep[];
   benefits: string[];
   faqs: TreatmentFAQ[];
@@ -35,9 +37,9 @@ export const treatmentsData: Record<string, TreatmentData> = {
     description: "Advanced single-visit root canal therapy using dental microscopes for 100% precision and zero pain.",
     longDescription: "Root canal treatment at Noble Dental Care is defined by technology. Utilizing Zeiss Extaro 300 microscopes, we identify micro-canals (MB2) that traditional methods often miss. Our protocol includes Er:YAG laser activation of irrigants, ensuring 99.9% bacterial elimination from the root system for predictable long-term healing.",
     stats: [
-      { label: "Duration", value: "45 Mins", icon: Clock },
-      { label: "Precision", value: "Microscopic", icon: Ruler },
-      { label: "Success Rate", value: "99.2%", icon: Activity }
+      { label: "Duration", value: "45 Mins", icon: "Clock" },
+      { label: "Precision", value: "Microscopic", icon: "Ruler" },
+      { label: "Success Rate", value: "99.2%", icon: "Activity" }
     ],
     process: [
       { title: "CBCT Root Mapping", desc: "3D visualization of canal anatomy to prevent perforations." },
@@ -67,9 +69,9 @@ export const treatmentsData: Record<string, TreatmentData> = {
     description: "Replace missing teeth with titanium anchors that look, feel, and function exactly like natural teeth.",
     longDescription: "Dental implants at Noble combine surgical robotics (Guided Templates) with biological boosters. We utilize ITI (International Team for Implantology) standards, placing Grade-5 Titanium or Metal-Free Zirconia implants. Our unique PRF (Platelet Rich Fibrin) protocol uses your own growth factors to accelerate bone integration by 40%.",
     stats: [
-      { label: "Stability", value: "Guided Fix", icon: Shield },
-      { label: "Healing", value: "PRF Fast-Track", icon: Droplets },
-      { label: "Warranty", value: "Lifetime", icon: Star }
+      { label: "Stability", value: "Guided Fix", icon: "Shield" },
+      { label: "Healing", value: "PRF Fast-Track", icon: "Droplets" },
+      { label: "Warranty", value: "Lifetime", icon: "Star" }
     ],
     process: [
       { title: "Bone Density Scan", desc: "3D assessment of jaw volume using digital CBCT." },
@@ -99,9 +101,9 @@ export const treatmentsData: Record<string, TreatmentData> = {
     description: "The clear alternative to braces. Removable, comfortable, and virtually invisible trays.",
     longDescription: "Transform your smile without metal. Our aligner program utilizes the iTero Element 5D scanner to capture 6,000 images per second. Dr. Deepak's 3D planning software simulates your entire movement trajectory before the first tray is even manufactured, ensuring predictable results for professionals and students alike.",
     stats: [
-      { label: "Scanning", value: "iTero 5D", icon: Scan },
-      { label: "Comfort", value: "Ultra-Thin", icon: Smile },
-      { label: "Planning", value: "AI-Driven", icon: Activity }
+      { label: "Scanning", value: "iTero 5D", icon: "Scan" },
+      { label: "Comfort", value: "Ultra-Thin", icon: "Smile" },
+      { label: "Planning", value: "AI-Driven", icon: "Activity" }
     ],
     process: [
       { title: "3D Smile Scan", desc: "Instant digital map of your bite and alignment." },
@@ -131,9 +133,9 @@ export const treatmentsData: Record<string, TreatmentData> = {
     description: "Traditional and ceramic orthodontics using smart-wire technology for complex bite correction.",
     longDescription: "While aligners are great, fixed braces remain the gold standard for complex biometric movements. We use self-ligating Damon brackets that reduce friction and treatment time by 30%.",
     stats: [
-      { label: "Duration", value: "18 Months", icon: Clock },
-      { label: "Type", value: "Self-Ligating", icon: Zap },
-      { label: "Comfort", value: "Low Friction", icon: Smile }
+      { label: "Duration", value: "18 Months", icon: "Clock" },
+      { label: "Type", value: "Self-Ligating", icon: "Zap" },
+      { label: "Comfort", value: "Low Friction", icon: "Smile" }
     ],
     process: [
       { title: "Bonding", desc: "Placing brackets on teeth." },
@@ -161,9 +163,9 @@ export const treatmentsData: Record<string, TreatmentData> = {
     description: "Custom-milled zirconia and E.max restorations for broken or missing teeth.",
     longDescription: "Our restorations are designed digitally for a 5-micron accuracy fit. We use multi-layered monolithic zirconia that mimics the translucency of natural enamel while providing high fracture resistance.",
     stats: [
-        { label: "Fit", value: "Digital CAD", icon: Scan },
-        { label: "Strength", value: "1200 MPa", icon: Shield },
-        { label: "Warranty", value: "10 Years", icon: Award }
+        { label: "Fit", value: "Digital CAD", icon: "Scan" },
+        { label: "Strength", value: "1200 MPa", icon: "Shield" },
+        { label: "Warranty", value: "10 Years", icon: "Award" }
     ],
     process: [
         { title: "Digital Scan", desc: "Intraoral mapping with iTero 5D." },
@@ -184,9 +186,9 @@ export const treatmentsData: Record<string, TreatmentData> = {
     description: "Gentle dental checkups and treatments for infants and children in a friendly environment.",
     longDescription: "Building a lifetime of healthy habits starts here. Our pediatric specialists use 'Tell-Show-Do' techniques to ensure every child feels safe and empowered during their visit.",
     stats: [
-        { label: "Approach", value: "No Tears", icon: Heart },
-        { label: "Focus", value: "Prevention", icon: Shield },
-        { label: "Fun", value: "Reward Kits", icon: Star }
+        { label: "Approach", value: "No Tears", icon: "Heart" },
+        { label: "Focus", value: "Prevention", icon: "Shield" },
+        { label: "Fun", value: "Reward Kits", icon: "Star" }
     ],
     process: [
         { title: "Welcome Orientation", desc: "Gentle introduction to the dental chair." },
@@ -207,9 +209,9 @@ export const treatmentsData: Record<string, TreatmentData> = {
     description: "Clinical hygiene and guidance specifically tailored for the safety of mother and baby.",
     longDescription: "Hormonal changes during pregnancy can increase the risk of gum disease. We provide specialized, fetal-safe protocols to maintain oral health during all three trimesters.",
     stats: [
-        { label: "Safety", value: "Fetal Safe", icon: ShieldCheck },
-        { label: "Protocol", value: "WHO Aligned", icon: HeartPulse },
-        { label: "Comfort", value: "Ergonomic", icon: Smile }
+        { label: "Safety", value: "Fetal Safe", icon: "ShieldCheck" },
+        { label: "Protocol", value: "WHO Aligned", icon: "HeartPulse" },
+        { label: "Comfort", value: "Ergonomic", icon: "Smile" }
     ],
     process: [
         { title: "Bio-Audit", desc: "Assessing gum health and hormonal impacts." },
@@ -229,9 +231,9 @@ export const treatmentsData: Record<string, TreatmentData> = {
     description: "Painless removal of decayed or impacted wisdom teeth using microsurgical instruments.",
     longDescription: "We redefine the extraction experience. Using Piezosurgery (ultrasonic bone cutting), we eliminate the trauma associated with traditional drills. This preserves the surrounding bone and soft tissue, resulting in 94% less post-operative swelling and significantly faster recovery times.",
     stats: [
-      { label: "Trauma", value: "Near-Zero", icon: Heart },
-      { label: "Planning", value: "Nerve Tracing", icon: Scan },
-      { label: "Healing", value: "PRF Dome", icon: Activity }
+      { label: "Trauma", value: "Near-Zero", icon: "Heart" },
+      { label: "Planning", value: "Nerve Tracing", icon: "Scan" },
+      { label: "Healing", value: "PRF Dome", icon: "Activity" }
     ],
     process: [
       { title: "3D Nerve Map", desc: "Locating sensory nerves via CBCT to ensure safety." },
@@ -261,9 +263,9 @@ export const treatmentsData: Record<string, TreatmentData> = {
     description: "Nano-composite bonding that mimics your natural tooth color and strength.",
     longDescription: "We utilize biomimetic principles to 're-build' your tooth rather than just filling a hole. Using Tetric-N-Line nano-hybrid composites under rubber dam isolation, we ensure a 100% moisture-free chemical bond. This creates a restoration that flexes like natural dentin and looks like pure enamel.",
     stats: [
-      { label: "Finish", value: "Mirror Polish", icon: Sparkles },
-      { label: "Bonding", value: "ISO-Bond", icon: Shield },
-      { label: "Isolation", value: "Rubber Dam", icon: Zap }
+      { label: "Finish", value: "Mirror Polish", icon: "Sparkles" },
+      { label: "Bonding", value: "ISO-Bond", icon: "Shield" },
+      { label: "Isolation", value: "Rubber Dam", icon: "Zap" }
     ],
     process: [
       { title: "Strict Isolation", desc: "Rubber dam use to prevent saliva contamination." },
@@ -293,9 +295,9 @@ export const treatmentsData: Record<string, TreatmentData> = {
     description: "Guided Biofilm Therapy (GBT) removes calculus and stains using heated ultrasonic waves, restoring gum health painlessly.",
     longDescription: "Traditional scaling is outdated. At Noble, we use EMS AirFlow® Guided Biofilm Therapy. This 8-step protocol uses disclosure dye to visualize plaque, followed by heated water and erythritol powder to clean deep into gum pockets without touching the sensitive enamel.",
     stats: [
-      { label: "Safety", value: "Enamel-Safe", icon: Shield },
-      { label: "Stain Removal", value: "100%", icon: Sparkles },
-      { label: "Comfort", value: "Heated Wave", icon: Heart }
+      { label: "Safety", value: "Enamel-Safe", icon: "Shield" },
+      { label: "Stain Removal", value: "100%", icon: "Sparkles" },
+      { label: "Comfort", value: "Heated Wave", icon: "Heart" }
     ],
     process: [
       { title: "Biofilm Disclosure", desc: "Dyeing plaque purple to reveal all hidden areas." },
@@ -325,9 +327,9 @@ export const treatmentsData: Record<string, TreatmentData> = {
     description: "Safe, effective, and instant teeth whitening performed by dental professionals.",
     longDescription: "Our in-office whitening procedure uses light-activated peroxide gels to break down deep-set stains from coffee, tea, and aging. Unlike home kits, we use gum barriers to protect soft tissues, ensuring maximum whitening power with zero gum irritation.",
     stats: [
-      { label: "Time", value: "60 Mins", icon: Clock },
-      { label: "Shades", value: "Up to 8", icon: Sparkles },
-      { label: "Safety", value: "Gum-Safe", icon: Shield }
+      { label: "Time", value: "60 Mins", icon: "Clock" },
+      { label: "Shades", value: "Up to 8", icon: "Sparkles" },
+      { label: "Safety", value: "Gum-Safe", icon: "Shield" }
     ],
     process: [
       { title: "Shade Assessment", desc: "Documenting your current tooth shade." },
@@ -347,128 +349,5 @@ export const treatmentsData: Record<string, TreatmentData> = {
       { q: "How long does it last?", a: "Results can last 1-3 years depending on dietary habits (coffee/wine intake)." }
     ],
     keywords: ["white", "bleach", "stain", "yellow", "bright", "smile"]
-  },
-  "veneers": {
-    id: "veneers",
-    title: "E.max Porcelain Veneers",
-    subtitle: "The Hollywood Smile Makeover.",
-    category: "Cosmetic",
-    heroImage: "https://images.unsplash.com/photo-1600170311833-c2cf5280ce49?auto=format&fit=crop&q=80&w=1200",
-    description: "Ultra-thin ceramic shells customized to cover stains, chips, and gaps for a flawless smile.",
-    longDescription: "Veneers are the secret behind most celebrity smiles. We use Lithium Disilicate (E.max) ceramic, which is as thin as a contact lens (0.3mm) yet incredibly strong. This allows us to transform your smile with minimal to no drilling of your natural tooth structure.",
-    stats: [
-      { label: "Thickness", value: "0.3 mm", icon: Ruler },
-      { label: "Material", value: "E.max Press", icon: Shield },
-      { label: "Warranty", value: "15 Years", icon: Award }
-    ],
-    process: [
-      { title: "Digital Smile Design", desc: "We design your new smile digitally on your face photo." },
-      { title: "Mock-Up Trial", desc: "You 'test drive' the new smile with temporary material." },
-      { title: "Preparation", desc: "Minimally invasive polishing of the enamel surface." },
-      { title: "Bonding", desc: "Permanent adhesion of the ceramic shells." }
-    ],
-    benefits: [
-      "Stain Resistant Forever",
-      "Corrects Gaps & Crowding",
-      "Instant Orthodontic Effect",
-      "Custom Shade Matching"
-    ],
-    faqs: [
-      { q: "Do you shave my teeth?", a: "Minimal preparation is needed (0.3mm), but we offer 'No-Prep' veneers for suitable cases." }
-    ],
-    keywords: ["veneers", "smile makeover", "hollywood smile", "laminates", "gap closure"]
-  },
-
-  "laser-gum-surgery": {
-    id: "laser-gum-surgery",
-    title: "Laser Gum Therapy",
-    subtitle: "LANAP Protocol for Gum Disease.",
-    category: "Periodontics",
-    heroImage: "https://images.unsplash.com/photo-1609840112855-915d61d66623?auto=format&fit=crop&q=80&w=1200",
-    description: "Treat bleeding gums and loose teeth without blades or sutures using advanced laser energy.",
-    longDescription: "Gum disease is the #1 cause of tooth loss. Our LANAP (Laser Assisted New Attachment Procedure) specifically targets infected tissue while leaving healthy gum intact. The laser energy also stimulates stem cells to regenerate lost bone around the tooth.",
-    stats: [
-      { label: "Pain", value: "Zero", icon: Smile },
-      { label: "Healing", value: "24 Hours", icon: Clock },
-      { label: "Incision", value: "None", icon: ShieldCheck }
-    ],
-    process: [
-      { title: "Measurement", desc: "Mapping the depth of gum pockets." },
-      { title: "Laser Ablation", desc: "Vaporizing bacteria and diseased tissue." },
-      { title: "Calculus Removal", desc: "Ultrasonic cleaning of the root surface." },
-      { title: "Clot Formation", desc: "Sealing the gum pocket naturally." }
-    ],
-    benefits: [
-      "No Scalpels or Stitches",
-      "Regenerates Bone",
-      "Saves 'Hopeless' Teeth",
-      "Safe for Diabetics"
-    ],
-    faqs: [
-      { q: "Is it painful?", a: "Most patients return to work the very next day with minimal discomfort." }
-    ],
-    keywords: ["gums", "bleeding", "pyorrhea", "loose tooth", "laser", "lanap"]
-  },
-
-  "full-mouth-rehab": {
-    id: "full-mouth-rehab",
-    title: "Full Mouth Rehabilitation",
-    subtitle: "Restoring function to a collapsed bite.",
-    category: "Restorative",
-    heroImage: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=1200",
-    description: "A comprehensive protocol to rebuild worn-down, missing, or damaged teeth across the entire jaw.",
-    longDescription: "For patients with severe wear, multiple missing teeth, or jaw pain (TMJ), single fillings aren't enough. We use neuromuscular dentistry to find your jaw's most comfortable position, then rebuild every tooth to hold that position using crowns, onlays, and implants.",
-    stats: [
-      { label: "Jaw Balance", value: "T-Scan", icon: Activity },
-      { label: "Aesthetics", value: "10/10", icon: Sparkles },
-      { label: "Function", value: "100%", icon: Zap }
-    ],
-    process: [
-      { title: "TMJ Analysis", desc: "Determining the optimal jaw muscle position." },
-      { title: "Digital Mockup", desc: "Designing the new bite architecture." },
-      { title: "Temporization", desc: "Wearing prototypes to test comfort." },
-      { title: "Final Restoration", desc: "Placing permanent full-arch ceramics." }
-    ],
-    benefits: [
-      "Eliminates Headaches/TMJ Pain",
-      "Restores Facial Height (Anti-Aging)",
-      "Perfect Chewing Efficiency",
-      "Comprehensive Warranty"
-    ],
-    faqs: [
-      { q: "How long does it take?", a: "Typically 2-4 weeks depending on the complexity and implant integration times." }
-    ],
-    keywords: ["full mouth", "worn teeth", "tmj", "bite collapse", "reconstruction"]
-  },
-
-  "bps-dentures": {
-    id: "bps-dentures",
-    title: "BPS Suction Dentures",
-    subtitle: "Swiss bio-functional prosthetics.",
-    category: "Prosthodontics",
-    heroImage: "https://images.unsplash.com/photo-1551601651-2a8555f1a136?auto=format&fit=crop&q=80&w=1200",
-    description: "High-quality dentures that use suction mechanics to stay firm without adhesives.",
-    longDescription: "Traditional dentures float and cause sores. BPS (Biofunctional Prosthetic System) Dentures are engineered to work with your facial muscles. They create a suction seal against the gums, allowing you to eat apples and corn without the teeth moving.",
-    stats: [
-      { label: "Fit", value: "Suction", icon: Shield },
-      { label: "Material", value: "Ivoclar", icon: Star },
-      { label: "Look", value: "Natural", icon: Smile }
-    ],
-    process: [
-      { title: "Primary Impression", desc: "Mapping the muscle borders." },
-      { title: "Bite Registration", desc: "Recording how your jaws meet." },
-      { title: "Try-In", desc: "Checking aesthetics with wax teeth." },
-      { title: "Processing", desc: "High-pressure injection molding for density." }
-    ],
-    benefits: [
-      "No Messy Adhesives Needed",
-      "Restores Facial Volume",
-      "Chew Hard Foods",
-      "Stain Resistant"
-    ],
-    faqs: [
-      { q: "Are they unbreakable?", a: "They are high-impact acrylic, much stronger than regular dentures, but care is still needed." }
-    ],
-    keywords: ["dentures", "false teeth", "bps", "suction", "old age"]
   }
 };
