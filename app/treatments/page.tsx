@@ -1,26 +1,16 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-// We will create this data file next
-import { treatmentsData } from '@/data/treatments';
-import { ArrowRight, Activity, Search, Stethoscope, Clock, Microscope } from 'lucide-react';
 import Link from 'next/link';
+import { treatmentsData } from '@/data/treatments';
+import { ArrowRight, Activity, Clock, Microscope, Search, Stethoscope } from 'lucide-react';
+import { RevealOnScroll } from '@/components/RevealOnScroll';
 
-// Simple Reveal Component since we don't have the original RevealOnScroll yet
-const Reveal = ({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) => (
-  <div className="animate-fade-in-up" style={{ animationDelay: `${delay}ms` }}>
-    {children}
-  </div>
-);
-
-export default function TreatmentsPage() {
+const TreatmentsPage = () => {
+  const treatmentsList = Object.values(treatmentsData);
   const [filter, setFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Fallback if data is missing (prevents crash before you add data/treatments.ts)
-  const data = treatmentsData || {};
-  const treatmentsList = Object.values(data);
-  
   const categories = ['All', 'Endodontics', 'Surgery', 'Orthodontics', 'Restorative', 'Preventive'];
   
   const filteredList = useMemo(() => {
@@ -39,9 +29,9 @@ export default function TreatmentsPage() {
     <div className="pt-32 pb-24 min-h-screen bg-slate-50 dark:bg-[#020617] transition-colors duration-500">
       <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16">
         
-        {/* Header */}
+        {/* Advanced Clinical Header */}
         <header className="mb-24">
-          <Reveal>
+          <RevealOnScroll>
             <div className="grid lg:grid-cols-2 gap-16 items-end">
                <div>
                   <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-blue-600/10 border border-blue-600/20 text-blue-600 dark:text-cyan-400 font-black text-[10px] uppercase tracking-[0.4em] mb-8">
@@ -72,24 +62,19 @@ export default function TreatmentsPage() {
                   </div>
                </div>
             </div>
-          </Reveal>
+          </RevealOnScroll>
         </header>
 
-        {/* Grid */}
+        {/* Treatment Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {filteredList.map((item: any, idx: number) => (
-            <Reveal key={item.id} delay={idx * 50}>
+            <RevealOnScroll key={item.id} delay={idx * 50}>
               <Link href={`/treatments/${item.id}`} className="block h-full">
                 <div 
                   className="group relative bg-white dark:bg-[#0B1019] rounded-[4rem] overflow-hidden cursor-pointer border border-slate-100 dark:border-white/5 hover:border-blue-500/40 transition-all duration-700 shadow-sm hover:shadow-2xl flex flex-col h-full hover:-translate-y-4"
                 >
                   <div className="relative h-96 overflow-hidden">
-                    {/* Image Fallback included */}
-                    <img 
-                      src={item.heroImage || 'https://via.placeholder.com/800'} 
-                      alt={item.title} 
-                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
-                    />
+                    <img src={item.heroImage} alt={item.title} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0B1019] via-transparent to-transparent opacity-80"></div>
                     <div className="absolute top-10 left-10 px-5 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-[10px] font-black uppercase tracking-widest text-white">{item.category}</div>
                   </div>
@@ -97,7 +82,7 @@ export default function TreatmentsPage() {
                   <div className="p-12 flex flex-col flex-1">
                     <div className="flex items-center gap-4 mb-8">
                        <div className="px-4 py-1.5 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                          <Activity size={12}/> Success
+                          <Activity size={12}/> {item.stats?.[2]?.value || '99%'} Success
                        </div>
                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2"><Clock size={12}/> Fast Recovery</span>
                     </div>
@@ -114,7 +99,31 @@ export default function TreatmentsPage() {
             </Reveal>
           ))}
         </div>
+
+        {/* Clinical Disclaimer */}
+        <footer className="mt-32 p-12 bg-slate-900 rounded-[4rem] text-white relative overflow-hidden group">
+           <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[100px] group-hover:scale-110 transition-transform"></div>
+           <div className="relative z-10 grid lg:grid-cols-2 gap-16 items-center">
+              <div>
+                 <h2 className="text-4xl font-black mb-6 tracking-tight">Quality Assurance Pulse.</h2>
+                 <p className="text-xl text-slate-400 leading-relaxed font-medium">Every procedure is logged via our Healthflo Dental OS and cross-verified against international ADA safety benchmarks.</p>
+              </div>
+              <div className="flex gap-12">
+                 <div>
+                    <div className="text-5xl font-black text-blue-400 mb-2">99.8%</div>
+                    <div className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em]">Safety Compliance</div>
+                 </div>
+                 <div className="h-16 w-px bg-white/10"></div>
+                 <div>
+                    <div className="text-5xl font-black text-blue-400 mb-2">24/7</div>
+                    <div className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em]">Clinical Triage</div>
+                 </div>
+              </div>
+           </div>
+        </footer>
       </div>
     </div>
   );
-}
+};
+
+export default TreatmentsPage;
