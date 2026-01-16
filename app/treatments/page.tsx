@@ -96,7 +96,7 @@ const TreatmentsPage = () => {
                   </div>
                 </div>
               </Link>
-            </Reveal>
+            </RevealOnScroll>
           ))}
         </div>
 
