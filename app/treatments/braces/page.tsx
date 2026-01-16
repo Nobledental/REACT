@@ -26,7 +26,10 @@ export default function BracesPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans transition-colors duration-500 overflow-x-hidden pt-20">
-      
+      {/* --- DEBUG BANNER (REMOVE LATER) --- */}
+    <div className="bg-red-600 text-white font-bold text-center p-4 fixed top-20 left-0 w-full z-[100]">
+      ✅ CUSTOM BRACES PAGE IS ACTIVE
+    </div>
       <div className="relative min-h-[90vh] w-full flex items-center justify-center overflow-hidden bg-white dark:bg-[#020617] transition-colors">
         <div className="absolute inset-0">
             <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-100 dark:bg-blue-600/10 rounded-full blur-[120px] animate-pulse"></div>
