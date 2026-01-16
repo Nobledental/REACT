@@ -1,9 +1,11 @@
+// app/treatments/[slug]/page.tsx
 import React from 'react';
 import { notFound } from 'next/navigation';
 import { treatmentsData } from '@/data/treatments';
 import TreatmentDetailClient from '@/components/TreatmentDetailClient';
 
-// This runs at build time on the server
+// This function tells GitHub Pages which pages to build
+// It runs at BUILD time on the server
 export function generateStaticParams() {
   return Object.keys(treatmentsData).map((slug) => ({
     slug: slug,
@@ -17,6 +19,7 @@ export default function TreatmentDetail({ params }: { params: { slug: string } }
     return notFound();
   }
 
-  // treatment is now a plain JSON object (no functions/icons)
+  // Pass data to the Client Component
+  // 'treatment' object now contains ONLY strings, numbers, arrays (no functions)
   return <TreatmentDetailClient treatment={treatment} />;
 }
