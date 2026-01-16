@@ -3,25 +3,31 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { 
-  ArrowLeft, Microscope, Zap, ShieldCheck, Clock, Activity, 
+  ArrowLeft, Zap, ShieldCheck, Clock, Activity, 
   Search, CheckCircle2, XCircle, AlertTriangle, ChevronRight, 
-  DollarSign, TrendingDown, Eye, Scan
+  DollarSign, TrendingDown, Eye, Scan, Thermometer, Moon, Info,
+  Drill, Layers
 } from 'lucide-react';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
 
 export default function RootCanalPage() {
-  const [lensPosition, setLensPosition] = useState({ x: 50, y: 50 });
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [activeTab, setActiveTab] = useState<'manual' | 'micro'>('micro');
+  const [cleaningProgress, setCleaningProgress] = useState(0);
+  const [activeSymptom, setActiveSymptom] = useState<number | null>(null);
+  const isClean = cleaningProgress >= 100;
 
-  // --- MOUSE TRACKING FOR "X-RAY LENS" ---
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setLensPosition({ x, y });
+  // --- INTERACTIVE CLEANING LOGIC ---
+  const handleScrub = (e: React.MouseEvent) => {
+    // Increment progress as user moves mouse over the infection
+    if (cleaningProgress < 100) {
+      setCleaningProgress(prev => Math.min(prev + 2, 100));
+    }
   };
+
+  const symptoms = [
+    { title: "Lingering Hot/Cold Sensitivity", desc: "If pain lasts >10 seconds after eating, the nerve is irreversibly damaged.", icon: Thermometer, color: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-900/20" },
+    { title: "Spontaneous Night Pain", desc: "Throbbing that wakes you up is a classic sign of pulpitis requiring RCT.", icon: Moon, color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-900/20" },
+    { title: "Pain on Chewing", desc: "Sharp pain when biting down often indicates infection at the root tip.", icon: Zap, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-900/20" },
+  ];
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans transition-colors duration-500 overflow-x-hidden pt-20">
@@ -46,15 +52,15 @@ export default function RootCanalPage() {
             <div className="space-y-8 order-2 lg:order-1">
                 <RevealOnScroll>
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 text-purple-600 dark:text-purple-400 font-bold text-[10px] uppercase tracking-[0.3em] mb-6">
-                        <Microscope size={12} /> Zeiss Extaro® Protocol
+                        <Activity size={12} /> Automated Rotary Protocol
                     </div>
                     <h1 className="text-5xl md:text-8xl font-black text-slate-900 dark:text-white leading-[0.9] tracking-tighter">
                         Don't Remove.<br/>
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-500">Revitalize.</span>
                     </h1>
                     <p className="text-xl text-slate-600 dark:text-slate-400 font-light leading-relaxed max-w-lg border-l-4 border-purple-500/50 pl-6 my-8">
-                        The <strong>Single-Visit Microscopic RCT</strong>. <br/>
-                        We use 25x magnification to find hidden bacteria that traditional dentistry misses.
+                        The <strong>Digital Rotary RCT</strong>. <br/>
+                        We use flexible titanium files and digital sensors to clean curved roots faster and more comfortably than traditional hand filing.
                     </p>
 
                     <div className="flex flex-wrap gap-4">
@@ -69,122 +75,167 @@ export default function RootCanalPage() {
                 </RevealOnScroll>
             </div>
 
-            {/* Right: INTERACTIVE MICROSCOPE LENS */}
+            {/* Right: INTERACTIVE "INFECTION WIPER" */}
             <div className="order-1 lg:order-2 flex justify-center">
                 <div 
-                  ref={containerRef}
-                  onMouseMove={handleMouseMove}
-                  className="relative w-[400px] h-[500px] bg-slate-100 dark:bg-slate-900 rounded-[3rem] border border-slate-200 dark:border-white/10 overflow-hidden cursor-crosshair shadow-2xl group"
+                  className="relative w-[350px] h-[500px] bg-slate-100 dark:bg-slate-900 rounded-[3rem] border border-slate-200 dark:border-white/10 overflow-hidden shadow-2xl group select-none"
+                  onMouseMove={handleScrub}
                 >
-                    {/* Layer 1: Blurry / Infected View (Background) */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-50 blur-sm grayscale">
-                        <svg viewBox="0 0 200 300" className="w-64 h-full">
-                            <path d="M60,20 Q100,0 140,20 Q160,50 150,100 L120,280 Q100,300 80,280 L50,100 Q40,50 60,20" fill="#cbd5e1" />
-                        </svg>
-                    </div>
-                    <div className="absolute top-10 w-full text-center text-slate-400 font-bold uppercase tracking-widest text-xs">
-                        Naked Eye View (Blurry)
-                    </div>
+                    <div className="absolute inset-0 bg-white dark:bg-[#0f172a] flex items-center justify-center">
+                        {/* THE TOOTH */}
+                        <div className="relative w-64 h-full py-10">
+                            <svg viewBox="0 0 200 400" className="w-full h-full drop-shadow-xl">
+                                {/* Tooth Outline */}
+                                <path d="M50,50 Q100,20 150,50 Q180,100 170,180 L140,380 Q100,400 60,380 L30,180 Q20,100 50,50" 
+                                      fill="#f8fafc" stroke="#94a3b8" strokeWidth="3" />
+                                
+                                {/* Root Canal Space (Mask for Infection) */}
+                                <mask id="canalMask">
+                                    <path d="M85,80 L75,350 Q100,370 125,350 L115,80 Q100,90 85,80" fill="white" />
+                                </mask>
 
-                    {/* Layer 2: The "Lens" (Clear View) */}
-                    <div 
-                        className="absolute inset-0 pointer-events-none"
-                        style={{
-                            maskImage: `radial-gradient(circle 100px at ${lensPosition.x}% ${lensPosition.y}%, black 100%, transparent 100%)`,
-                            WebkitMaskImage: `radial-gradient(circle 100px at ${lensPosition.x}% ${lensPosition.y}%, black 100%, transparent 100%)`
-                        }}
-                    >
-                        {/* High-Def Tooth with Canals */}
-                        <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-[#0f172a]">
-                             {/* Grid */}
-                             <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.1)_1px,transparent_1px)] bg-[size:20px_20px]"></div>
-                             
-                             <svg viewBox="0 0 200 300" className="w-64 h-full relative z-10">
-                                {/* Tooth Body */}
-                                <path d="M60,20 Q100,0 140,20 Q160,50 150,100 L120,280 Q100,300 80,280 L50,100 Q40,50 60,20" fill="none" stroke="#7c3aed" strokeWidth="2" />
-                                {/* Root Canals (The hidden detail) */}
-                                <path d="M85,40 L70,250" fill="none" stroke="#a78bfa" strokeWidth="2" strokeDasharray="4 4" className="animate-[dash_20s_linear_infinite]" />
-                                <path d="M115,40 L130,250" fill="none" stroke="#a78bfa" strokeWidth="2" strokeDasharray="4 4" className="animate-[dash_20s_linear_infinite_reverse]" />
-                                {/* Hidden MB2 Canal (The secret) */}
-                                <path d="M100,40 L100,180" fill="none" stroke="#f43f5e" strokeWidth="3" className="animate-pulse" />
-                                <circle cx="100" cy="180" r="4" fill="#f43f5e" className="animate-ping" />
+                                {/* 1. The Infection (Red) - Opacity controlled by progress */}
+                                <g mask="url(#canalMask)" style={{ opacity: 1 - (cleaningProgress / 100) }}>
+                                    <rect x="0" y="0" width="200" height="400" fill="#ef4444" />
+                                    {/* Bacteria Dots */}
+                                    {[...Array(20)].map((_, i) => (
+                                        <circle key={i} cx={70 + Math.random()*60} cy={100 + Math.random()*250} r={2 + Math.random()*4} fill="#7f1d1d" className="animate-pulse" />
+                                    ))}
+                                </g>
+
+                                {/* 2. The Clean Canal (Blue/White) - Revealed as infection fades */}
+                                <g mask="url(#canalMask)" style={{ opacity: cleaningProgress / 100 }}>
+                                    <rect x="0" y="0" width="200" height="400" fill="#dbeafe" />
+                                    <path d="M100,80 L100,350" stroke="#3b82f6" strokeWidth="2" strokeDasharray="4 4" />
+                                </g>
                             </svg>
+
+                            {/* Rotary File Animation (Only visible when cleaning) */}
+                            {cleaningProgress > 0 && cleaningProgress < 100 && (
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-32 bg-slate-400 animate-spin origin-top rounded-full blur-[1px]"></div>
+                            )}
                         </div>
                     </div>
 
-                    {/* Lens Border UI */}
-                    <div 
-                        className="absolute w-[200px] h-[200px] rounded-full border-2 border-purple-500/50 shadow-[0_0_30px_rgba(124,58,237,0.3)] pointer-events-none transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center"
-                        style={{ left: `${lensPosition.x}%`, top: `${lensPosition.y}%` }}
-                    >
-                        <div className="text-[10px] font-mono text-purple-500 mt-24 bg-black/80 px-2 py-1 rounded">25x ZOOM</div>
-                        <div className="absolute w-2 h-2 bg-purple-500 rounded-full"></div>
-                    </div>
-
-                    <div className="absolute bottom-8 w-full text-center">
-                        <span className="bg-black/80 text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest shadow-xl backdrop-blur-md">
-                            <Search size={12} className="inline mr-2" /> Move to Inspect
-                        </span>
+                    {/* UI Overlay */}
+                    <div className="absolute bottom-0 w-full p-6 bg-white/80 dark:bg-black/80 backdrop-blur-md border-t border-slate-200 dark:border-white/10">
+                        <div className="flex justify-between text-xs font-bold uppercase tracking-widest mb-2">
+                            <span className={isClean ? "text-green-500" : "text-red-500"}>
+                                {isClean ? "Canal Disinfected" : "Infection Detected"}
+                            </span>
+                            <span>{Math.round(cleaningProgress)}% Clean</span>
+                        </div>
+                        <div className="w-full h-2 bg-slate-200 dark:bg-white/20 rounded-full overflow-hidden">
+                            <div 
+                                className={`h-full transition-all duration-100 ${isClean ? 'bg-green-500' : 'bg-purple-600'}`}
+                                style={{ width: `${cleaningProgress}%` }}
+                            ></div>
+                        </div>
+                        {!isClean && (
+                            <p className="text-[10px] text-center mt-3 text-slate-500 animate-pulse">
+                                Hover over the tooth to clean infection
+                            </p>
+                        )}
                     </div>
                 </div>
             </div>
         </div>
       </div>
 
-      {/* ================= PAIN-FREE TECHNOLOGY ================= */}
-      <div className="bg-slate-50 dark:bg-slate-900 border-y border-slate-200 dark:border-white/5 py-32">
+      {/* ================= SYMPTOM DECODER ================= */}
+      <div className="max-w-7xl mx-auto px-6 py-32">
+          <RevealOnScroll>
+              <div className="text-center mb-16">
+                  <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Do I Need a Root Canal?</h2>
+                  <p className="text-slate-600 dark:text-slate-400">Common signs that the nerve inside your tooth is calling for help.</p>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-6">
+                  {symptoms.map((sym, i) => (
+                      <div 
+                        key={i}
+                        onMouseEnter={() => setActiveSymptom(i)}
+                        onMouseLeave={() => setActiveSymptom(null)}
+                        className={`p-8 rounded-3xl border transition-all duration-300 cursor-default ${
+                            activeSymptom === i 
+                            ? 'bg-white dark:bg-[#151b2b] border-purple-500 shadow-xl scale-105 z-10' 
+                            : 'bg-slate-50 dark:bg-white/5 border-transparent hover:border-slate-200 dark:hover:border-white/10'
+                        }`}
+                      >
+                          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${sym.bg} ${sym.color}`}>
+                              <sym.icon size={28} />
+                          </div>
+                          <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3">{sym.title}</h3>
+                          <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{sym.desc}</p>
+                      </div>
+                  ))}
+              </div>
+          </RevealOnScroll>
+      </div>
+
+      {/* ================= TECHNOLOGY (NO MICRO/WAND) ================= */}
+      <div className="bg-slate-100 dark:bg-slate-900 border-y border-slate-200 dark:border-white/5 py-32">
           <div className="max-w-7xl mx-auto px-6">
               <RevealOnScroll>
                   <div className="grid md:grid-cols-2 gap-16 items-center">
                       <div>
-                          <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-6">Forget the "Scary Syringe".</h2>
+                          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 text-blue-600 dark:text-blue-400 font-bold text-[10px] uppercase tracking-[0.3em] mb-6">
+                              <Zap size={12} /> Modern Endodontics
+                          </div>
+                          <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-6">Faster. Quieter. Safer.</h2>
                           <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed mb-8">
-                              The #1 fear in dentistry is the injection. We replaced it with **The Wand™**. 
-                              It's a computer-controlled system that delivers anesthesia drop-by-drop below your pain threshold.
+                              We threw out the manual hand files. Our clinic uses **Rotary Endodontics**—flexible titanium instruments that curve with your roots, cleaning them efficiently without the "scraping" sensation of older methods.
                           </p>
-                          <ul className="space-y-4">
-                              {[
-                                  "No 'Sting' sensation",
-                                  "Numbs only the tooth, not your whole face",
-                                  "Instant onset (No waiting)",
-                                  "Safe for High BP patients"
-                              ].map((item, i) => (
-                                  <li key={i} className="flex items-center gap-3 text-slate-700 dark:text-slate-300 font-medium">
-                                      <CheckCircle2 className="text-green-500" size={20} /> {item}
-                                  </li>
-                              ))}
-                          </ul>
+                          
+                          <div className="grid grid-cols-2 gap-6">
+                              <div className="p-4 bg-white dark:bg-black/20 rounded-2xl border border-slate-200 dark:border-white/5">
+                                  <Scan size={24} className="text-purple-500 mb-2" />
+                                  <h4 className="font-bold text-slate-900 dark:text-white text-sm">Digital Apex Locator</h4>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Beeps exactly when we reach the root tip. No guessing.</p>
+                              </div>
+                              <div className="p-4 bg-white dark:bg-black/20 rounded-2xl border border-slate-200 dark:border-white/5">
+                                  <Layers size={24} className="text-blue-500 mb-2" />
+                                  <h4 className="font-bold text-slate-900 dark:text-white text-sm">3-Step Numbing</h4>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Gel first, then spray, then a gentle injection. Minimal pinch.</p>
+                              </div>
+                          </div>
                       </div>
                       
-                      {/* Visual Meter */}
-                      <div className="bg-white dark:bg-[#151b2b] p-8 rounded-[2.5rem] border border-slate-200 dark:border-white/5 shadow-xl">
+                      {/* Visual Meter: Pain Perception */}
+                      <div className="bg-white dark:bg-[#151b2b] p-10 rounded-[2.5rem] border border-slate-200 dark:border-white/5 shadow-xl relative overflow-hidden">
+                          <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl"></div>
+                          
+                          <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-8">Patient Pain Perception</h3>
+                          
                           <div className="space-y-8">
                               <div>
                                   <div className="flex justify-between text-xs font-bold uppercase text-slate-400 mb-2">
-                                      <span>Traditional Shot</span>
-                                      <span className="text-red-500">Pain Level: High</span>
+                                      <span>What people expect</span>
+                                      <span className="text-red-500">8/10 Pain</span>
                                   </div>
-                                  <div className="h-4 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
-                                      <div className="h-full w-[80%] bg-gradient-to-r from-orange-400 to-red-500"></div>
+                                  <div className="h-3 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
+                                      <div className="h-full w-[80%] bg-red-400 rounded-full"></div>
                                   </div>
                               </div>
                               
                               <div>
                                   <div className="flex justify-between text-xs font-bold uppercase text-slate-400 mb-2">
-                                      <span>The Wand™ (Our Tech)</span>
-                                      <span className="text-green-500">Pain Level: Zero</span>
+                                      <span>Actual Experience</span>
+                                      <span className="text-green-500">1/10 (Pressure only)</span>
                                   </div>
-                                  <div className="h-4 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
-                                      <div className="h-full w-[5%] bg-green-500"></div>
+                                  <div className="h-3 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
+                                      <div className="h-full w-[10%] bg-green-500 rounded-full relative">
+                                          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full animate-ping"></div>
+                                      </div>
                                   </div>
                               </div>
                           </div>
                           
-                          <div className="mt-8 pt-8 border-t border-slate-100 dark:border-white/5 text-center">
-                              <div className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 font-black text-xl">
-                                  <Zap size={24} className="fill-current" /> "I didn't feel a thing."
-                              </div>
-                              <p className="text-xs text-slate-400 mt-2">- 98% of our patients</p>
+                          <div className="mt-8 p-4 bg-purple-50 dark:bg-purple-900/10 rounded-xl border border-purple-100 dark:border-purple-500/20 flex gap-3">
+                              <Info className="text-purple-600 shrink-0" size={20} />
+                              <p className="text-xs text-purple-800 dark:text-purple-300 font-medium">
+                                  RCT actually <strong>relieves</strong> the pain caused by infection. It doesn't cause it.
+                              </p>
                           </div>
                       </div>
                   </div>
@@ -216,22 +267,22 @@ export default function RootCanalPage() {
                       
                       <div className="space-y-4 mb-8 border-b border-slate-100 dark:border-white/5 pb-8">
                           <div className="flex justify-between text-sm">
-                              <span className="text-slate-500">Microscopic RCT</span>
-                              <span className="font-bold dark:text-white">₹8,000</span>
+                              <span className="text-slate-500">Rotary RCT</span>
+                              <span className="font-bold dark:text-white">₹5,000</span>
                           </div>
                           <div className="flex justify-between text-sm">
                               <span className="text-slate-500">Core Build-up</span>
                               <span className="font-bold dark:text-white">₹1,500</span>
                           </div>
                           <div className="flex justify-between text-sm">
-                              <span className="text-slate-500">Zirconia Crown</span>
-                              <span className="font-bold dark:text-white">₹10,000</span>
+                              <span className="text-slate-500">Ceramic Crown</span>
+                              <span className="font-bold dark:text-white">₹6,000</span>
                           </div>
                       </div>
                       
                       <div className="flex justify-between items-end">
                           <div className="text-xs text-slate-400 uppercase font-bold">Total Investment</div>
-                          <div className="text-3xl font-black text-green-600 dark:text-green-400">₹19,500</div>
+                          <div className="text-3xl font-black text-green-600 dark:text-green-400">₹12,500</div>
                       </div>
                   </div>
 
@@ -251,17 +302,17 @@ export default function RootCanalPage() {
                               <span className="font-bold dark:text-white">₹8,000</span>
                           </div>
                           <div className="flex justify-between text-sm">
-                              <span className="text-slate-500">Titanium Implant + Crown</span>
-                              <span className="font-bold dark:text-white">₹35,000</span>
+                              <span className="text-slate-500">Implant + Crown</span>
+                              <span className="font-bold dark:text-white">₹30,000</span>
                           </div>
                       </div>
                       
                       <div className="flex justify-between items-end">
                           <div className="text-xs text-slate-400 uppercase font-bold">Total Cost</div>
-                          <div className="text-3xl font-black text-red-500">₹46,000</div>
+                          <div className="text-3xl font-black text-red-500">₹41,000</div>
                       </div>
                       <div className="mt-4 text-xs text-center text-red-400 font-bold bg-red-100 dark:bg-red-900/20 py-2 rounded-lg">
-                          You lose ₹26,500 by extracting!
+                          You lose ₹28,500 by extracting!
                       </div>
                   </div>
 
@@ -274,8 +325,8 @@ export default function RootCanalPage() {
           <div className="max-w-7xl mx-auto px-6">
               <RevealOnScroll>
                   <div className="text-center mb-16">
-                      <h2 className="text-3xl font-bold mb-4">Transparency First.</h2>
-                      <p className="text-slate-400">Our microscopic pricing is competitive with standard "blind" treatments elsewhere.</p>
+                      <h2 className="text-3xl font-bold mb-4">Transparent Pricing.</h2>
+                      <p className="text-slate-400">Premium digital care at honest neighborhood prices.</p>
                   </div>
 
                   <div className="overflow-x-auto">
@@ -283,17 +334,17 @@ export default function RootCanalPage() {
                           <thead>
                               <tr className="border-b border-white/10 text-xs font-black uppercase tracking-widest text-slate-500">
                                   <th className="pb-6 pl-4">Treatment Type</th>
-                                  <th className="pb-6">Corporate Clinics</th>
-                                  <th className="pb-6 text-purple-400">Noble Dental (Microscopic)</th>
+                                  <th className="pb-6">Average Clinic</th>
+                                  <th className="pb-6 text-purple-400">Noble Dental</th>
                                   <th className="pb-6">Warranty</th>
                               </tr>
                           </thead>
                           <tbody className="text-sm font-medium">
                               {[
-                                  { name: "Standard RCT (Front Tooth)", mkt: "₹4,500 - ₹6,000", noble: "₹5,000", w: "5 Years" },
-                                  { name: "Multi-Root Molar RCT", mkt: "₹6,500 - ₹9,000", noble: "₹7,500", w: "10 Years" },
-                                  { name: "Re-Treatment (Failed RCT)", mkt: "₹10,000+", noble: "₹9,000", w: "Case Specific" },
-                                  { name: "Laser Disinfection Add-on", mkt: "₹2,000 Extra", noble: "Included", w: "-" },
+                                  { name: "Anterior RCT (Front Tooth)", mkt: "₹4,500 - ₹5,500", noble: "₹4,000", w: "5 Years" },
+                                  { name: "Molar RCT (Back Tooth)", mkt: "₹6,000 - ₹8,000", noble: "₹5,000", w: "10 Years" },
+                                  { name: "Re-Treatment (Failed RCT)", mkt: "₹8,000+", noble: "₹7,000", w: "Case Specific" },
+                                  { name: "Painless Anesthesia Add-on", mkt: "₹500 Extra", noble: "Included", w: "-" },
                               ].map((row, i) => (
                                   <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                                       <td className="py-6 pl-4 text-white font-bold">{row.name}</td>
