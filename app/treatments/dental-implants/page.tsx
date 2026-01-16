@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-/* Added Sparkles/Sparkles to imports */
+/* Added Play to the imports to fix the error */
 import { 
   ArrowLeft, Shield, Award, Activity, 
   Check, ScanLine, Cpu, Droplets, Ruler, User,
   Beaker, ShieldCheck, Microscope, Info, Zap,
   TrendingUp, Dna, Layers, Target, ChevronRight, ChevronLeft,
-  Sparkles, DollarSign, TrendingDown, AlertCircle, XCircle
+  Sparkles, DollarSign, TrendingDown, AlertCircle, XCircle, Play
 } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectCoverflow, Autoplay, Pagination, Navigation, Keyboard } from 'swiper/modules';
