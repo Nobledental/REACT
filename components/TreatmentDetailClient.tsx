@@ -1,15 +1,25 @@
+// components/TreatmentDetailClient.tsx
 'use client';
 
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2, Calendar, Shield, Activity, Clock, Play, Zap, ArrowRight, Layers, Star, Smile, Sparkles } from 'lucide-react';
+import { 
+  ArrowLeft, CheckCircle2, Calendar, Shield, Activity, Clock, Play, Zap, 
+  ArrowRight, Layers, Star, Smile, Sparkles, Ruler, Award, ShieldCheck, HeartPulse, Heart, Scan
+} from 'lucide-react';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
 import { TreatmentData } from '@/data/treatments';
 
 interface Props {
   treatment: TreatmentData;
 }
+
+// Map string names to components
+const IconMap: Record<string, any> = {
+  Clock, Ruler, Activity, Shield, Droplets: Activity, 
+  Star, Scan, Smile, ShieldCheck, HeartPulse, Award, Heart, Sparkles, Zap
+};
 
 export default function TreatmentDetailClient({ treatment }: Props) {
   const [activeStep, setActiveStep] = useState(0);
@@ -89,15 +99,18 @@ export default function TreatmentDetailClient({ treatment }: Props) {
       {/* --- STATS GRID --- */}
       <div className="bg-slate-900 border-y border-white/5 py-12">
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
-              {treatment.stats.map((stat, i) => (
-                  <div key={i} className="text-center border-r border-white/5 last:border-0">
-                      <div className="flex justify-center mb-3 text-blue-500">
-                          <stat.icon size={24} />
-                      </div>
-                      <div className="text-3xl md:text-4xl font-black text-white mb-2">{stat.value}</div>
-                      <div className="text-xs font-bold uppercase text-slate-500 tracking-widest">{stat.label}</div>
-                  </div>
-              ))}
+              {treatment.stats.map((stat, i) => {
+                  const IconComponent = IconMap[stat.icon] || Activity;
+                  return (
+                    <div key={i} className="text-center border-r border-white/5 last:border-0">
+                        <div className="flex justify-center mb-3 text-blue-500">
+                            <IconComponent size={24} />
+                        </div>
+                        <div className="text-3xl md:text-4xl font-black text-white mb-2">{stat.value}</div>
+                        <div className="text-xs font-bold uppercase text-slate-500 tracking-widest">{stat.label}</div>
+                    </div>
+                  );
+              })}
           </div>
       </div>
 
