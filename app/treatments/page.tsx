@@ -1,209 +1,129 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2, Shield, Activity, Clock, Play, Zap, ArrowRight, Layers } from 'lucide-react';
+import { treatmentsData } from '@/data/treatments';
+import { ArrowRight, Activity, Clock, Microscope, Search, Stethoscope } from 'lucide-react';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
 
-export default function DentalImplantsPage() {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+const TreatmentsPage = () => {
+  const treatmentsList = Object.values(treatmentsData);
+  const [filter, setFilter] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const [activeStep, setActiveStep] = useState(0);
-
-  const steps = [
-    { title: "3D Scan", desc: "Bone density mapping via CBCT." },
-    { title: "Placement", desc: "Titanium implant insertion." },
-    { title: "Integration", desc: "3-month biological healing." },
-    { title: "Loading", desc: "Final ceramic crown fixation." }
-  ];
+  const categories = ['All', 'Endodontics', 'Surgery', 'Orthodontics', 'Restorative', 'Preventive'];
+  
+  const filteredList = useMemo(() => {
+    return treatmentsList.filter((item: any) => {
+      const matchesFilter = filter === 'All' || item.category === filter;
+      const lowerQuery = searchQuery.toLowerCase().trim();
+      const matchesSearch = !lowerQuery || 
+        item.title.toLowerCase().includes(lowerQuery) ||
+        item.description.toLowerCase().includes(lowerQuery) ||
+        (item.keywords && item.keywords.some((k: string) => k.toLowerCase().includes(lowerQuery)));
+      return matchesFilter && matchesSearch;
+    });
+  }, [filter, searchQuery, treatmentsList]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-blue-500/30 overflow-x-hidden pt-20">
-      
-      {/* --- HERO SECTION --- */}
-      <div className="relative min-h-[90vh] w-full flex items-center justify-center overflow-hidden">
-        {/* Background Ambience */}
-        <div className="absolute inset-0 bg-[#020617]">
-            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-teal-600/10 rounded-full blur-[120px] animate-pulse"></div>
-            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px]"></div>
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
-        </div>
-
-        <div className="absolute top-6 left-6 z-30">
-             <Link href="/treatments" className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white hover:bg-white/10 transition-all text-xs font-bold uppercase tracking-widest group">
-                <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> Back
-             </Link>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-6 relative z-10 w-full grid lg:grid-cols-2 gap-16 items-center">
-            
-            <div className="space-y-8 order-2 lg:order-1">
-                <RevealOnScroll>
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 font-bold text-[10px] uppercase tracking-[0.3em] mb-6">
-                        <Shield size={12} /> Lifetime Warranty
-                    </div>
-                    <h1 className="text-5xl md:text-8xl font-black text-white leading-[0.9] tracking-tighter">
-                        Biological <br/>
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500">Stability.</span>
-                    </h1>
-                    <p className="text-xl text-slate-400 font-light leading-relaxed max-w-lg border-l-2 border-teal-500/30 pl-6 my-8">
-                        Replace missing teeth with Swiss-grade titanium anchors that fuse biologically with your jawbone.
-                    </p>
-
-                    <div className="flex flex-wrap gap-4">
-                        <button className="px-8 py-4 bg-teal-600 hover:bg-teal-500 text-white rounded-full font-bold shadow-[0_0_40px_-10px_rgba(20,184,166,0.5)] transition-all flex items-center gap-2">
-                            Book Scan
-                        </button>
-                        <button className="px-8 py-4 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-full font-bold transition-all flex items-center gap-2">
-                            <Play size={16} fill="currentColor" /> Virtual Surgery
-                        </button>
-                    </div>
-                </RevealOnScroll>
-            </div>
-
-            {/* Right: CUSTOM IMPLANT ANIMATION */}
-            <div className="order-1 lg:order-2 relative h-[500px] bg-slate-900/50 backdrop-blur-md rounded-[3rem] border border-white/10 flex items-center justify-center overflow-hidden shadow-2xl group">
-                
-                {/* Grid Background */}
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
-
-                {/* The Animated Screw (SVG) */}
-                <svg viewBox="0 0 200 400" className="w-64 h-full relative z-10 drop-shadow-2xl">
-                   <defs>
-                      <linearGradient id="metalGradient" x1="0" y1="0" x2="1" y2="0">
-                         <stop offset="0%" stopColor="#334155" />
-                         <stop offset="50%" stopColor="#94a3b8" />
-                         <stop offset="100%" stopColor="#334155" />
-                      </linearGradient>
-                   </defs>
-
-                   {/* Bone Tissue (Mask) */}
-                   <path d="M0,220 Q100,240 200,220 V400 H0 Z" fill="#ec4899" fillOpacity="0.05" className="animate-pulse" />
-
-                   {/* The Implant Screw - Rotating Animation */}
-                   <g className="animate-[spin_4s_linear_infinite_reverse]" style={{ transformOrigin: '100px 250px' }}>
-                      {/* Screw Threads */}
-                      <path 
-                        d="M70,150 L130,150 L140,170 L60,170 Z M60,180 L140,180 L130,200 L70,200 Z M70,210 L130,210 L140,230 L60,230 Z M60,240 L140,240 L130,260 L70,260 Z" 
-                        fill="url(#metalGradient)" 
-                      />
-                      {/* Main Body */}
-                      <rect x="80" y="260" width="40" height="100" fill="url(#metalGradient)" rx="5" />
-                   </g>
-
-                   {/* Abutment (Top Part) - Floating Down */}
-                   <g className="animate-[bounce_3s_infinite]">
-                      <rect x="75" y="100" width="50" height="40" fill="white" rx="5" stroke="#94a3b8" strokeWidth="2" />
-                      <path d="M75,100 L125,100 L130,80 L70,80 Z" fill="white" opacity="0.8" />
-                   </g>
-                </svg>
-
-                <div className="absolute bottom-10 bg-black/50 px-6 py-3 rounded-full text-xs font-bold text-white backdrop-blur-md border border-white/20 shadow-lg flex items-center gap-2">
-                   <Activity size={14} className="text-teal-400 animate-pulse" /> Osseointegration Active
-                </div>
-            </div>
-
-        </div>
-      </div>
-
-      {/* --- STATS GRID --- */}
-      <div className="bg-slate-900 border-y border-white/5 py-12">
-          <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
-              {[
-                  { label: "Success Rate", val: "99%", sub: "ITI Standards" },
-                  { label: "Material", val: "Ti-Grade 5", sub: "Biocompatible" },
-                  { label: "Warranty", val: "Lifetime", sub: "Global Coverage" },
-                  { label: "Healing", val: "12 Wks", sub: "Osseointegration" },
-              ].map((stat, i) => (
-                  <div key={i} className="text-center border-r border-white/5 last:border-0">
-                      <div className="text-3xl md:text-4xl font-black text-white mb-2">{stat.val}</div>
-                      <div className="text-xs font-bold uppercase text-teal-500 tracking-widest mb-1">{stat.label}</div>
-                      <div className="text-[10px] text-slate-500">{stat.sub}</div>
-                  </div>
-              ))}
-          </div>
-      </div>
-
-      {/* --- WORKFLOW --- */}
-      <div className="max-w-7xl mx-auto px-6 py-32">
+    <div className="pt-32 pb-24 min-h-screen bg-slate-50 dark:bg-[#020617] transition-colors duration-500">
+      <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16">
+        
+        {/* Advanced Clinical Header */}
+        <header className="mb-24">
           <RevealOnScroll>
-            <div className="text-center mb-24">
-                <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">The Reconstruction Protocol</h2>
-                <p className="text-slate-400 max-w-2xl mx-auto text-lg">
-                    A precise 4-step surgical protocol designed for minimal trauma and maximum stability.
-                </p>
+            <div className="grid lg:grid-cols-2 gap-16 items-end">
+               <div>
+                  <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-blue-600/10 border border-blue-600/20 text-blue-600 dark:text-cyan-400 font-black text-[10px] uppercase tracking-[0.4em] mb-8">
+                    <Stethoscope size={14}/> Surgical Catalog v4.0
+                  </div>
+                  <h1 className="text-6xl md:text-[9rem] font-black text-slate-900 dark:text-white leading-[0.8] tracking-tighter mb-10">
+                    Dental <br/>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500">Protocols.</span>
+                  </h1>
+                  <p className="text-2xl text-slate-500 dark:text-slate-400 max-w-2xl font-medium leading-tight">
+                    Evidence-based procedures designed for biological longevity and patient comfort.
+                  </p>
+               </div>
+               
+               <div className="space-y-8">
+                  <div className="relative group">
+                     <Search size={22} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                     <input 
+                        type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Describe symptoms (e.g. 'Toothache at night')..."
+                        className="w-full bg-white dark:bg-[#151b2b] border border-slate-200 dark:border-white/5 rounded-[3rem] py-7 pl-16 pr-8 text-lg font-bold shadow-xl focus:ring-4 focus:ring-blue-600/10 outline-none transition-all dark:text-white"
+                     />
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                     {categories.map(cat => (
+                        <button key={cat} onClick={() => setFilter(cat)} className={`px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border ${filter === cat ? 'bg-blue-600 text-white border-blue-600 shadow-xl' : 'bg-white dark:bg-white/5 text-slate-500 border-slate-200 dark:border-white/10 hover:border-blue-600'}`}>{cat}</button>
+                     ))}
+                  </div>
+               </div>
             </div>
           </RevealOnScroll>
+        </header>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {steps.map((step, i) => (
-                  <div 
-                    key={i}
-                    onMouseEnter={() => setActiveStep(i)}
-                    className={`p-8 rounded-[2rem] border transition-all duration-500 cursor-default group ${activeStep === i ? 'bg-teal-900/20 border-teal-500/50 scale-105 shadow-2xl' : 'bg-slate-900 border-white/5 hover:border-white/10'}`}
-                  >
-                      <div className="text-6xl font-black text-white/5 mb-6 group-hover:text-teal-500/10 transition-colors">0{i+1}</div>
-                      <h3 className={`text-xl font-bold mb-3 ${activeStep === i ? 'text-teal-400' : 'text-white'}`}>{step.title}</h3>
-                      <p className="text-slate-400 text-sm leading-relaxed">{step.desc}</p>
+        {/* Treatment Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          {filteredList.map((item: any, idx: number) => (
+            <RevealOnScroll key={item.id} delay={idx * 50}>
+              <Link href={`/treatments/${item.id}`} className="block h-full">
+                <div 
+                  className="group relative bg-white dark:bg-[#0B1019] rounded-[4rem] overflow-hidden cursor-pointer border border-slate-100 dark:border-white/5 hover:border-blue-500/40 transition-all duration-700 shadow-sm hover:shadow-2xl flex flex-col h-full hover:-translate-y-4"
+                >
+                  <div className="relative h-96 overflow-hidden">
+                    <img src={item.heroImage} alt={item.title} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B1019] via-transparent to-transparent opacity-80"></div>
+                    <div className="absolute top-10 left-10 px-5 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-[10px] font-black uppercase tracking-widest text-white">{item.category}</div>
                   </div>
-              ))}
-          </div>
-      </div>
+                  
+                  <div className="p-12 flex flex-col flex-1">
+                    <div className="flex items-center gap-4 mb-8">
+                       <div className="px-4 py-1.5 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                          <Activity size={12}/> {item.stats?.[2]?.value || '99%'} Success
+                       </div>
+                       <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2"><Clock size={12}/> Fast Recovery</span>
+                    </div>
+                    <h3 className="text-4xl font-bold text-slate-900 dark:text-white mb-6 group-hover:text-blue-600 transition-colors tracking-tighter leading-none">{item.title}</h3>
+                    <p className="text-lg text-slate-500 dark:text-slate-400 font-medium leading-relaxed mb-10 flex-1 line-clamp-3">{item.description}</p>
+                    
+                    <div className="pt-10 border-t border-slate-50 dark:border-white/5 mt-auto flex justify-between items-center">
+                       <span className="text-[11px] font-black uppercase tracking-[0.3em] text-blue-600 dark:text-cyan-400 flex items-center gap-2">Explore Logic <ArrowRight size={14}/></span>
+                       <div className="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all"><Microscope size={20}/></div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </RevealOnScroll>
+          ))}
+        </div>
 
-      {/* --- TECH SPECS --- */}
-      <div className="bg-white/5 py-32">
-          <div className="max-w-7xl mx-auto px-6">
-              <div className="grid md:grid-cols-3 gap-12">
-                  <div className="space-y-6">
-                      <div className="w-16 h-16 bg-blue-600/20 rounded-2xl flex items-center justify-center text-blue-400">
-                          <Layers size={32} />
-                      </div>
-                      <h3 className="text-2xl font-bold text-white">Bone Level</h3>
-                      <p className="text-slate-400 leading-relaxed">
-                          We place implants at the optimal bone level to preserve your facial structure and prevent the "sunken face" look of aging.
-                      </p>
-                  </div>
-                  <div className="space-y-6">
-                      <div className="w-16 h-16 bg-teal-600/20 rounded-2xl flex items-center justify-center text-teal-400">
-                          <Zap size={32} />
-                      </div>
-                      <h3 className="text-2xl font-bold text-white">SLA Active Surface</h3>
-                      <p className="text-slate-400 leading-relaxed">
-                          Our implants feature a chemically active surface that attracts blood proteins, cutting healing time by 50%.
-                      </p>
-                  </div>
-                  <div className="space-y-6">
-                      <div className="w-16 h-16 bg-purple-600/20 rounded-2xl flex items-center justify-center text-purple-400">
-                          <CheckCircle2 size={32} />
-                      </div>
-                      <h3 className="text-2xl font-bold text-white">Guided Surgery</h3>
-                      <p className="text-slate-400 leading-relaxed">
-                          We use 3D-printed surgical guides that fit over your gums, ensuring the implant is placed with 0.1mm accuracy.
-                      </p>
-                  </div>
+        {/* Clinical Disclaimer */}
+        <footer className="mt-32 p-12 bg-slate-900 rounded-[4rem] text-white relative overflow-hidden group">
+           <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[100px] group-hover:scale-110 transition-transform"></div>
+           <div className="relative z-10 grid lg:grid-cols-2 gap-16 items-center">
+              <div>
+                 <h2 className="text-4xl font-black mb-6 tracking-tight">Quality Assurance Pulse.</h2>
+                 <p className="text-xl text-slate-400 leading-relaxed font-medium">Every procedure is logged via our Healthflo Dental OS and cross-verified against international ADA safety benchmarks.</p>
               </div>
-          </div>
+              <div className="flex gap-12">
+                 <div>
+                    <div className="text-5xl font-black text-blue-400 mb-2">99.8%</div>
+                    <div className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em]">Safety Compliance</div>
+                 </div>
+                 <div className="h-16 w-px bg-white/10"></div>
+                 <div>
+                    <div className="text-5xl font-black text-blue-400 mb-2">24/7</div>
+                    <div className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em]">Clinical Triage</div>
+                 </div>
+              </div>
+           </div>
+        </footer>
       </div>
-
-      {/* --- CTA FOOTER --- */}
-      <div className="max-w-5xl mx-auto px-6 py-20 text-center">
-          <h2 className="text-3xl font-bold text-white mb-6">Invest in a permanent solution.</h2>
-          <p className="text-slate-400 mb-10">
-              Stop struggling with dentures or bridges. <br/> 
-              Get teeth that feel and function exactly like your own.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <button className="px-10 py-4 bg-white text-slate-900 rounded-full font-black uppercase text-xs tracking-widest hover:scale-105 transition-transform flex items-center gap-2 justify-center">
-                  Book 3D Scan <ArrowRight size={16} />
-              </button>
-              <button className="px-10 py-4 bg-transparent border border-white/20 text-white rounded-full font-black uppercase text-xs tracking-widest hover:bg-white/5 transition-all">
-                  View Cost Guide
-              </button>
-          </div>
-      </div>
-
     </div>
   );
-}
+};
+
+export default TreatmentsPage;
