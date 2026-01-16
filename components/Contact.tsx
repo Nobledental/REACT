@@ -5,27 +5,13 @@ import { Phone, MapPin, ArrowRight, MessageCircle, User, Stethoscope, FileText, 
 import { RevealOnScroll } from './RevealOnScroll';
 
 const Contact = () => {
-  const [dates, setDates] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
     service: 'General Consultation',
     doctor: 'Dr. Dhivakaran',
-    day: '',
-    time: '',
     notes: ''
   });
-
-  useEffect(() => {
-    const nextDays = [];
-    const today = new Date();
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(today);
-      d.setDate(today.getDate() + i);
-      nextDays.push(d.toLocaleDateString("en-IN", { weekday: "short", month: "short", day: "numeric" }));
-    }
-    setDates(nextDays);
-  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -33,7 +19,7 @@ const Contact = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const msg = `Hello Noble Dental! I'd like to book an appointment.\n\nName: ${formData.name}\nPhone: ${formData.phone}\nService: ${formData.service}\nDoctor: ${formData.doctor}\nPreferred: ${formData.day || 'Any day'} at ${formData.time || 'Any time'}\nNotes: ${formData.notes}`;
+    const msg = `Hello Noble Dental! I'd like to book an appointment.\n\nName: ${formData.name}\nPhone: ${formData.phone}\nService: ${formData.service}\nDoctor: ${formData.doctor}\nNotes: ${formData.notes}`;
     window.open(`https://wa.me/918610425342?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
@@ -76,7 +62,7 @@ const Contact = () => {
         }
       `}</style>
 
-      {/* Floating Background Icons for Visual Appeal */}
+      {/* Background Elements */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-[10%] left-[5%] animate-float opacity-20"><Plus size={40} className="text-blue-500" /></div>
         <div className="absolute top-[60%] left-[15%] animate-float opacity-10 [animation-delay:2s]"><Heart size={60} className="text-rose-500" /></div>
@@ -86,6 +72,7 @@ const Contact = () => {
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
             
+            {/* Contact Links */}
             <div className="lg:col-span-5 space-y-12">
                 <RevealOnScroll>
                    <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-cyan-400 font-black text-[10px] uppercase tracking-[0.3em] mb-4">
@@ -96,7 +83,7 @@ const Contact = () => {
                       <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-400">Our Priority.</span>
                    </h2>
                    <p className="text-xl text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-lg">
-                      Ready to experience pain-free dentistry? Choose your preferred contact method below or use our clinical reservation form.
+                      Ready to experience pain-free dentistry? Choose your preferred contact method below.
                    </p>
                 </RevealOnScroll>
 
@@ -130,12 +117,13 @@ const Contact = () => {
                                 <MapPin size={24} />
                             </div>
                             <h4 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Nallagandla</h4>
-                            <p className="text-sm font-bold text-slate-700 dark:text-slate-300 leading-tight">ICA Clinic Building, Nallagandla Main Road.</p>
+                            <p className="text-sm font-bold text-slate-700 dark:text-slate-300 leading-tight">ICA Clinic Building, Main Road.</p>
                         </div>
                     </RevealOnScroll>
                 </div>
             </div>
 
+            {/* Reservation Form */}
             <div className="lg:col-span-7">
                <RevealOnScroll delay={200}>
                   <div className="neon-card-wrapper">
@@ -147,8 +135,10 @@ const Contact = () => {
                                    <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Reserve clinical time.</h3>
                                    <div className="px-4 py-1.5 bg-green-500/10 text-green-600 dark:text-green-400 text-[10px] font-black uppercase tracking-widest rounded-full border border-green-500/20 animate-pulse">Accepting Patients</div>
                                </div>
+                               
                                <form onSubmit={handleSubmit} className="space-y-8">
                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                       {/* Inputs */}
                                        <div className="space-y-2">
                                            <label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Patient Name</label>
                                            <div className="relative group">
@@ -157,17 +147,17 @@ const Contact = () => {
                                            </div>
                                        </div>
                                        <div className="space-y-2">
-                                           <label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Contact Link</label>
+                                           <label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Phone</label>
                                            <div className="relative group">
                                                <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                               <input type="tel" name="phone" required onChange={handleChange} className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-5 pl-12 pr-4 font-bold" placeholder="+91 99999 99999" />
+                                               <input type="tel" name="phone" required onChange={handleChange} className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-5 pl-12 pr-4 font-bold" placeholder="+91..." />
                                            </div>
                                        </div>
                                        <div className="space-y-2">
                                            <label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Specialist</label>
                                            <div className="relative">
                                                <Stethoscope size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                               <select name="doctor" onChange={handleChange} className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-5 pl-12 appearance-none font-bold cursor-pointer">
+                                               <select name="doctor" onChange={handleChange} className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-5 pl-12 font-bold appearance-none">
                                                    <option>Dr. Dhivakaran (Implantology)</option>
                                                    <option>Dr. Roger Ronaldo (Surgery)</option>
                                                    <option>Dr. Deepak (Aligners)</option>
@@ -175,10 +165,10 @@ const Contact = () => {
                                            </div>
                                        </div>
                                        <div className="space-y-2">
-                                           <label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Service Type</label>
+                                           <label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Service</label>
                                            <div className="relative">
                                                <Sparkles size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                               <select name="service" onChange={handleChange} className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-5 pl-12 appearance-none font-bold cursor-pointer">
+                                               <select name="service" onChange={handleChange} className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-5 pl-12 font-bold appearance-none">
                                                    <option>General Checkup</option>
                                                    <option>Single Visit RCT</option>
                                                    <option>Invisalign Aligners</option>
@@ -186,13 +176,15 @@ const Contact = () => {
                                            </div>
                                        </div>
                                    </div>
+                                   
                                    <div className="space-y-2">
-                                       <label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Triage Notes (Optional)</label>
+                                       <label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Triage Notes</label>
                                        <div className="relative">
                                            <FileText size={18} className="absolute left-4 top-6 text-slate-400" />
-                                           <textarea name="notes" rows={3} onChange={handleChange} className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[2rem] py-5 pl-12 pr-4 font-bold resize-none" placeholder="Briefly describe your concerns..."></textarea>
+                                           <textarea name="notes" rows={2} onChange={handleChange} className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[2rem] py-5 pl-12 pr-4 font-bold resize-none" placeholder="Briefly describe your pain..."></textarea>
                                        </div>
                                    </div>
+
                                    <button type="submit" className="w-full bg-slate-900 dark:bg-blue-600 text-white font-black uppercase tracking-[0.3em] py-6 rounded-[2rem] shadow-xl hover:-translate-y-1 transition-all flex justify-center items-center gap-3 group">
                                        <span>Confirm Reservation</span>
                                        <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
