@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowRight, Play, Pause, SkipBack, SkipForward, Heart, Search, Share2, Sparkles, Bookmark, Bot, Loader2, X } from 'lucide-react';
-import { RevealOnScroll } from './RevealOnScroll';
-import { filterBlogsWithAi } from '@/services/geminiService'; // Updated import path for Next.js
+import Link from 'next/link';
+import { ArrowRight, Play, Pause, SkipBack, SkipForward, Heart, Share2, Sparkles, Bookmark, Bot, Loader2, X, Search } from 'lucide-react';
+import { RevealOnScroll } from '@/components/RevealOnScroll';
+import { filterBlogsWithAi } from '@/services/geminiService';
 
 // Refined CSS for Gallery & Blog Cards
 const cssStyles = `
@@ -34,6 +35,7 @@ const cssStyles = `
     }
   }
 
+  /* Left Media Section */
   .player-media {
     flex: 1.4;
     position: relative;
@@ -54,6 +56,7 @@ const cssStyles = `
     scale: 1.05;
   }
 
+  /* Right Content Section */
   .player-content {
     flex: 1;
     padding: 40px;
@@ -78,6 +81,7 @@ const cssStyles = `
   
   :global(.dark) .track-title { color: #fff; }
 
+  /* Blog Grid Horizontal Scroll */
   .blog-scroll-container {
     display: flex;
     overflow-x: auto;
@@ -255,7 +259,7 @@ const Gallery = () => {
   };
 
   return (
-    <section id="gallery" className="py-24 relative transition-colors duration-500 overflow-hidden">
+    <section id="gallery" className="py-24 relative transition-colors duration-500 overflow-hidden bg-slate-50 dark:bg-[#0B1019]">
       <style jsx global>{cssStyles}</style>
 
       {/* Section Header */}
@@ -270,7 +274,7 @@ const Gallery = () => {
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500">Expert Journal.</span>
              </h2>
              <p className="text-lg text-slate-500 dark:text-slate-400 max-w-xl font-medium leading-relaxed">
-                Deep-dives into clinical science and surgical technology.
+               Deep-dives into clinical science and surgical technology.
              </p>
           </div>
         </RevealOnScroll>
@@ -335,8 +339,8 @@ const Gallery = () => {
         <div className="mt-32">
            <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-8">
               <RevealOnScroll>
-                  <h3 className="text-3xl md:text-5xl font-black tracking-tight dark:text-white">Latest From The Journal</h3>
-                  <p className="text-slate-500 font-medium mt-2">Expert perspectives on modern clinical care.</p>
+                 <h3 className="text-3xl md:text-5xl font-black tracking-tight dark:text-white">Latest From The Journal</h3>
+                 <p className="text-slate-500 font-medium mt-2">Expert perspectives on modern clinical care.</p>
               </RevealOnScroll>
               
               <div className="flex flex-col gap-4 w-full max-w-md">
@@ -361,16 +365,16 @@ const Gallery = () => {
                        )}
                     </div>
                     <button 
-                      onClick={handleAiSearch}
-                      disabled={isAiSearching || !searchQuery.trim()}
-                      className={`h-11 px-5 rounded-full flex items-center gap-2 font-black text-[10px] uppercase tracking-widest transition-all ${
-                        isAiSearching 
-                        ? 'bg-slate-100 dark:bg-white/5 text-slate-400 cursor-not-allowed'
-                        : 'bg-blue-600 text-white shadow-lg shadow-blue-500/25 hover:bg-blue-700 active:scale-95'
-                      }`}
+                       onClick={handleAiSearch}
+                       disabled={isAiSearching || !searchQuery.trim()}
+                       className={`h-11 px-5 rounded-full flex items-center gap-2 font-black text-[10px] uppercase tracking-widest transition-all ${
+                         isAiSearching 
+                         ? 'bg-slate-100 dark:bg-white/5 text-slate-400 cursor-not-allowed'
+                         : 'bg-blue-600 text-white shadow-lg shadow-blue-500/25 hover:bg-blue-700 active:scale-95'
+                       }`}
                     >
-                      {isAiSearching ? <Loader2 size={14} className="animate-spin" /> : <Bot size={14} />}
-                      AI Search
+                       {isAiSearching ? <Loader2 size={14} className="animate-spin" /> : <Bot size={14} />}
+                       AI Search
                     </button>
                  </div>
                  {aiFilteredIndices !== null && (
@@ -420,15 +424,5 @@ const Gallery = () => {
            </div>
 
            <div className="text-center mt-12">
-              <button className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-blue-600 transition-colors group">
-                 Open Editorial Journal <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />
-              </button>
-           </div>
-        </div>
-
-      </div>
-    </section>
-  );
-};
-
-export default Gallery;
+              <Link href="/gallery" className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-blue-600 transition-colors group">
+                 Open Clinical Archives <ArrowRight size={16} className="group-hover:translate-
