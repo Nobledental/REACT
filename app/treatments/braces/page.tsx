@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   ArrowLeft, CheckCircle2, Shield, Sparkles, Zap, ChevronRight, 
-  Play, ArrowRight, Clock, Activity, Scan, Smile, XCircle, Check, AlertCircle 
+  Play, ArrowRight, Clock, Activity, Scan, Smile, XCircle, Check, AlertCircle, 
+  TrendingDown, BrainCircuit, Cpu, Info
 } from 'lucide-react';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
 
@@ -47,6 +48,13 @@ export default function BracesPage() {
     ]
   };
 
+  const pricingData = [
+    { type: "Metal Braces", market: "₹35,000 - ₹45,000", noble: "₹28,000", savings: "Save ₹7k+", feature: "Durable & Classic" },
+    { type: "Ceramic", market: "₹60,000 - ₹75,000", noble: "₹48,000", savings: "Save ₹12k+", feature: "Tooth-Colored" },
+    { type: "Self-Ligating", market: "₹75,000 - ₹95,000", noble: "₹65,000", savings: "Save ₹10k+", feature: "Fast & Frictionless" },
+    { type: "Invisible", market: "₹1.5L - ₹3.5L", noble: "₹1.2L", savings: "Save ₹30k+", feature: "Clear Aligners" },
+  ];
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans transition-colors duration-500 overflow-x-hidden pt-20">
       
@@ -77,7 +85,7 @@ export default function BracesPage() {
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-500">Biomechanics.</span>
                     </h1>
                     <p className="text-xl text-slate-600 dark:text-slate-400 font-light leading-relaxed max-w-lg border-l-2 border-blue-200 dark:border-blue-500/30 pl-6 my-8">
-                        We combine <strong>CBCT Jaw Analysis</strong> and <strong>Smart-Wire Technology</strong> to create smiles that fit your face perfectly.
+                        We combine <strong>CBCT Jaw Analysis</strong> and <strong>AI-Driven Growth Prediction</strong> to create smiles that fit your face perfectly.
                     </p>
 
                     <div className="flex flex-wrap gap-4">
@@ -143,37 +151,86 @@ export default function BracesPage() {
         </div>
       </div>
 
-      {/* ================= STATS GRID ================= */}
-      <div className="bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-white/5 py-12 transition-colors">
-          <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
-              {[
-                  { label: "Smiles Aligned", val: "650+", sub: "Successful Cases" },
-                  { label: "Avg Duration", val: "18mo", sub: "Fast-Track Protocol" },
-                  { label: "Technology", val: "Damon", sub: "Self-Ligating System" },
-                  { label: "Age Range", val: "7-55", sub: "Kids & Adults" },
-              ].map((stat, i) => (
-                  <div key={i} className="text-center border-r border-slate-200 dark:border-white/5 last:border-0">
-                      <div className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mb-2">{stat.val}</div>
-                      <div className="text-xs font-bold uppercase text-teal-600 dark:text-teal-500 tracking-widest mb-1">{stat.label}</div>
-                      <div className="text-[10px] text-slate-500">{stat.sub}</div>
+      {/* ================= AI & TECH SECTION (NEW) ================= */}
+      <div className="bg-slate-50 dark:bg-slate-900 border-y border-slate-200 dark:border-white/5 py-24">
+          <div className="max-w-7xl mx-auto px-6">
+              <RevealOnScroll>
+                  <div className="grid md:grid-cols-3 gap-12 text-center">
+                      <div className="space-y-4">
+                          <div className="mx-auto w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400">
+                              <BrainCircuit size={32} />
+                          </div>
+                          <h3 className="text-xl font-bold text-slate-900 dark:text-white">AI Treatment Planning</h3>
+                          <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                              We use predictive AI to simulate 18 months of movement, ensuring your roots land in safe bone.
+                          </p>
+                      </div>
+                      <div className="space-y-4">
+                          <div className="mx-auto w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center text-purple-600 dark:text-purple-400">
+                              <Cpu size={32} />
+                          </div>
+                          <h3 className="text-xl font-bold text-slate-900 dark:text-white">Smart-Wire Tech</h3>
+                          <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                              Heat-activated CuNiTi wires apply constant, gentle force that works 24/7 with less soreness.
+                          </p>
+                      </div>
+                      <div className="space-y-4">
+                          <div className="mx-auto w-16 h-16 bg-teal-100 dark:bg-teal-900/30 rounded-full flex items-center justify-center text-teal-600 dark:text-teal-400">
+                              <Scan size={32} />
+                          </div>
+                          <h3 className="text-xl font-bold text-slate-900 dark:text-white">Digital Bonding</h3>
+                          <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                              Brackets are placed digitally on screen first, then 3D printed guides transfer them to your teeth.
+                          </p>
+                      </div>
                   </div>
-              ))}
+              </RevealOnScroll>
           </div>
       </div>
 
-      {/* ================= JOURNEY TIMELINE ================= */}
+      {/* ================= HYDERABAD PRICING MATRIX (NEW) ================= */}
       <div className="max-w-7xl mx-auto px-6 py-32">
           <RevealOnScroll>
-            <div className="text-center mb-20">
-                <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">The Alignment Roadmap</h2>
-                <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-lg">
-                    Biology takes time. We move teeth gently to ensure the roots and bone remain healthy.
-                </p>
-            </div>
-          </RevealOnScroll>
+              <div className="text-center mb-16">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-xs font-bold uppercase tracking-widest mb-4">
+                      <TrendingDown size={14} /> Best Price Guarantee
+                  </div>
+                  <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">Hyderabad Market Pricing</h2>
+                  <p className="text-slate-600 dark:text-slate-400">Transparent pricing. No hidden fees. 5k-10k less than average clinics.</p>
+              </div>
 
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {pricingData.map((plan, i) => (
+                      <div key={i} className="relative group bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-white/10 p-8 hover:border-blue-500/50 transition-all duration-300 hover:-translate-y-2 overflow-hidden">
+                          {/* Holographic BG on Hover */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/5 group-hover:to-purple-500/5 transition-all duration-500"></div>
+                          
+                          <div className="relative z-10">
+                              <div className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-2">{plan.type}</div>
+                              <div className="text-3xl font-black text-slate-900 dark:text-white mb-4">{plan.noble}</div>
+                              
+                              <div className="flex items-center gap-2 text-xs text-slate-400 mb-6 pb-6 border-b border-slate-100 dark:border-white/5">
+                                  <span className="line-through decoration-red-500/50">Market: {plan.market}</span>
+                              </div>
+
+                              <div className="flex items-center justify-between">
+                                  <span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded">{plan.feature}</span>
+                                  <span className="text-xs font-bold text-green-600 dark:text-green-400 flex items-center gap-1">
+                                      <TrendingDown size={12} /> {plan.savings}
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                  ))}
+              </div>
+          </RevealOnScroll>
+      </div>
+
+      {/* ================= JOURNEY TIMELINE ================= */}
+      <div className="max-w-7xl mx-auto px-6 py-20">
           <div className="grid lg:grid-cols-2 gap-16">
               <div className="space-y-4">
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-8">Treatment Timeline</h3>
                   {journeyStages.map((stage, idx) => (
                       <div 
                         key={idx}
@@ -195,7 +252,7 @@ export default function BracesPage() {
                   ))}
               </div>
 
-              <div className="relative bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-white/10 p-10 flex flex-col justify-center items-center text-center shadow-2xl">
+              <div className="relative bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-white/10 p-10 flex flex-col justify-center items-center text-center shadow-2xl h-fit sticky top-32">
                   <div className="absolute inset-0 bg-blue-50 dark:bg-blue-600/5 rounded-[2.5rem]"></div>
                   <div className="w-20 h-20 bg-blue-100 dark:bg-blue-500/10 rounded-full flex items-center justify-center mb-8 animate-pulse text-blue-600 dark:text-blue-400">
                       <Clock size={32} />
@@ -212,46 +269,8 @@ export default function BracesPage() {
           </div>
       </div>
 
-      {/* ================= NEW SECTION: COMPARISON MATRIX ================= */}
-      <div className="bg-slate-50 dark:bg-slate-900 py-32 border-y border-slate-200 dark:border-white/5">
-          <div className="max-w-7xl mx-auto px-6">
-              <RevealOnScroll>
-                  <div className="text-center mb-16">
-                      <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Compare Systems</h2>
-                      <p className="text-slate-600 dark:text-slate-400">Which option fits your lifestyle?</p>
-                  </div>
-                  
-                  <div className="overflow-x-auto">
-                      <div className="min-w-[800px] grid grid-cols-4 gap-4 text-sm">
-                          {/* Headers */}
-                          <div className="col-span-1"></div>
-                          <div className="col-span-1 font-bold text-slate-900 dark:text-white text-center bg-white dark:bg-white/5 p-4 rounded-t-2xl shadow-sm">Metal Braces</div>
-                          <div className="col-span-1 font-bold text-slate-900 dark:text-white text-center bg-white dark:bg-white/5 p-4 rounded-t-2xl shadow-sm">Ceramic</div>
-                          <div className="col-span-1 font-bold text-blue-600 dark:text-blue-400 text-center bg-blue-50 dark:bg-blue-900/20 p-4 rounded-t-2xl border-b-2 border-blue-500 shadow-sm">Invisalign</div>
-
-                          {/* Rows */}
-                          {[
-                              { label: "Visibility", metal: "High", ceramic: "Low", align: "Invisible" },
-                              { label: "Hygiene", metal: "Difficult", ceramic: "Difficult", align: "Easy (Removable)" },
-                              { label: "Comfort", metal: "Fair", ceramic: "Good", align: "Excellent" },
-                              { label: "Speed", metal: "Fastest", ceramic: "Fast", align: "Moderate" },
-                              { label: "Cost", metal: "₹", ceramic: "₹₹", align: "₹₹₹" },
-                          ].map((row, i) => (
-                              <React.Fragment key={i}>
-                                  <div className="font-bold text-slate-500 dark:text-slate-400 p-4 flex items-center">{row.label}</div>
-                                  <div className="bg-white dark:bg-white/5 p-4 text-center text-slate-700 dark:text-slate-300 flex items-center justify-center rounded-lg">{row.metal}</div>
-                                  <div className="bg-white dark:bg-white/5 p-4 text-center text-slate-700 dark:text-slate-300 flex items-center justify-center rounded-lg">{row.ceramic}</div>
-                                  <div className="bg-blue-50/50 dark:bg-blue-900/10 p-4 text-center text-slate-900 dark:text-white font-bold flex items-center justify-center border border-blue-200 dark:border-blue-800 rounded-lg">{row.align}</div>
-                              </React.Fragment>
-                          ))}
-                      </div>
-                  </div>
-              </RevealOnScroll>
-          </div>
-      </div>
-
       {/* ================= NEW SECTION: LIFE WITH BRACES (Interactive) ================= */}
-      <div className="max-w-7xl mx-auto px-6 py-32">
+      <div className="max-w-7xl mx-auto px-6 py-32 border-t border-slate-200 dark:border-white/5">
           <RevealOnScroll>
               <div className="grid lg:grid-cols-2 gap-16 items-center">
                   <div>
@@ -304,37 +323,6 @@ export default function BracesPage() {
                   </div>
               </div>
           </RevealOnScroll>
-      </div>
-
-      {/* ================= HARDWARE SELECTION ================= */}
-      <div className="bg-white/50 dark:bg-white/5 py-32">
-          <div className="max-w-7xl mx-auto px-6">
-              <div className="text-center mb-16">
-                  <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Choose Your Hardware</h2>
-                  <p className="text-slate-600 dark:text-slate-400">From classic metal to invisible ceramic, pick what fits your lifestyle.</p>
-              </div>
-
-              <div className="grid md:grid-cols-3 gap-8">
-                  {[
-                      { name: "Metal Braces", desc: "Durable & classic. Best for complex surgical cases.", icon: Shield, color: "text-slate-400" },
-                      { name: "Ceramic", desc: "Tooth-colored brackets. Discreet aesthetic for adults.", icon: Smile, color: "text-orange-400" },
-                      { name: "Damon System", desc: "Self-ligating. Faster movement, less friction, no elastics.", icon: Zap, color: "text-blue-400" },
-                  ].map((type, i) => (
-                      <RevealOnScroll key={i} delay={i * 100}>
-                          <div className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 hover:border-blue-300 dark:hover:border-blue-500/50 transition-all group hover:-translate-y-2 shadow-lg dark:shadow-none">
-                              <div className={`w-14 h-14 bg-slate-100 dark:bg-white/5 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform ${type.color}`}>
-                                  <type.icon size={32} />
-                              </div>
-                              <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{type.name}</h4>
-                              <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">
-                                  {type.desc}
-                              </p>
-                              <div className="w-full h-px bg-slate-100 dark:bg-white/10 group-hover:bg-blue-500/50 transition-colors"></div>
-                          </div>
-                      </RevealOnScroll>
-                  ))}
-              </div>
-          </div>
       </div>
 
       {/* ================= CTA FOOTER ================= */}
