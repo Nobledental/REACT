@@ -19,3 +19,16 @@ export interface Testimonial {
   rating: number;
   text: string;
 }
+
+// NEW: Chat Types
+export interface Source {
+  title: string;
+  uri: string;
+}
+
+export interface ChatMessage {
+  role: 'user' | 'model';
+  text: string;
+  timestamp: number;
+  sources?: Source[];
+}
