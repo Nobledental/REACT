@@ -1,5 +1,3 @@
-// types.ts
-
 export interface Doctor {
   id: string;
   name: string;
@@ -20,7 +18,6 @@ export interface Testimonial {
   text: string;
 }
 
-// NEW: Chat Types
 export interface Source {
   title: string;
   uri: string;
