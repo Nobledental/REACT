@@ -1,6 +1,4 @@
-// REMOVE icon imports from 'lucide-react' at the top
-// You only need the types if you want them, but for data, just strings.
-
+// data/treatments.ts
 export interface TreatmentStep {
   title: string;
   desc: string;
@@ -19,7 +17,7 @@ export interface TreatmentData {
   heroImage: string;
   description: string;
   longDescription: string;
-  // CHANGE icon type to string
+  // Icons are now strings to avoid serialization errors
   stats: { label: string; value: string; icon: string }[]; 
   process: TreatmentStep[];
   benefits: string[];
