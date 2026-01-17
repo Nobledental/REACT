@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useRef, useEffect, ReactNode } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+/* --- FIXED IMPORTS: Added 'X' and 'CheckCircle' --- */
 import { 
   ArrowRight, Play, Pause, SkipBack, SkipForward, Heart, Share2, 
   Sparkles, Bookmark, Activity, ShieldAlert, ShieldCheck,
   Scan, Database, Wifi, ArrowDown, Zap, AlertTriangle,
-  Microscope, Layers, Droplets, Flame, Skull, Anchor, Wind
+  Microscope, Layers, Droplets, Skull, Anchor, X, CheckCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
@@ -32,7 +33,7 @@ const wideCardStyles = `
   @media (min-width: 1024px) {
     .unified-player-card {
       flex-direction: row;
-      height: 600px; /* Taller for complex visuals */
+      height: 600px; 
     }
   }
 
@@ -43,9 +44,9 @@ const wideCardStyles = `
   }
 
   .player-media {
-    flex: 1.4; /* Give visuals more space (60/40 split) */
+    flex: 1.4;
     position: relative;
-    background: #020617; /* Deepest slate for contrast */
+    background: #020617; 
     min-height: 400px;
     overflow: hidden;
     display: flex;
@@ -60,7 +61,7 @@ const wideCardStyles = `
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    background: rgba(255,255,255,0.02); /* Subtle texture */
+    background: rgba(255,255,255,0.02);
   }
   
   .track-title {
@@ -68,7 +69,6 @@ const wideCardStyles = `
     letter-spacing: -0.03em;
   }
 
-  /* HUD / Info Overlay Styles */
   .hud-container {
     position: absolute;
     inset: 0;
@@ -95,7 +95,6 @@ const wideCardStyles = `
     transform-origin: center;
   }
 
-  /* Grid Background for Technical Feel */
   .tech-grid {
     background-size: 40px 40px;
     background-image: 
@@ -116,16 +115,14 @@ const ImplantStory = () => {
     <div className="relative w-full h-full bg-slate-950 flex flex-col items-center justify-center overflow-hidden">
       <div className="tech-grid"></div>
       
-      {/* Container for Split View */}
       <div className="flex w-full h-full relative z-10">
         
-        {/* LEFT: BONE LOSS (The Problem) */}
+        {/* LEFT: BONE LOSS */}
         <div className="flex-1 flex flex-col items-center justify-end pb-20 border-r border-white/5 relative group">
            <div className="absolute top-10 left-10 anim-info-box border-red-500/50 text-red-400">
              <AlertTriangle size={12} /> Bone Resorption
            </div>
            
-           {/* Animated Bone Shrinking */}
            <div className="w-32 bg-slate-800/50 h-64 rounded-t-lg relative overflow-hidden border border-white/10">
               <motion.div 
                 initial={{ height: '100%' }}
@@ -133,11 +130,9 @@ const ImplantStory = () => {
                 transition={{ duration: 6, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
                 className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-red-900/40 to-slate-800 w-full"
               >
-                 {/* Trabecular Bone Pattern */}
                  <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '8px 8px' }}></div>
               </motion.div>
               
-              {/* Ghost Tooth (Missing) */}
               <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-20">
                  <Skull size={40} className="text-slate-500" />
               </div>
@@ -145,19 +140,17 @@ const ImplantStory = () => {
            <p className="text-[10px] text-slate-500 mt-4 uppercase tracking-widest font-bold">Unstimulated Bone</p>
         </div>
 
-        {/* RIGHT: OSSEOINTEGRATION (The Solution) */}
+        {/* RIGHT: OSSEOINTEGRATION */}
         <div className="flex-1 flex flex-col items-center justify-end pb-20 relative">
            <div className="absolute top-10 right-10 anim-info-box border-blue-500/50 text-blue-400">
              <Anchor size={12} /> Titanium Fusion
            </div>
 
            <div className="w-32 bg-slate-800/50 h-64 rounded-t-lg relative overflow-hidden border border-white/10 flex justify-center">
-              {/* Healthy Bone Level */}
               <div className="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-slate-800 h-full">
                  <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '8px 8px' }}></div>
               </div> 
               
-              {/* THE IMPLANT SCREW (SVG) */}
               <motion.div
                  initial={{ y: -200 }}
                  animate={{ y: 20 }}
@@ -166,7 +159,6 @@ const ImplantStory = () => {
               >
                  <svg viewBox="0 0 40 120" fill="none" className="w-full h-full filter drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]">
                     <path d="M5 0H35V10L30 15V110L20 120L10 110V15L5 10V0Z" fill="url(#titanium_grad)" />
-                    {/* Threads */}
                     {[...Array(10)].map((_,i) => (
                        <path key={i} d={`M5 ${20 + i*9}H35`} stroke="rgba(0,0,0,0.3)" strokeWidth="1"/>
                     ))}
@@ -180,7 +172,6 @@ const ImplantStory = () => {
                  </svg>
               </motion.div>
 
-              {/* OSTEOBLAST ACTIVITY (Cells Attaching) */}
               {[...Array(8)].map((_, i) => (
                  <motion.div
                     key={i}
@@ -207,41 +198,36 @@ const ImplantStory = () => {
 const VeneerStory = () => {
   return (
     <div className="relative w-full h-full bg-black flex items-center justify-center">
-      {/* Background Reflection */}
       <div className="absolute inset-0 bg-gradient-to-tr from-purple-900/10 to-blue-900/10"></div>
 
       <div className="flex gap-16 items-center z-10">
          
-         {/* 1. THE FAKE (Monolithic) */}
+         {/* 1. THE FAKE */}
          <div className="flex flex-col items-center opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
             <div className="relative w-28 h-36 bg-white rounded-md mb-6 shadow-xl border border-slate-300 flex items-center justify-center">
                <span className="text-[10px] text-slate-400 font-mono rotate-[-45deg] opacity-50">NO DEPTH</span>
             </div>
+            {/* FIX: 'X' is now imported correctly */}
             <div className="anim-info-box !relative !inset-0 border-red-500 text-red-400">
                <X size={12}/> Opaque Block
             </div>
          </div>
 
-         {/* Arrow */}
          <div className="text-slate-600"><ArrowRight size={24}/></div>
 
-         {/* 2. THE TRUE (Layered) */}
+         {/* 2. THE TRUE */}
          <div className="flex flex-col items-center">
             <div className="relative w-28 h-36 mb-6 perspective-[1000px] group">
-               
-               {/* Layer 1: Dentin (Warm Core) */}
                <motion.div 
                   initial={{ z: -20, opacity: 0 }} animate={{ z: 0, opacity: 1 }} transition={{ delay: 0.5, duration: 1 }}
                   className="absolute inset-0 bg-gradient-to-b from-amber-100 to-amber-300 rounded-md border border-amber-200/50"
                   style={{ transformStyle: 'preserve-3d' }}
                />
                
-               {/* Layer 2: Enamel (Translucent Shell) */}
                <motion.div 
                   initial={{ z: 20, opacity: 0 }} animate={{ z: 0, opacity: 0.7 }} transition={{ delay: 1.5, duration: 1 }}
                   className="absolute inset-[-2px] bg-gradient-to-b from-blue-50/40 to-transparent rounded-md border border-white/60 backdrop-blur-[1px] shadow-[0_0_30px_rgba(255,255,255,0.3)]"
                >
-                  {/* Light Physics */}
                   <motion.div 
                      animate={{ left: ['-100%', '200%'] }}
                      transition={{ duration: 4, repeat: Infinity, ease: "linear", delay: 3 }}
@@ -249,15 +235,15 @@ const VeneerStory = () => {
                   />
                </motion.div>
 
-               {/* Internal Structure Lines */}
                <svg className="absolute inset-0 w-full h-full opacity-30" viewBox="0 0 100 100" preserveAspectRatio="none">
                   <path d="M20 100 Q 50 20 80 100" stroke="orange" strokeWidth="0.5" fill="none" />
                   <path d="M10 100 Q 50 10 90 100" stroke="orange" strokeWidth="0.5" fill="none" />
                </svg>
             </div>
             
+            {/* FIX: 'CheckCircle' is now imported */}
             <div className="anim-info-box !relative !inset-0 border-green-500 text-green-400">
-               <Layers size={12}/> Biomimetic Depth
+               <CheckCircle size={12}/> Biomimetic Layering
             </div>
          </div>
       </div>
@@ -271,7 +257,6 @@ const HeartMouthStory = () => {
     <div className="relative w-full h-full bg-slate-950 flex flex-col justify-center px-12 overflow-hidden">
        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-red-900/10 via-slate-950 to-slate-950"></div>
 
-       {/* Flow Path */}
        <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
           <path id="bloodstream" d="M 100 150 C 300 150, 400 300, 600 300" stroke="#ef4444" strokeWidth="40" fill="none" strokeLinecap="round" />
           <path d="M 100 150 C 300 150, 400 300, 600 300" stroke="#7f1d1d" strokeWidth="2" fill="none" strokeDasharray="5 5" className="animate-[dash_20s_linear_infinite]" />
@@ -279,10 +264,8 @@ const HeartMouthStory = () => {
 
        <div className="relative z-10 flex justify-between items-center h-64">
           
-          {/* MOUTH (Source) */}
           <div className="text-center w-32">
              <div className="w-24 h-24 rounded-full bg-slate-800 border-4 border-red-500/50 flex items-center justify-center relative overflow-hidden shadow-[0_0_40px_rgba(239,68,68,0.2)]">
-                {/* Spawning Bacteria */}
                 {[...Array(6)].map((_, i) => (
                    <motion.div
                       key={i}
@@ -300,12 +283,10 @@ const HeartMouthStory = () => {
              <p className="mt-4 text-[10px] font-black uppercase text-red-400 tracking-widest">Periodontal Pocket</p>
           </div>
 
-          {/* THE JOURNEY (Particles) */}
           <div className="flex-1 h-32 relative">
              <motion.div 
                className="absolute top-1/2 left-0 right-0 h-1 bg-red-500/20"
              />
-             {/* Traveling Pathogen */}
              <motion.div
                 className="absolute w-4 h-4 bg-green-500 rounded-full shadow-[0_0_15px_#22c55e] flex items-center justify-center top-1/2 -translate-y-1/2"
                 animate={{ left: ['0%', '100%'], opacity: [0, 1, 1, 0] }}
@@ -319,7 +300,6 @@ const HeartMouthStory = () => {
              </div>
           </div>
 
-          {/* HEART (Target) */}
           <div className="text-center w-32">
              <motion.div 
                animate={{ scale: [1, 1.15, 1] }}
@@ -343,11 +323,9 @@ const AlignerStory = () => {
        
        <div className="relative z-10 flex items-center gap-12">
           
-          {/* THE TOOTH */}
           <div className="relative w-32 h-40 bg-slate-200 rounded-[2rem] border-4 border-slate-300 flex items-center justify-center shadow-2xl">
              <span className="text-slate-400 font-black text-6xl opacity-20">T</span>
              
-             {/* The Aligner Ghost (Plastic) */}
              <motion.div
                 animate={{ opacity: [0.2, 0.6, 0.2], scale: [1, 1.02, 1] }}
                 transition={{ duration: 3, repeat: Infinity }}
@@ -355,7 +333,6 @@ const AlignerStory = () => {
              />
           </div>
 
-          {/* FORCE VECTORS */}
           <div className="flex flex-col gap-4">
              <motion.div 
                initial={{ width: 0, opacity: 0 }} 
@@ -392,7 +369,6 @@ const AlignerStory = () => {
 const AIStory = () => {
   return (
     <div className="relative w-full h-full bg-black flex items-center justify-center">
-       {/* 3D Wireframe Tooth */}
        <svg width="240" height="300" viewBox="0 0 200 260" className="opacity-40">
           <path d="M60 200 Q 30 100 60 50 Q 100 20 140 50 Q 170 100 140 200 L 120 250 L 80 250 Z" 
                 stroke="#10b981" strokeWidth="1" fill="none" strokeDasharray="4 4" 
@@ -401,21 +377,18 @@ const AIStory = () => {
           <path d="M80 80 Q 100 100 120 80" stroke="#10b981" strokeWidth="1" />
        </svg>
 
-       {/* The "Hidden" Cavity (Red Spot) */}
        <motion.div 
           animate={{ opacity: [0, 1, 1, 0] }}
           transition={{ duration: 4, repeat: Infinity, delay: 1.5 }}
           className="absolute top-[120px] left-[130px] w-4 h-4 bg-red-600 rounded-full blur-sm z-10 shadow-[0_0_20px_#ef4444]"
        />
 
-       {/* SCANNING LASER BEAM */}
        <motion.div
           animate={{ top: ['10%', '90%', '10%'] }}
           transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
           className="absolute w-[80%] h-1 bg-green-500 shadow-[0_0_30px_#22c55e] z-20 opacity-80"
        />
 
-       {/* DATA CLOUD (Floating Code) */}
        <div className="absolute inset-0 pointer-events-none">
           {[...Array(6)].map((_, i) => (
              <motion.div
@@ -434,7 +407,6 @@ const AIStory = () => {
           ))}
        </div>
 
-       {/* ALERT BOX */}
        <motion.div
           initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 2, type: "spring" }}
           className="anim-info-box absolute bottom-16 bg-red-900/90 border-red-500 text-white shadow-2xl"
@@ -453,18 +425,15 @@ const AIStory = () => {
 const FluorideStory = () => {
   return (
     <div className="relative w-full h-full bg-slate-900 flex items-center justify-center">
-       {/* Enamel Crystal Lattice Grid */}
        <div className="grid grid-cols-5 gap-3 p-8 bg-slate-800/50 rounded-xl border border-slate-700">
           {[...Array(25)].map((_, i) => {
              const isDamaged = [7, 12, 17].includes(i);
              return (
                <div key={i} className="relative">
-                  {/* The Calcium/Phosphate Hexagon */}
                   <div className={`w-8 h-8 ${isDamaged ? 'border-red-500/30' : 'border-white/20'} border-2 rounded-lg flex items-center justify-center`}>
                      {!isDamaged && <div className="w-2 h-2 bg-white/40 rounded-full"></div>}
                   </div>
                   
-                  {/* Fluoride Ion Repairing */}
                   {isDamaged && (
                      <motion.div
                         initial={{ scale: 3, opacity: 0, x: 50, y: -50 }}
@@ -498,10 +467,8 @@ const FluorideStory = () => {
 const BiofilmStory = () => {
   return (
     <div className="relative w-full h-full bg-slate-950 flex items-center justify-center overflow-hidden">
-       {/* Tooth Surface Floor */}
        <div className="absolute bottom-0 w-full h-1/3 bg-slate-100 rounded-t-[50%] opacity-10"></div>
 
-       {/* Bacteria Colony */}
        <div className="relative z-10 mb-12">
           {[...Array(12)].map((_, i) => (
              <motion.div
@@ -513,7 +480,6 @@ const BiofilmStory = () => {
              />
           ))}
           
-          {/* THE SLIME LAYER (Matrix) */}
           <motion.div
              initial={{ opacity: 0, scale: 0.8 }}
              animate={{ opacity: 1, scale: 1.2 }}
@@ -524,7 +490,6 @@ const BiofilmStory = () => {
           </motion.div>
        </div>
 
-       {/* Water Splashing (Rinsing) FAILING */}
        <motion.div
           animate={{ y: [0, 50], opacity: [0, 1, 0] }}
           transition={{ duration: 1.5, repeat: Infinity }}
@@ -557,8 +522,6 @@ export default function Gallery() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // --- PLAYLIST DATA: 20 TOPICS (10 PUSH / 10 SHIELD) ---
-  // Note: We use the 7 Animations cyclically for the visual component to keep file size managed
-  // Audio files mapped to existing 6 files or generic ones.
   
   const playlist = [
     // --- TOPIC 1: IMPLANTS (Push) ---
