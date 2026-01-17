@@ -16,6 +16,7 @@ const Gallery = () => {
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // UPDATED TRACKS WITH DISTINCT MP3 SOURCES
   const tracks = [
     {
       name: "Biological Foundations of Dental Implants",
@@ -23,7 +24,8 @@ const Gallery = () => {
       description: "How bone fusion (osseointegration) works on a cellular level and why Swiss titanium ensures lifetime stability.",
       artist: "Dr. Dhivakaran",
       video: "https://videos.pexels.com/video-files/3195394/3195394-hd_1920_1080_25fps.mp4",
-      source: "https://raw.githubusercontent.com/muhammederdem/mini-player/master/mp3/2.mp3",
+      // Tech/Ambient Track
+      source: "https://cdn.pixabay.com/download/audio/2022/03/24/audio_18d3509238.mp3?filename=technology-abstract-8027.mp3",
       tags: ['Implants', 'Biology', 'Surgery']
     },
     {
@@ -32,7 +34,8 @@ const Gallery = () => {
       description: "A deep dive into why microscopic root canals have a 99% success rate compared to traditional methods.",
       artist: "Dr. Roger",
       video: "https://videos.pexels.com/video-files/5091624/5091624-hd_1920_1080_24fps.mp4",
-      source: "https://raw.githubusercontent.com/muhammederdem/mini-player/master/mp3/5.mp3",
+      // Lo-Fi/Chill Track
+      source: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112762.mp3",
       tags: ['Endo', 'Precision', 'Tech']
     }
   ];
@@ -68,6 +71,7 @@ const Gallery = () => {
     }
   ];
 
+  // --- AI SEARCH LOGIC ---
   const handleAiSearch = async () => {
     if (!searchQuery.trim()) return;
     setIsAiSearching(true);
@@ -101,28 +105,82 @@ const Gallery = () => {
   const filteredBlogs = getFilteredBlogs();
   const currentTrack = tracks[currentTrackIndex];
 
+  // --- AUDIO PLAYER LOGIC FIXED ---
+
+  // 1. Initialize Audio Object
   useEffect(() => {
-    if (!audioRef.current) audioRef.current = new Audio(tracks[0].source);
+    if (!audioRef.current) {
+      audioRef.current = new Audio(tracks[0].source);
+    }
+    
     const audio = audioRef.current;
-    const updateProgress = () => setBarWidth(`${(audio.currentTime / audio.duration) * 100}%`);
+    
+    const updateProgress = () => {
+      if (audio.duration) {
+        setBarWidth(`${(audio.currentTime / audio.duration) * 100}%`);
+      }
+    };
+
+    // Auto-play next track when ended
+    const handleEnded = () => {
+        handleNext();
+    };
+
     audio.addEventListener('timeupdate', updateProgress);
-    return () => audio.removeEventListener('timeupdate', updateProgress);
+    audio.addEventListener('ended', handleEnded);
+
+    return () => {
+      audio.removeEventListener('timeupdate', updateProgress);
+      audio.removeEventListener('ended', handleEnded);
+    };
   }, []);
+
+  // 2. Handle Track Switching (The missing piece)
+  useEffect(() => {
+    if (audioRef.current) {
+      // Pause current
+      audioRef.current.pause();
+      // Swap Source
+      audioRef.current.src = tracks[currentTrackIndex].source;
+      audioRef.current.load(); // Important to reload the resource
+      
+      // If player was active, auto-play new track. 
+      // Or if you want auto-play on skip regardless, just call play()
+      if (isTimerPlaying) {
+        const playPromise = audioRef.current.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.error("Auto-play prevented:", error);
+                setIsTimerPlaying(false);
+            });
+        }
+      } else {
+          setBarWidth("0%"); // Reset bar if paused
+      }
+    }
+  }, [currentTrackIndex]); // Runs whenever index changes
 
   const togglePlay = () => {
     if(!audioRef.current) return;
-    if(isTimerPlaying) { audioRef.current.pause(); setIsTimerPlaying(false); }
-    else { audioRef.current.play(); setIsTimerPlaying(true); }
+    if(isTimerPlaying) { 
+        audioRef.current.pause(); 
+        setIsTimerPlaying(false); 
+    } else { 
+        audioRef.current.play(); 
+        setIsTimerPlaying(true); 
+    }
   };
 
   const handleNext = () => {
     setCurrentTrackIndex((prev) => (prev + 1) % tracks.length);
-    setIsTimerPlaying(false);
+    // Note: We keep isTimerPlaying true so the next track plays automatically
+    // If you want it to stop on skip, set setIsTimerPlaying(false) here.
+    setIsTimerPlaying(true); 
   };
 
   const handlePrev = () => {
     setCurrentTrackIndex((prev) => (prev - 1 + tracks.length) % tracks.length);
-    setIsTimerPlaying(false);
+    setIsTimerPlaying(true);
   };
 
   return (
@@ -152,7 +210,7 @@ const Gallery = () => {
            <div className="unified-player-card">
               <div className="player-media">
                   <video 
-                    key={currentTrack.video}
+                    key={currentTrack.video} // Key forces video reload on track change
                     src={currentTrack.video} 
                     className="player-video" 
                     autoPlay loop muted playsInline 
@@ -183,17 +241,17 @@ const Gallery = () => {
                           <div className="h-full bg-blue-600 transition-all duration-300" style={{ width: barWidth }}></div>
                       </div>
                       <div className="flex items-center justify-between">
-                         <div className="flex items-center gap-8">
-                            <SkipBack className="text-slate-400 hover:text-blue-600 cursor-pointer transition-colors" size={24} onClick={handlePrev} />
-                            <button onClick={togglePlay} className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-2xl shadow-blue-500/30 hover:scale-105 transition-transform">
-                               {isTimerPlaying ? <Pause size={32} /> : <Play size={32} className="ml-1" />}
-                            </button>
-                            <SkipForward className="text-slate-400 hover:text-blue-600 cursor-pointer transition-colors" size={24} onClick={handleNext} />
-                         </div>
-                         <div className="flex items-center gap-6">
-                            <Heart className="text-slate-300 hover:text-red-500 cursor-pointer transition-colors" />
-                            <Share2 className="text-slate-300 hover:text-blue-500 cursor-pointer transition-colors" />
-                         </div>
+                          <div className="flex items-center gap-8">
+                             <SkipBack className="text-slate-400 hover:text-blue-600 cursor-pointer transition-colors" size={24} onClick={handlePrev} />
+                             <button onClick={togglePlay} className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-2xl shadow-blue-500/30 hover:scale-105 transition-transform">
+                                {isTimerPlaying ? <Pause size={32} /> : <Play size={32} className="ml-1" />}
+                             </button>
+                             <SkipForward className="text-slate-400 hover:text-blue-600 cursor-pointer transition-colors" size={24} onClick={handleNext} />
+                          </div>
+                          <div className="flex items-center gap-6">
+                             <Heart className="text-slate-300 hover:text-red-500 cursor-pointer transition-colors" />
+                             <Share2 className="text-slate-300 hover:text-blue-500 cursor-pointer transition-colors" />
+                          </div>
                       </div>
                   </div>
               </div>
