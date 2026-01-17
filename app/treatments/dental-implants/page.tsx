@@ -10,7 +10,7 @@ import {
   Sparkles, DollarSign, TrendingDown, AlertCircle, XCircle, Play, 
   Bone, Scale, Clock, FileText, Calculator, RefreshCw, ThumbsUp,
   HeartPulse, Brain, Baby, Cigarette, Pill, Thermometer, CheckCircle2,
-  AlertTriangle, HelpCircle, Phone, Globe
+  AlertTriangle, HelpCircle, Phone, Globe, Calendar, MapPin, Mail
 } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectCoverflow, Autoplay, Pagination, Navigation } from 'swiper/modules';
@@ -74,20 +74,47 @@ const customStyles = `
   .animate-glow {
     animation: glow 3s infinite;
   }
+
+  /* Sticky Nav */
+  .sticky-nav {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.8);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .dark .sticky-nav {
+    background: rgba(2, 6, 23, 0.8);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
 `;
 
 export default function DentalImplantsPage() {
   const [boneSlider, setBoneSlider] = useState(50);
   const [activeLayer, setActiveLayer] = useState<number | null>(null);
-  const [calculatorYears, setCalculatorYears] = useState(20);
-  
-  // Self Check State
   const [activeTab, setActiveTab] = useState('heart');
   const [riskScore, setRiskScore] = useState(0);
   const [riskFactors, setRiskFactors] = useState<string[]>([]);
+  const [activeSection, setActiveSection] = useState('overview');
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    // Intersection Observer for Sticky Nav
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('section[id]').forEach(section => {
+      observer.observe(section);
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   // --- DATA: ELIGIBILITY CHECK ---
@@ -174,12 +201,21 @@ export default function DentalImplantsPage() {
     { id: 3, name: "The Implant Screw", role: "The Artificial Root", desc: "Biocompatible Titanium Grade-5. Fuses with bone (Osseointegration).", color: "bg-slate-800 text-white" }
   ];
 
+  // --- DATA: LIFECYCLE STEPS ---
+  const lifecycleSteps = [
+    { title: "Digital Scan & CBCT", sub: "Phase 01", desc: "3D CBCT imaging reveals bone anatomy, nerves, and implant position for guided planning.", icon: Target },
+    { title: "Virtual Planning", sub: "Phase 02", desc: "AI-guided simulation ensures precision implant placement with minimal trauma.", icon: ScanLine },
+    { title: "PRF Biologic Healing", sub: "Phase 03", desc: "We use your blood to prepare PRF membranes that enhance bone & soft-tissue healing naturally.", icon: Droplets },
+    { title: "Guided Surgery", sub: "Phase 04", desc: "Digitally printed guides direct exact implant angle, depth, and position — fast & painless.", icon: CrosshairIcon },
+    { title: "Crown Placement", sub: "Phase 05", desc: "Your final crown is 3D designed, shade-matched, and digitally aligned for your bite.", icon: Sparkles }
+  ];
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-200 font-sans transition-colors duration-500 overflow-x-hidden pt-20 bg-noise">
       <style>{customStyles}</style>
       
       {/* ================= HERO SECTION ================= */}
-      <div className="relative min-h-[90vh] w-full flex items-center justify-center overflow-hidden bg-gradient-to-b from-white to-slate-50 dark:from-[#020617] dark:to-[#0B1019] transition-colors duration-500">
+      <section id="overview" className="relative min-h-[90vh] w-full flex items-center justify-center overflow-hidden bg-gradient-to-b from-white to-slate-50 dark:from-[#020617] dark:to-[#0B1019] transition-colors duration-500">
         {/* Dynamic Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
             {/* Light Mode Blobs */}
@@ -200,7 +236,7 @@ export default function DentalImplantsPage() {
             <div className="space-y-10 order-2 lg:order-1">
                 <RevealOnScroll>
                     <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-teal-50 dark:bg-teal-900/30 border border-teal-200 dark:border-teal-500/30 text-teal-700 dark:text-teal-400 font-bold text-[10px] uppercase tracking-[0.3em] mb-8 shadow-lg shadow-teal-500/10">
-                        <Award size={14} /> ITI & ADA Certified Center
+                        <Award size={14} /> ISO 9001:2015 • ITI & ADA Certified
                     </div>
                     <h1 className="text-6xl md:text-8xl lg:text-[6.5rem] font-black text-slate-900 dark:text-white leading-[0.9] tracking-tighter">
                         Precision <br/>
@@ -208,7 +244,7 @@ export default function DentalImplantsPage() {
                     </h1>
                     <p className="text-xl text-slate-600 dark:text-slate-300 font-medium leading-relaxed max-w-lg border-l-4 border-teal-500 pl-6 my-10">
                         Replace missing teeth with Swiss-Grade Titanium. <br/>
-                        <span className="font-black text-teal-600 dark:text-teal-400">99.2% Success Rate</span> via Guided Surgery Protocols.
+                        <span className="font-black text-teal-600 dark:text-teal-400">99.2% Success Rate</span> via Guided Surgery Protocols in Nallagandla.
                     </p>
 
                     <div className="flex flex-wrap gap-5">
@@ -221,6 +257,21 @@ export default function DentalImplantsPage() {
                         <button className="px-10 py-5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white rounded-full font-bold uppercase tracking-widest text-xs transition-all flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-white/10 hover:shadow-lg">
                             <Play size={16} fill="currentColor" /> Watch 3D Demo
                         </button>
+                    </div>
+                    
+                    <div className="flex gap-8 pt-8 border-t border-slate-200 dark:border-white/10 mt-8">
+                       <div>
+                          <div className="text-2xl font-black text-slate-900 dark:text-white">1500+</div>
+                          <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Implants Placed</div>
+                       </div>
+                       <div>
+                          <div className="text-2xl font-black text-slate-900 dark:text-white">Lifetime</div>
+                          <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Warranty</div>
+                       </div>
+                       <div>
+                          <div className="text-2xl font-black text-slate-900 dark:text-white">45 min</div>
+                          <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Surgery Time</div>
+                       </div>
                     </div>
                 </RevealOnScroll>
             </div>
@@ -271,6 +322,35 @@ export default function DentalImplantsPage() {
                 </div>
             </div>
         </div>
+      </section>
+
+      {/* ================= STICKY NAVIGATION ================= */}
+      <div className="sticky-nav overflow-x-auto no-scrollbar">
+         <div className="max-w-7xl mx-auto px-6 flex items-center gap-8 h-16">
+            {[
+               { id: 'overview', label: 'Overview' },
+               { id: 'self-check', label: 'Eligibility' },
+               { id: 'solutions', label: 'Solutions' },
+               { id: 'comparison', label: 'Vs Bridge' },
+               { id: 'recovery', label: 'Recovery' },
+               { id: 'outcomes', label: 'Outcomes' },
+               { id: 'cases', label: 'Cases' },
+               { id: 'team', label: 'Team' },
+               { id: 'pricing', label: 'Pricing' },
+               { id: 'faq', label: 'FAQ' },
+            ].map(link => (
+               <a 
+                  key={link.id}
+                  href={`#${link.id}`}
+                  className={`text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-colors ${activeSection === link.id ? 'text-teal-600 dark:text-teal-400' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
+               >
+                  {link.label}
+               </a>
+            ))}
+            <a href="#contact" className="ml-auto px-4 py-2 bg-teal-600 text-white rounded-full text-xs font-black uppercase tracking-widest hover:bg-teal-700 transition-colors whitespace-nowrap">
+               Book Now
+            </a>
+         </div>
       </div>
 
       {/* ================= ELIGIBILITY SELF-CHECK ================= */}
@@ -398,7 +478,7 @@ export default function DentalImplantsPage() {
       </section>
 
       {/* ================= IMPLANT TYPES (SOLUTIONS) ================= */}
-      <section className="py-32 bg-white dark:bg-[#0f1420] relative">
+      <section id="solutions" className="py-32 bg-white dark:bg-[#0f1420] relative">
          <div className="max-w-7xl mx-auto px-6">
             <div className="text-center mb-20">
                <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-6">Architectural Solutions</h2>
@@ -436,7 +516,7 @@ export default function DentalImplantsPage() {
       </section>
 
       {/* ================= BONE LOSS SIMULATOR ================= */}
-      <div className="max-w-7xl mx-auto px-6 py-32 bg-slate-100 dark:bg-[#0b1221] rounded-[4rem] my-20 overflow-hidden relative">
+      <div id="comparison" className="max-w-7xl mx-auto px-6 py-32 bg-slate-100 dark:bg-[#0b1221] rounded-[4rem] my-20 overflow-hidden relative">
           <div className="absolute inset-0 opacity-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
           
           <RevealOnScroll>
@@ -511,7 +591,7 @@ export default function DentalImplantsPage() {
       </div>
 
       {/* ================= RECOVERY DASHBOARD ================= */}
-      <section className="py-32 max-w-7xl mx-auto px-6">
+      <section id="recovery" className="py-32 max-w-7xl mx-auto px-6">
          <div className="section-header mb-20">
             <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-4">Recovery Dashboard</h2>
             <p className="text-slate-600 dark:text-slate-400 text-lg">Monitor your healing with our clinical indicator guide.</p>
@@ -539,8 +619,166 @@ export default function DentalImplantsPage() {
          </div>
       </section>
 
+      {/* ================= CLINICAL OUTCOMES ================= */}
+      <section id="outcomes" className="py-32 bg-slate-900 text-white">
+         <div className="max-w-7xl mx-auto px-6">
+            <RevealOnScroll>
+               <div className="section-header mb-16">
+                  <h2 className="text-4xl font-black mb-4">Clinical Outcomes</h2>
+                  <p className="text-slate-400 text-lg">We measure healing with data, not guesswork.</p>
+               </div>
+               
+               <div className="grid md:grid-cols-3 gap-8">
+                  <article className="p-8 bg-white/5 border border-white/10 rounded-3xl backdrop-blur-sm">
+                     <h3 className="text-xl font-bold mb-2">Osseointegration</h3>
+                     <p className="text-teal-400 text-sm font-black uppercase tracking-widest mb-4">98.5% Success Rate</p>
+                     <div className="w-full bg-slate-800 rounded-full h-2 mb-4">
+                        <div className="bg-teal-500 h-2 rounded-full" style={{width: '98.5%'}}></div>
+                     </div>
+                     <p className="text-sm text-slate-400">Verified by ISQ stability meter readings at 12 weeks.</p>
+                  </article>
+                  
+                  <article className="p-8 bg-white/5 border border-white/10 rounded-3xl backdrop-blur-sm">
+                     <h3 className="text-xl font-bold mb-2">Pain Management</h3>
+                     <p className="text-blue-400 text-sm font-black uppercase tracking-widest mb-4">96% Zero Pain</p>
+                     <div className="w-full bg-slate-800 rounded-full h-2 mb-4">
+                        <div className="bg-blue-500 h-2 rounded-full" style={{width: '96%'}}></div>
+                     </div>
+                     <p className="text-sm text-slate-400">Reported pain score of 0-1/10 post-surgery by patients.</p>
+                  </article>
+                  
+                  <article className="p-8 bg-white/5 border border-white/10 rounded-3xl backdrop-blur-sm">
+                     <h3 className="text-xl font-bold mb-2">Longevity</h3>
+                     <p className="text-amber-400 text-sm font-black uppercase tracking-widest mb-4">20+ Years</p>
+                     <div className="w-full bg-slate-800 rounded-full h-2 mb-4">
+                        <div className="bg-amber-500 h-2 rounded-full" style={{width: '99%'}}></div>
+                     </div>
+                     <p className="text-sm text-slate-400">Projected survival based on clinical maintenance protocols.</p>
+                  </article>
+               </div>
+            </RevealOnScroll>
+         </div>
+      </section>
+
+      {/* ================= CASE LIBRARY ================= */}
+      <section id="cases" className="py-32 bg-white dark:bg-[#0f1420]">
+         <div className="max-w-7xl mx-auto px-6">
+            <div className="section-header mb-16">
+               <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-4">Case Library</h2>
+               <p className="text-slate-600 dark:text-slate-400 text-lg">Real outcomes for Hyderabad residents.</p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+               <article className="p-8 rounded-[2.5rem] bg-slate-50 dark:bg-[#151b2b] border border-slate-200 dark:border-white/5">
+                  <div className="text-[10px] font-black uppercase tracking-widest text-teal-600 dark:text-teal-400 mb-4">Case 01 · Single Molar</div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Immediate placement after extraction</h3>
+                  <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400 mb-6">
+                     <div className="flex justify-between border-b border-slate-200 dark:border-white/5 pb-2">
+                        <span>Challenge</span>
+                        <span className="font-bold text-slate-900 dark:text-white">Fractured Root</span>
+                     </div>
+                     <div className="flex justify-between border-b border-slate-200 dark:border-white/5 pb-2">
+                        <span>Solution</span>
+                        <span className="font-bold text-slate-900 dark:text-white">Straumann BLX</span>
+                     </div>
+                     <div className="flex justify-between">
+                        <span>Time</span>
+                        <span className="font-bold text-slate-900 dark:text-white">Same Day</span>
+                     </div>
+                  </div>
+                  <button className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white flex items-center gap-2 group">
+                     View Protocol <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform"/>
+                  </button>
+               </article>
+
+               <article className="p-8 rounded-[2.5rem] bg-slate-50 dark:bg-[#151b2b] border border-slate-200 dark:border-white/5">
+                  <div className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-4">Case 02 · Full Mouth</div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">All-on-4 Rehabilitation</h3>
+                  <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400 mb-6">
+                     <div className="flex justify-between border-b border-slate-200 dark:border-white/5 pb-2">
+                        <span>Challenge</span>
+                        <span className="font-bold text-slate-900 dark:text-white">Loose Dentures</span>
+                     </div>
+                     <div className="flex justify-between border-b border-slate-200 dark:border-white/5 pb-2">
+                        <span>Solution</span>
+                        <span className="font-bold text-slate-900 dark:text-white">Nobel Biocare</span>
+                     </div>
+                     <div className="flex justify-between">
+                        <span>Time</span>
+                        <span className="font-bold text-slate-900 dark:text-white">3 Days</span>
+                     </div>
+                  </div>
+                  <button className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white flex items-center gap-2 group">
+                     View Protocol <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform"/>
+                  </button>
+               </article>
+
+               <article className="p-8 rounded-[2.5rem] bg-slate-50 dark:bg-[#151b2b] border border-slate-200 dark:border-white/5">
+                  <div className="text-[10px] font-black uppercase tracking-widest text-purple-600 dark:text-purple-400 mb-4">Case 03 · Front Tooth</div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Esthetic Zone Implant</h3>
+                  <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400 mb-6">
+                     <div className="flex justify-between border-b border-slate-200 dark:border-white/5 pb-2">
+                        <span>Challenge</span>
+                        <span className="font-bold text-slate-900 dark:text-white">Missing Incisor</span>
+                     </div>
+                     <div className="flex justify-between border-b border-slate-200 dark:border-white/5 pb-2">
+                        <span>Solution</span>
+                        <span className="font-bold text-slate-900 dark:text-white">Zirconia Abutment</span>
+                     </div>
+                     <div className="flex justify-between">
+                        <span>Time</span>
+                        <span className="font-bold text-slate-900 dark:text-white">12 Weeks</span>
+                     </div>
+                  </div>
+                  <button className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white flex items-center gap-2 group">
+                     View Protocol <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform"/>
+                  </button>
+               </article>
+            </div>
+         </div>
+      </section>
+
+      {/* ================= TEAM ================= */}
+      <section id="team" className="py-32 bg-slate-50 dark:bg-[#0b101b]">
+         <div className="max-w-7xl mx-auto px-6">
+            <div className="section-header mb-16 text-center">
+               <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-4">Your Implant Team</h2>
+               <p className="text-slate-600 dark:text-slate-400 text-lg">ISO-certified experts with verifiable credentials.</p>
+            </div>
+            
+            <div className="grid md:grid-cols-3 gap-8">
+               <div className="group text-center">
+                  <div className="w-48 h-48 mx-auto rounded-full overflow-hidden mb-6 border-4 border-white dark:border-[#151b2b] shadow-xl">
+                     <img src="/images/dhivakaran.webp" alt="Dr. Dhivakaran" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"/>
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Dr. Dhivakaran</h3>
+                  <p className="text-sm font-medium text-teal-600 dark:text-teal-400 uppercase tracking-widest mb-4">CMD</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 px-4">Over 3200+ implants placed.</p>
+               </div>
+               
+               <div className="group text-center">
+                  <div className="w-48 h-48 mx-auto rounded-full overflow-hidden mb-6 border-4 border-white dark:border-[#151b2b] shadow-xl">
+                     <img src="/images/roger.webp" alt="Dr. Roger" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"/>
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Dr. Roger</h3>
+                  <p className="text-sm font-medium text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-4">OMFS</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 px-4">Specialist in Oro-Facial Surgeries, digital smile design and full-mouth rehabilitation.</p>
+               </div>
+               
+               <div className="group text-center">
+                  <div className="w-48 h-48 mx-auto rounded-full overflow-hidden mb-6 border-4 border-white dark:border-[#151b2b] shadow-xl">
+                     <img src="/images/thikvijay.webp" alt="Dr. Thik Vijay" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"/>
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Dr. Thik Vijay</h3>
+                  <p className="text-sm font-medium text-purple-600 dark:text-purple-400 uppercase tracking-widest mb-4">Smile Architect</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 px-4">Focuses on esthetic zone implants and gum contouring for natural results.</p>
+               </div>
+            </div>
+         </div>
+      </section>
+
       {/* ================= BRAND TIERS ================= */}
-      <div className="bg-slate-50 dark:bg-[#0b101b] py-32 border-t border-slate-200 dark:border-white/5">
+      <div id="pricing" className="bg-slate-50 dark:bg-[#0b101b] py-32 border-t border-slate-200 dark:border-white/5">
           <div className="max-w-7xl mx-auto px-6">
               <RevealOnScroll>
                   <div className="text-center mb-20">
@@ -598,7 +836,7 @@ export default function DentalImplantsPage() {
       </div>
 
       {/* ================= FAQ ACCORDION ================= */}
-      <section className="py-32 max-w-4xl mx-auto px-6">
+      <section id="faq" className="py-32 max-w-4xl mx-auto px-6">
          <div className="text-center mb-20">
             <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4">Common Questions</h2>
             <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">Reviewed by Dr. Dhivakaran & Implantology Team</p>
@@ -608,7 +846,9 @@ export default function DentalImplantsPage() {
             {[
                { q: "Is the procedure painful?", a: "No. Implants are placed under local anesthesia, so you feel numb just like a filling. Most patients report less discomfort than a tooth extraction. Post-op soreness is managed easily with standard painkillers for 1-2 days." },
                { q: "How long do they last?", a: "With proper hygiene (brushing/flossing), dental implants can last a lifetime. The titanium screw is permanent. The crown may need replacement after 15-20 years due to normal wear, similar to natural enamel." },
-               { q: "Can I get implants if I have diabetes?", a: "Yes, provided your diabetes is controlled (HbA1c ≤ 7.5%). We use specialized implant surfaces (like Straumann SLActive) that accelerate healing specifically for diabetic patients. Uncontrolled diabetes poses a higher failure risk." }
+               { q: "Can I get implants if I have diabetes?", a: "Yes, provided your diabetes is controlled (HbA1c ≤ 7.5%). We use specialized implant surfaces (like Straumann SLActive) that accelerate healing specifically for diabetic patients. Uncontrolled diabetes poses a higher failure risk." },
+               { q: "How long is the healing period?", a: "Typically 3-4 months for the bone to fuse with the implant. In some cases with excellent bone quality, we can load the crown immediately." },
+               { q: "What if I don't have enough bone?", a: "We can perform bone grafting or a sinus lift to build up the bone volume before or during implant placement to ensure a stable foundation." }
             ].map((faq, i) => (
                <details key={i} className="group bg-white dark:bg-[#151b2b] rounded-2xl border border-slate-200 dark:border-white/5 overflow-hidden transition-all duration-300 open:shadow-lg open:border-teal-500/50">
                   <summary className="flex items-center justify-between p-6 font-bold text-slate-900 dark:text-white cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-colors select-none">
@@ -622,6 +862,52 @@ export default function DentalImplantsPage() {
                   </div>
                </details>
             ))}
+         </div>
+      </section>
+
+      {/* ================= CONTACT / BOOKING ================= */}
+      <section id="contact" className="py-24 bg-slate-900 text-white">
+         <div className="max-w-7xl mx-auto px-6">
+            <div className="section-header text-center mb-16">
+               <h2 className="text-4xl font-black mb-4">Talk to our Implant Concierge</h2>
+               <p className="text-slate-400 text-lg">Send X-rays, insurance documents or schedule virtual second opinions.</p>
+            </div>
+            
+            <div className="grid md:grid-cols-4 gap-6">
+               <a href="tel:+918610425342" className="flex flex-col items-center p-8 bg-white/5 border border-white/10 rounded-3xl hover:bg-white/10 transition-colors group">
+                  <div className="w-16 h-16 rounded-2xl bg-teal-500/20 flex items-center justify-center text-teal-400 mb-6 group-hover:scale-110 transition-transform">
+                     <Phone size={32} />
+                  </div>
+                  <h3 className="font-bold text-lg mb-2">Call Reception</h3>
+                  <p className="text-sm text-slate-400">+91 86104 25342</p>
+               </a>
+               
+               <a href="https://wa.me/918610425342" className="flex flex-col items-center p-8 bg-white/5 border border-white/10 rounded-3xl hover:bg-white/10 transition-colors group">
+                  <div className="w-16 h-16 rounded-2xl bg-green-500/20 flex items-center justify-center text-green-400 mb-6 group-hover:scale-110 transition-transform">
+                     <div className="ri-whatsapp-line text-3xl"></div> 
+                     {/* Lucide doesn't have whatsapp icon, using text or similar */}
+                     <span className="font-black text-xl">WA</span>
+                  </div>
+                  <h3 className="font-bold text-lg mb-2">WhatsApp Triage</h3>
+                  <p className="text-sm text-slate-400">Share photos/X-rays</p>
+               </a>
+               
+               <a href="mailto:care@nobledentalnallagandla.in" className="flex flex-col items-center p-8 bg-white/5 border border-white/10 rounded-3xl hover:bg-white/10 transition-colors group">
+                  <div className="w-16 h-16 rounded-2xl bg-blue-500/20 flex items-center justify-center text-blue-400 mb-6 group-hover:scale-110 transition-transform">
+                     <Mail size={32} />
+                  </div>
+                  <h3 className="font-bold text-lg mb-2">Email Records</h3>
+                  <p className="text-sm text-slate-400">Send previous scans</p>
+               </a>
+               
+               <a href="https://maps.app.goo.gl/fFbpcXZ9RBBCpWrg9" target="_blank" className="flex flex-col items-center p-8 bg-white/5 border border-white/10 rounded-3xl hover:bg-white/10 transition-colors group">
+                  <div className="w-16 h-16 rounded-2xl bg-purple-500/20 flex items-center justify-center text-purple-400 mb-6 group-hover:scale-110 transition-transform">
+                     <MapPin size={32} />
+                  </div>
+                  <h3 className="font-bold text-lg mb-2">Visit Clinic</h3>
+                  <p className="text-sm text-slate-400">Nallagandla, Hyderabad</p>
+               </a>
+            </div>
          </div>
       </section>
 
