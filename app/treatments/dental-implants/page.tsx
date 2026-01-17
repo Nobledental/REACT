@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
-  ArrowLeft, Shield, Award, Activity, 
+  ArrowLeft, ArrowRight, Shield, Award, Activity, 
   Check, ScanLine, Cpu, Droplets, Ruler, User,
   Beaker, ShieldCheck, Microscope, Info, Zap,
   TrendingUp, Dna, Layers, Target, ChevronRight, ChevronLeft,
