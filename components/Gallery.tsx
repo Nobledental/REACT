@@ -5,556 +5,428 @@ import Link from 'next/link';
 import { 
   ArrowRight, Play, Pause, SkipBack, SkipForward, Heart, Share2, 
   Sparkles, Bookmark, Activity, ShieldAlert, ShieldCheck,
-  Scan, Database, Wifi, ArrowDown, Zap, AlertTriangle,
-  Microscope, Layers, Droplets, Skull, Anchor, X, CheckCircle,
-  MessageCircle, Clock, Info, ChevronRight
+  Scan, Database, Wifi, ArrowDown, Zap, AlertTriangle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
 
-// ==========================================
-// 1. GLOBAL STYLES & LAYOUT
-// ==========================================
-
-const consoleStyles = `
-  .console-card {
-    background: #ffffff;
+// --- STYLES ---
+const wideCardStyles = `
+  .unified-player-card {
+    background: #fff;
     border-radius: 40px;
-    box-shadow: 0 40px 80px -20px rgba(0,0,0,0.15);
+    box-shadow: 0 30px 60px -10px rgba(0,0,0,0.1);
     display: flex;
     flex-direction: column;
     overflow: hidden;
     position: relative;
     border: 1px solid rgba(0,0,0,0.05);
     transition: all 0.5s ease;
-    height: auto;
   }
-  
   @media (min-width: 1024px) {
-    .console-card {
+    .unified-player-card {
       flex-direction: row;
-      height: 700px; /* Tall canvas for detailed storytelling */
+      height: 550px; 
     }
   }
-
-  .dark .console-card {
-    background: #0f172a;
+  .dark .unified-player-card {
+    background: #1e293b;
     border-color: rgba(255,255,255,0.05);
-    box-shadow: 0 40px 80px -20px rgba(0,0,0,0.5);
+    box-shadow: 0 30px 60px -10px rgba(0,0,0,0.3);
   }
 
-  /* The Visual Stage (Left/Top) */
-  .visual-stage {
-    flex: 1.6; /* 60% Width */
+  .player-media {
+    flex: 1.3;
     position: relative;
-    background: #020617; 
-    min-height: 450px;
+    background: #0f172a; 
+    min-height: 350px;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-right: 1px solid rgba(255,255,255,0.05);
   }
 
-  /* The Controller (Right/Bottom) */
-  .controller-panel {
-    flex: 1; /* 40% Width */
-    padding: 3.5rem;
+  .player-content {
+    flex: 1;
+    padding: 3rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    background: rgba(255,255,255,0.02);
-    position: relative;
   }
   
   .track-title {
     font-family: 'Inter', sans-serif;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.02em;
   }
 
-  /* Subtitle / Narrative Box */
-  .narrative-overlay {
-    position: absolute;
-    bottom: 2rem;
-    left: 2rem;
-    right: 2rem;
-    background: rgba(15, 23, 42, 0.85);
-    backdrop-filter: blur(16px);
+  .anim-info-box {
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(8px);
     border: 1px solid rgba(255,255,255,0.1);
-    padding: 1.5rem;
-    border-radius: 1.5rem;
-    z-index: 50;
-    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.6);
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .typewriter-text {
-    font-family: 'Geist Mono', 'Monaco', monospace;
-    font-size: 0.95rem;
-    line-height: 1.6;
-    color: #e2e8f0;
-    font-weight: 500;
-  }
-  
-  .cursor-blink {
-    display: inline-block;
-    width: 8px;
-    height: 18px;
-    background: #3b82f6;
-    margin-left: 4px;
-    vertical-align: middle;
-    animation: blink 1s infinite;
-  }
-  
-  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
-  /* Technical Grid Background */
-  .grid-bg {
-    background-size: 50px 50px;
-    background-image: 
-      linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    padding: 8px 14px;
+    border-radius: 8px;
     position: absolute;
-    inset: 0;
-    pointer-events: none;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 10px 20px -5px rgba(0,0,0,0.3);
+    z-index: 20;
   }
 `;
 
-// --- HELPER: TYPEWRITER EFFECT ---
-const Typewriter = ({ text, speed = 25 }: { text: string, speed?: number }) => {
-  const [displayed, setDisplayed] = useState('');
-  useEffect(() => {
-    let i = 0;
-    setDisplayed('');
-    const timer = setInterval(() => {
-      if (i < text.length) {
-        setDisplayed(prev => prev + text.charAt(i));
-        i++;
-      } else { clearInterval(timer); }
-    }, speed);
-    return () => clearInterval(timer);
-  }, [text, speed]);
-  return <div className="typewriter-text">{displayed}<span className="cursor-blink"/></div>;
-};
-
 // ==========================================
-// 2. ADVANCED SCENES (The "Visual Engine")
+// --- 1. IMPLANTS: Bone Loss vs. Preservation ---
 // ==========================================
-
-// --- SCENE 1: THE BIONIC TOOTH (Implants) ---
-const ImplantScene = ({ phase }: { phase: number }) => {
+const ImplantStory = () => {
   return (
-    <div className="w-full h-full relative flex items-center justify-center bg-slate-950 overflow-hidden">
-      <div className="grid-bg"></div>
-      
-      {/* Container holding the jaw section */}
-      <div className="relative w-64 h-96 flex flex-col justify-end">
+    <div className="relative w-full h-full bg-slate-900 flex flex-col items-center justify-center p-8">
+      <div className="flex w-full justify-around items-end h-64">
         
-        {/* 1. JAWBONE CROSS SECTION */}
-        <div className="w-full h-64 bg-slate-800 rounded-b-[3rem] relative overflow-hidden border-x-4 border-b-4 border-slate-700 shadow-2xl">
-           {/* Trabecular Mesh Pattern */}
-           <div className="absolute inset-0 opacity-20" 
-                style={{ backgroundImage: 'radial-gradient(circle, #94a3b8 1px, transparent 1px)', backgroundSize: '6px 6px' }}>
-           </div>
-
-           {/* PHASE 1: BONE LOSS ANIMATION */}
-           {/* The bone level drops physically to simulate resorption */}
+        {/* SCENARIO A: NO IMPLANT (Bone Loss) */}
+        <div className="flex flex-col items-center relative w-1/3">
            <motion.div 
-             className="absolute top-0 left-0 right-0 bg-slate-950/90 z-20 w-full border-b border-red-500/30"
-             initial={{ height: 0 }}
-             animate={{ height: phase === 1 ? '40%' : phase >= 2 ? '0%' : '0%' }}
-             transition={{ duration: 4, ease: "easeInOut" }}
+             className="anim-info-box mb-4 !relative !top-0 !left-0 border-red-500 text-red-400"
+             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
            >
-              {phase === 1 && (
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] text-red-500 font-black uppercase tracking-widest animate-pulse">
-                   Bone Resorption Active
-                </div>
-              )}
+             Without Implant
            </motion.div>
-
-           {/* PHASE 2 & 3: THE IMPLANT SCREW */}
-           <motion.div
-             className="absolute top-4 left-1/2 -translate-x-1/2 w-12 z-30"
-             initial={{ y: -300 }}
-             animate={{ 
-               y: phase >= 2 ? 20 : -300, 
-               rotate: phase >= 2 && phase < 3 ? 720 : 0 
-             }}
-             transition={{ duration: 3, ease: "circOut" }}
-           >
-              <svg viewBox="0 0 40 120" className="w-full drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]">
-                 <path d="M5 0H35V10L30 15V110L20 120L10 110V15L5 10V0Z" fill="url(#titanium)" />
-                 {[...Array(12)].map((_,i) => <path key={i} d={`M5 ${20 + i*8}H35`} stroke="rgba(0,0,0,0.4)" strokeWidth="1.5"/>)}
-                 <defs><linearGradient id="titanium" x1="0" y1="0" x2="1" y2="0"><stop stopColor="#94a3b8"/><stop offset="0.5" stopColor="#f1f5f9"/><stop offset="1" stopColor="#64748b"/></linearGradient></defs>
-              </svg>
-           </motion.div>
-
-           {/* PHASE 3: OSTEOBLAST INTEGRATION (Green Particles) */}
-           {phase >= 3 && (
-             <div className="absolute inset-0 z-40">
-               {[...Array(20)].map((_, i) => (
-                 <motion.div
-                   key={i}
-                   className="absolute w-1 h-1 bg-green-400 rounded-full shadow-[0_0_8px_#4ade80]"
-                   initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
-                   animate={{ 
-                     opacity: [0, 1, 0], 
-                     scale: [0, 1.5, 0],
-                     x: (Math.random()-0.5)*80, 
-                     y: 20 + (Math.random()*100) 
-                   }}
-                   transition={{ duration: 2, repeat: Infinity, delay: i * 0.1 }}
-                   style={{ left: '50%' }}
-                 />
-               ))}
-               <div className="absolute bottom-4 w-full text-center">
-                  <div className="inline-block px-3 py-1 bg-green-900/50 border border-green-500 rounded text-[9px] text-green-300 font-bold uppercase tracking-widest">
-                     Osseointegration: 100%
-                  </div>
-               </div>
-             </div>
-           )}
+           
+           {/* Bone shrinking animation */}
+           <div className="w-full bg-slate-800 h-40 rounded-b-3xl relative overflow-hidden border-t-4 border-slate-700">
+              <motion.div 
+                initial={{ height: '100%' }}
+                animate={{ height: '40%' }}
+                transition={{ duration: 4, repeat: Infinity, repeatType: "reverse", ease: "easeInOut", delay: 1 }}
+                className="absolute bottom-0 left-0 right-0 bg-pink-900/40 w-full"
+              />
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 text-xs text-slate-500 font-mono">Bone Resorption</div>
+           </div>
         </div>
 
-        {/* PHASE 4: THE ABUTMENT & CROWN */}
-        <motion.div
-           className="absolute bottom-[240px] left-1/2 -translate-x-1/2 w-20 h-24 z-10"
-           initial={{ opacity: 0, y: -50 }}
-           animate={{ opacity: phase >= 4 ? 1 : 0, y: phase >= 4 ? 0 : -50 }}
-           transition={{ duration: 1, type: "spring" }}
-        >
-           <div className="w-full h-full bg-gradient-to-b from-white to-slate-200 rounded-t-2xl shadow-xl border border-white/50 relative">
-              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/40 to-transparent opacity-50"></div>
+        {/* SCENARIO B: WITH IMPLANT (Preservation) */}
+        <div className="flex flex-col items-center relative w-1/3">
+           <motion.div 
+             className="anim-info-box mb-4 !relative !top-0 !left-0 border-green-500 text-green-400"
+             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
+           >
+             With Titanium
+           </motion.div>
+
+           {/* Bone staying strong */}
+           <div className="w-full bg-slate-800 h-40 rounded-b-3xl relative overflow-hidden border-t-4 border-slate-700 flex justify-center">
+              <div className="absolute inset-0 bg-pink-900/40 h-full"></div> {/* Full Bone Height */}
+              
+              {/* The Implant Screw */}
+              <motion.div
+                 initial={{ y: -100 }}
+                 animate={{ y: 20 }}
+                 transition={{ duration: 2, ease: "easeOut" }}
+                 className="w-4 h-24 bg-gradient-to-b from-slate-300 to-slate-500 rounded-b-lg relative z-10"
+              >
+                 {/* Screw threads */}
+                 {[...Array(6)].map((_,i) => (
+                    <div key={i} className="w-6 h-1 bg-slate-600 absolute left-[-4px]" style={{ top: i*12 + 10 }}></div>
+                 ))}
+              </motion.div>
+
+              {/* Integration lines */}
+              <motion.div 
+                 animate={{ opacity: [0, 1, 0] }} 
+                 transition={{ duration: 2, repeat: Infinity, delay: 2 }}
+                 className="absolute top-10 w-16 h-16 border-2 border-green-400 rounded-full"
+              />
            </div>
-        </motion.div>
-
+        </div>
       </div>
+      <p className="text-slate-400 text-xs mt-8 text-center max-w-md">
+        Bone requires stimulation to exist. Titanium mimics the tooth root, preventing facial collapse.
+      </p>
     </div>
   );
 };
 
-// --- SCENE 2: THE INSTAGRAM TRAP (Veneers) ---
-const VeneerScene = ({ phase }: { phase: number }) => {
+// ==========================================
+// --- 2. ETHICS: Chiclet vs Biomimetic ---
+// ==========================================
+const VeneerStory = () => {
   return (
-    <div className="w-full h-full relative flex items-center justify-center bg-black overflow-hidden">
-      {/* Studio Lighting Effects */}
-      <motion.div 
-        className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[100px]"
-        animate={{ opacity: [0.3, 0.6, 0.3] }} transition={{ duration: 5, repeat: Infinity }}
-      />
-
-      <div className="flex gap-12 items-center relative z-10">
+    <div className="relative w-full h-full bg-black flex flex-col items-center justify-center">
+      <div className="flex gap-12 items-center">
          
-         {/* OPTION A: THE "CHICLET" (Bad) */}
-         <motion.div 
-           className="flex flex-col items-center"
-           animate={{ 
-             opacity: phase === 1 ? 1 : 0.3, 
-             scale: phase === 1 ? 1.1 : 0.9,
-             filter: phase === 1 ? 'grayscale(0%)' : 'grayscale(100%)'
-           }}
-         >
-            <div className="w-32 h-40 bg-white rounded-xl shadow-[0_0_30px_rgba(255,255,255,0.9)] border-4 border-white flex items-center justify-center relative overflow-hidden">
-               <div className="absolute inset-0 bg-white"></div> {/* Opaque Block */}
-               <span className="relative z-10 text-slate-300 font-black text-xs -rotate-12 opacity-50">OPAQUE</span>
+         {/* THE FAKE LOOK */}
+         <div className="text-center opacity-50">
+            <div className="w-24 h-32 bg-white rounded-md mb-4 shadow-[0_0_20px_rgba(255,255,255,0.8)] border-4 border-white"></div>
+            <div className="anim-info-box !static border-red-500 text-red-400 mx-auto">
+               <X size={12}/> Opaque "Chiclet"
             </div>
-            {phase === 1 && (
-               <motion.div initial={{y:10, opacity:0}} animate={{y:0, opacity:1}} className="mt-4 px-3 py-1 bg-red-900/50 border border-red-500 text-red-400 text-[10px] font-bold uppercase rounded">
-                  <X size={10} className="inline mr-1"/> Monolithic Block
-               </motion.div>
-            )}
-         </motion.div>
+         </div>
 
-         {/* OPTION B: BIOMIMETIC (Good) */}
-         <motion.div 
-           className="flex flex-col items-center relative perspective-[800px]"
-           animate={{ 
-             opacity: phase >= 2 ? 1 : 0.3, 
-             scale: phase >= 2 ? 1.1 : 0.9 
-           }}
-         >
-            <div className="relative w-32 h-40">
-               
-               {/* LAYER 1: DENTIN (Core) */}
+         {/* THE BIOMIMETIC LOOK */}
+         <div className="text-center relative">
+            <div className="relative w-24 h-32 mb-4">
+               {/* Dentin Layer (Yellow/Warm) */}
                <motion.div 
-                  initial={{ height: 0 }} 
-                  animate={{ height: phase >= 2 ? '100%' : '0%' }} 
-                  transition={{ duration: 1.5 }}
-                  className="absolute bottom-0 w-full bg-gradient-to-b from-amber-100 to-amber-300 rounded-xl border border-amber-200/50 shadow-inner"
+                  initial={{ height: 0 }} animate={{ height: '100%' }} transition={{ duration: 1 }}
+                  className="absolute bottom-0 w-full bg-amber-200/80 rounded-md z-10"
                />
-               
-               {/* LAYER 2: ENAMEL (Translucent) */}
+               {/* Enamel Layer (Blue/Translucent) */}
                <motion.div 
-                  initial={{ opacity: 0 }} 
-                  animate={{ opacity: phase >= 3 ? 0.7 : 0 }} 
-                  transition={{ duration: 1.5 }}
-                  className="absolute inset-[-4px] bg-gradient-to-b from-blue-50/20 to-transparent rounded-xl border border-white/40 backdrop-blur-[2px] shadow-lg"
+                  initial={{ opacity: 0 }} animate={{ opacity: 0.6 }} transition={{ delay: 1, duration: 1 }}
+                  className="absolute inset-0 bg-gradient-to-b from-blue-100/30 to-transparent rounded-md z-20 border border-white/30 backdrop-blur-[2px]"
                />
-
-               {/* LAYER 3: LIGHT PHYSICS */}
-               {phase >= 4 && (
-                 <motion.div 
-                    className="absolute inset-0 overflow-hidden rounded-xl"
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                 >
-                    <motion.div 
-                       className="w-16 h-[200%] bg-gradient-to-r from-transparent via-white/70 to-transparent absolute top-[-50%] skew-x-12 filter blur-md"
-                       animate={{ left: ['-100%', '200%'] }}
-                       transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-                    />
-                 </motion.div>
-               )}
+               {/* Light Reflection */}
+               <motion.div 
+                  animate={{ left: ['-100%', '200%'] }}
+                  transition={{ duration: 3, repeat: Infinity, delay: 2 }}
+                  className="absolute top-0 bottom-0 w-10 bg-white/40 skew-x-12 z-30 filter blur-md"
+               />
             </div>
-
-            {phase >= 2 && (
-               <motion.div initial={{y:10, opacity:0}} animate={{y:0, opacity:1}} className="mt-6 px-3 py-1 bg-green-900/50 border border-green-500 text-green-400 text-[10px] font-bold uppercase rounded flex items-center gap-2">
-                  <CheckCircle size={10} /> 
-                  {phase === 2 ? "Dentin Core" : phase === 3 ? "Enamel Shell" : "Light Refraction"}
-               </motion.div>
-            )}
-         </motion.div>
+            <div className="anim-info-box !static border-green-500 text-green-400 mx-auto">
+               <CheckCircle size={12}/> Biomimetic Layering
+            </div>
+         </div>
+      </div>
+      <div className="absolute bottom-10 flex gap-4 text-[10px] text-slate-500 uppercase font-bold tracking-widest">
+         <span>Light Transmission</span> • <span>Natural Gradient</span> • <span>Texture</span>
       </div>
     </div>
   );
 };
 
-// --- SCENE 3: THE HEART-MOUTH LOOP (Systemic Health) ---
-const HeartScene = ({ phase }: { phase: number }) => {
+// ==========================================
+// --- 3. HEALTH: The Systemic Highway ---
+// ==========================================
+const HeartMouthStory = () => {
   return (
-    <div className="w-full h-full relative bg-slate-950 flex flex-col justify-center px-12 overflow-hidden">
-       {/* Vein Background */}
-       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-red-950 via-slate-950 to-slate-950"></div>
-       
-       <div className="relative z-10 flex justify-between items-center h-48">
-          
-          {/* 1. THE MOUTH (Source) */}
-          <div className="flex flex-col items-center gap-4">
-             <div className="w-24 h-24 rounded-full bg-slate-800 border-4 border-red-500/30 flex items-center justify-center relative overflow-hidden">
-                {/* Inflamed Tissue */}
-                <div className="absolute inset-0 bg-red-500/10 animate-pulse"></div>
-                {/* Spawning Bacteria */}
-                {[...Array(8)].map((_, i) => (
-                   <motion.div
-                      key={i}
-                      className="absolute w-2 h-2 bg-green-400 rounded-full"
-                      initial={{ scale: 0 }}
-                      animate={{ 
-                         scale: phase >= 1 ? [0, 1, 0] : 0,
-                         x: (Math.random()-0.5)*60,
-                         y: (Math.random()-0.5)*60
-                      }}
-                      transition={{ duration: 2, repeat: Infinity, delay: i*0.2 }}
-                      style={{ top: '50%', left: '50%' }}
-                   />
-                ))}
+    <div className="relative w-full h-full bg-slate-950 flex flex-col items-center justify-center">
+       {/* 1. GUM POCKET */}
+       <div className="flex items-center w-full max-w-lg justify-between px-8 relative">
+          <div className="flex flex-col items-center z-10">
+             <div className="w-16 h-16 bg-red-900/40 border-2 border-red-500 rounded-full flex items-center justify-center">
+                <div className="text-xs font-black text-red-500">GUMS</div>
              </div>
-             <span className="text-[10px] font-black uppercase text-red-400 tracking-widest bg-red-950/50 px-2 py-1 rounded">Gum Infection</span>
-          </div>
-
-          {/* 2. THE HIGHWAY (Bloodstream) */}
-          <div className="flex-1 h-12 relative mx-4 bg-red-900/10 rounded-full border-y border-red-500/20 overflow-hidden">
-             {/* Traveling Bacteria */}
-             {phase >= 2 && [...Array(5)].map((_, i) => (
+             {/* Bacteria Spawning */}
+             {[...Array(5)].map((_, i) => (
                 <motion.div
                    key={i}
-                   className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-green-500 rounded-full shadow-[0_0_10px_#22c55e]"
-                   initial={{ left: '-10%' }}
-                   animate={{ left: '110%' }}
-                   transition={{ duration: 3, repeat: Infinity, delay: i*0.8, ease: "linear" }}
-                />
-             ))}
-             {/* Blood Cells */}
-             {[...Array(10)].map((_, i) => (
-                <motion.div
-                   key={i+10}
-                   className="absolute top-1/3 w-2 h-2 bg-red-600 rounded-full opacity-50"
-                   animate={{ left: ['-10%', '110%'] }}
-                   transition={{ duration: 5, repeat: Infinity, delay: i*0.5, ease: "linear" }}
+                   className="absolute w-2 h-2 bg-green-500 rounded-full"
+                   initial={{ x: 0, y: 0, opacity: 0 }}
+                   animate={{ x: [0, 50, 100, 150, 200], y: [0, 10, -10, 5, 0], opacity: [1, 1, 1, 1, 0] }}
+                   transition={{ duration: 3, repeat: Infinity, delay: i * 0.6, ease: "linear" }}
+                   style={{ left: '60px', top: '35px' }}
                 />
              ))}
           </div>
 
-          {/* 3. THE HEART (Target) */}
-          <div className="flex flex-col items-center gap-4">
-             <div className="relative">
-                <motion.div 
-                  className="w-24 h-24 bg-red-700 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(220,38,38,0.4)] relative z-10"
-                  animate={{ scale: [1, 1.15, 1] }}
-                  transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
-                >
-                   <Heart fill="white" className="text-white w-10 h-10" />
-                </motion.div>
-                
-                {/* Inflammation Warning */}
-                {phase >= 3 && (
-                   <motion.div 
-                      className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center border-2 border-slate-900 z-20"
-                      initial={{ scale: 0 }} animate={{ scale: 1 }}
-                   >
-                      <AlertTriangle size={14} className="text-black" />
-                   </motion.div>
-                )}
+          {/* 2. BLOOD VESSEL PIPELINE */}
+          <div className="h-2 flex-1 bg-red-900/20 mx-4 rounded-full relative overflow-hidden">
+             <div className="absolute inset-0 bg-red-600/10 animate-pulse"></div>
+          </div>
+
+          {/* 3. HEART VALVE */}
+          <div className="flex flex-col items-center z-10">
+             <motion.div 
+               animate={{ scale: [1, 1.1, 1] }} 
+               transition={{ duration: 0.8, repeat: Infinity }}
+               className="w-16 h-16 bg-red-600 border-2 border-white rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(220,38,38,0.5)]"
+             >
+                <Heart fill="white" size={24} className="text-white"/>
+             </motion.div>
+             <div className="anim-info-box !static mt-4 border-red-500 text-white">
+               <Activity size={12}/> Heart Valve Risk
              </div>
-             <span className="text-[10px] font-black uppercase text-white tracking-widest bg-slate-800 px-2 py-1 rounded">Valve Risk</span>
           </div>
-
        </div>
+       <p className="text-slate-400 text-xs mt-8 text-center max-w-xs px-4">
+          Bacteria from periodontal pockets enter the bloodstream directly, lodging in heart valves.
+       </p>
     </div>
   );
 };
 
-// --- SCENE 4: INVISIBLE PHYSICS (Aligners) ---
-const AlignerScene = ({ phase }: { phase: number }) => {
+// ==========================================
+// --- 4. ALIGNERS: Physics Force Vectors ---
+// ==========================================
+const AlignerStory = () => {
   return (
-    <div className="w-full h-full relative bg-slate-900 flex items-center justify-center">
-       <div className="grid-bg opacity-30"></div>
-       
-       <div className="flex items-center gap-16 relative z-10">
+    <div className="relative w-full h-full bg-slate-900 flex items-center justify-center">
+       {/* The Tooth */}
+       <div className="relative w-24 h-32 bg-slate-200 rounded-lg border-2 border-slate-400 flex items-center justify-center">
+          <span className="text-slate-400 font-black text-4xl opacity-20">T</span>
           
-          {/* THE TOOTH */}
-          <div className="relative">
-             {/* Root Shadow */}
-             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-16 h-4 bg-black/50 blur-lg rounded-full"></div>
-             
-             {/* The Tooth Block */}
-             <motion.div 
-               className="w-32 h-40 bg-slate-200 rounded-[2rem] border-4 border-slate-300 flex items-center justify-center shadow-2xl relative"
-               animate={{ 
-                  rotate: phase >= 2 ? 15 : 0,
-                  x: phase >= 3 ? 40 : 0
-               }}
-               transition={{ duration: 2, ease: "easeInOut" }}
-             >
-                <span className="text-slate-400 font-black text-6xl opacity-20">T</span>
-                
-                {/* The Aligner Mesh (Invisible) */}
-                <motion.div
-                   className="absolute -inset-3 border-2 border-blue-400 rounded-[2.5rem] bg-blue-400/5 shadow-[0_0_20px_rgba(96,165,250,0.2)]"
-                   animate={{ opacity: [0.3, 0.6, 0.3] }}
-                   transition={{ duration: 3, repeat: Infinity }}
-                />
-             </motion.div>
-
-             {/* Center of Rotation Dot */}
-             {phase >= 2 && (
-                <motion.div initial={{scale:0}} animate={{scale:1}} className="absolute top-1/2 left-1/2 w-4 h-4 bg-red-500 rounded-full -translate-x-1/2 -translate-y-1/2 z-20 border-2 border-white shadow-lg" />
-             )}
-          </div>
-
-          {/* PHYSICS VECTORS */}
-          <div className="flex flex-col gap-6">
-             <motion.div 
-               className="flex items-center gap-3"
-               initial={{ opacity: 0, x: -20 }}
-               animate={{ opacity: phase >= 1 ? 1 : 0, x: phase >= 1 ? 0 : -20 }}
-             >
-                <div className="w-12 h-12 bg-blue-600/20 border border-blue-500 rounded-full flex items-center justify-center text-blue-400">
-                   <Zap size={20} />
-                </div>
-                <div>
-                   <div className="text-xs font-bold text-white uppercase">Constant Force</div>
-                   <div className="text-[10px] text-blue-400">0.25N Continuous</div>
-                </div>
-             </motion.div>
-
-             <motion.div 
-               className="flex items-center gap-3"
-               initial={{ opacity: 0, x: -20 }}
-               animate={{ opacity: phase >= 2 ? 1 : 0, x: phase >= 2 ? 0 : -20 }}
-             >
-                <div className="w-12 h-12 bg-purple-600/20 border border-purple-500 rounded-full flex items-center justify-center text-purple-400">
-                   <Activity size={20} />
-                </div>
-                <div>
-                   <div className="text-xs font-bold text-white uppercase">Torque Control</div>
-                   <div className="text-[10px] text-purple-400">Root Rotation</div>
-                </div>
-             </motion.div>
-          </div>
-       </div>
-    </div>
-  );
-};
-
-// --- SCENE 5: THE 3-YEAR WARNING (AI Scan) ---
-const ScannerScene = ({ phase }: { phase: number }) => {
-  return (
-    <div className="w-full h-full relative bg-black flex items-center justify-center overflow-hidden">
-       
-       {/* 1. THE TOOTH WIREFRAME */}
-       <div className="relative w-48 h-64 opacity-50">
-          <svg viewBox="0 0 100 130" className="w-full h-full">
-             <path d="M20 100 Q 50 10 80 100 L 70 120 L 30 120 Z" fill="none" stroke="#10b981" strokeWidth="0.5" strokeDasharray="2 2" />
-             <path d="M30 40 Q 50 50 70 40" fill="none" stroke="#10b981" strokeWidth="0.5" />
-          </svg>
-          
-          {/* THE HIDDEN DECAY (Invisible initially) */}
+          {/* Aligner Overlay (Invisible) */}
           <motion.div 
-             className="absolute top-[35%] left-[45%] w-6 h-6 bg-red-600 rounded-full blur-md"
-             initial={{ opacity: 0 }}
-             animate={{ opacity: phase >= 2 ? [0.5, 1, 0.5] : 0 }}
-             transition={{ duration: 1, repeat: Infinity }}
+             animate={{ opacity: [0.3, 0.6, 0.3] }}
+             transition={{ duration: 2, repeat: Infinity }}
+             className="absolute inset-[-4px] border-2 border-blue-400 rounded-xl bg-blue-400/10"
           />
        </div>
 
-       {/* 2. THE LASER BEAM */}
-       {phase >= 1 && (
-          <motion.div
-             className="absolute left-0 right-0 h-1 bg-green-500 shadow-[0_0_30px_#22c55e] z-20"
-             initial={{ top: '0%' }}
-             animate={{ top: ['0%', '100%', '0%'] }}
-             transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-          >
-             <div className="absolute right-10 -top-3 text-[10px] font-mono text-green-400 bg-black/50 px-2">SCANNING...</div>
-          </motion.div>
-       )}
+       {/* Force Vector Arrow */}
+       <motion.div
+          initial={{ x: -100, opacity: 0 }}
+          animate={{ x: -60, opacity: 1 }}
+          transition={{ duration: 1, delay: 0.5 }}
+          className="absolute left-20 flex items-center"
+       >
+          <div className="text-blue-500 font-bold text-xs mr-2 uppercase">Constant Force</div>
+          <ArrowRight size={40} className="text-blue-500" strokeWidth={3} />
+       </motion.div>
 
-       {/* 3. DATA HUD LAYERS */}
-       <div className="absolute inset-0 pointer-events-none">
-          {/* Floating Metrics */}
-          {phase >= 1 && [...Array(4)].map((_, i) => (
-             <motion.div
-                key={i}
-                className="absolute text-[8px] font-mono text-green-500/60 border border-green-500/30 px-2 py-1 rounded bg-green-900/10"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: i * 0.5 }}
-                style={{ top: `${20 + i*15}%`, right: '10%' }}
-             >
-                {['DENSITY: 98%', 'STRUCTURE: OK', 'SPECTRA: 450nm', 'DEPTH: 1.2mm'][i]}
-             </motion.div>
-          ))}
-
-          {/* ALERT BOX */}
-          <AnimatePresence>
-             {phase >= 3 && (
-                <motion.div
-                   initial={{ scale: 0, y: 50 }} 
-                   animate={{ scale: 1, y: 0 }}
-                   exit={{ opacity: 0 }}
-                   className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-red-950/90 border border-red-500 text-white p-4 rounded-xl shadow-2xl flex items-center gap-4 min-w-[250px]"
-                >
-                   <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center animate-pulse">
-                      <ShieldAlert size={20} className="text-white"/> 
-                   </div>
-                   <div>
-                      <div className="font-black uppercase text-sm tracking-wide">Decay Detected</div>
-                      <div className="text-[10px] font-mono text-red-200">Sub-surface: 2mm deep</div>
-                      <div className="text-[9px] text-slate-400 mt-1">Invisible to Naked Eye</div>
-                   </div>
-                </motion.div>
-             )}
-          </AnimatePresence>
+       {/* Movement Ghost */}
+       <motion.div
+          initial={{ x: 0, opacity: 0 }}
+          animate={{ x: 40, opacity: 0.5 }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute w-24 h-32 bg-slate-200/20 rounded-lg border-2 border-white/20 border-dashed"
+       />
+       
+       <div className="absolute bottom-10 anim-info-box border-blue-500 text-blue-300">
+          <Zap size={12}/> 0.25mm Movement / Tray
        </div>
     </div>
   );
 };
 
+// ==========================================
+// --- 5. AI DIAGNOSTICS: The Hidden Decay ---
+// ==========================================
+const AIStory = () => {
+  return (
+    <div className="relative w-full h-full bg-black flex items-center justify-center">
+       {/* Tooth Wireframe */}
+       <svg width="200" height="200" viewBox="0 0 200 200" className="opacity-50">
+          <path d="M50 150 L50 50 Q100 0 150 50 L150 150" stroke="white" strokeWidth="2" fill="none" />
+       </svg>
+
+       {/* The "Hidden" Cavity */}
+       <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 1, 1, 0] }}
+          transition={{ duration: 4, repeat: Infinity, delay: 1 }}
+          className="absolute top-[80px] left-[90px] w-6 h-6 bg-red-600 rounded-full blur-sm z-10"
+       />
+
+       {/* Laser Scanning Beam */}
+       <motion.div
+          animate={{ top: ['10%', '90%', '10%'] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+          className="absolute left-0 right-0 h-1 bg-green-500 shadow-[0_0_20px_#22c55e] z-20 w-1/2 mx-auto"
+       />
+
+       {/* Detection Alert */}
+       <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 1.5, duration: 0.2 }}
+          className="absolute top-[40px] right-[40px] bg-red-900/90 border border-red-500 text-white p-2 rounded-lg text-xs font-bold shadow-xl flex items-center gap-2"
+       >
+          <ShieldAlert size={14} className="animate-pulse"/> 
+          <div>
+             <div>DECAY DETECTED</div>
+             <div className="text-[9px] font-normal opacity-80">Sub-surface: 2mm deep</div>
+          </div>
+       </motion.div>
+    </div>
+  );
+};
 
 // ==========================================
-// 3. MAIN COMPONENT (State & Logic)
+// --- 6. FLUORIDE: The Lattice Repair ---
+// ==========================================
+const FluorideStory = () => {
+  return (
+    <div className="relative w-full h-full bg-slate-900 flex items-center justify-center">
+       {/* Enamel Grid (Damaged) */}
+       <div className="grid grid-cols-4 gap-2 opacity-50">
+          {[...Array(16)].map((_, i) => (
+             <div key={i} className={`w-8 h-8 border border-white/30 rounded-sm ${[5,6,9,10].includes(i) ? 'bg-transparent' : 'bg-white/10'}`}></div>
+          ))}
+       </div>
+
+       {/* Acid Attack */}
+       <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 1, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="absolute text-red-500 font-bold text-xs top-10"
+       >
+          ACID ATTACK
+       </motion.div>
+
+       {/* Fluoride Ions Repairing */}
+       {[5,6,9,10].map((pos, i) => (
+          <motion.div
+             key={i}
+             className="absolute w-8 h-8 bg-blue-500/80 rounded-sm flex items-center justify-center text-[8px] font-bold text-white shadow-[0_0_10px_#3b82f6]"
+             initial={{ scale: 2, opacity: 0 }}
+             animate={{ scale: 1, opacity: 1 }}
+             transition={{ delay: 1 + (i*0.2), duration: 0.5 }}
+             style={{ 
+                left: `calc(50% - 36px + ${(pos % 4) * 40}px - 40px)`, 
+                top: `calc(50% - 36px + ${Math.floor(pos / 4) * 40}px - 40px)` 
+             }}
+          >
+             F-
+          </motion.div>
+       ))}
+       
+       <div className="absolute bottom-10 anim-info-box border-blue-500 text-blue-300">
+          <ShieldCheck size={12}/> Remineralization Active
+       </div>
+    </div>
+  );
+};
+
+// ==========================================
+// --- 7. BIOFILM: The Sticky Web ---
+// ==========================================
+const BiofilmStory = () => {
+  return (
+    <div className="relative w-full h-full bg-slate-950 flex items-center justify-center">
+       {/* Tooth Surface */}
+       <div className="w-64 h-2 bg-white/20 absolute bottom-20 rounded-full"></div>
+       <div className="text-xs text-slate-500 absolute bottom-14">Tooth Surface</div>
+
+       {/* Bacteria Multiplying */}
+       {[...Array(15)].map((_, i) => (
+          <motion.div
+             key={i}
+             className="absolute w-3 h-3 bg-green-500/60 rounded-full"
+             initial={{ y: -200, x: (Math.random() - 0.5) * 200, opacity: 0 }}
+             animate={{ y: 20, opacity: 1 }}
+             transition={{ duration: 2, delay: i * 0.1 }}
+             style={{ bottom: `${25 + Math.random() * 20}%`, left: `${40 + (Math.random() - 0.5) * 40}%` }}
+          />
+       ))}
+
+       {/* The Protective Slime Layer Forming */}
+       <motion.div
+          initial={{ width: 0, opacity: 0 }}
+          animate={{ width: 200, opacity: 1 }}
+          transition={{ delay: 2, duration: 2 }}
+          className="absolute bottom-20 h-16 bg-green-900/30 border-t-2 border-green-500/50 rounded-t-xl backdrop-blur-sm z-10"
+       />
+       
+       <motion.div 
+         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 4 }}
+         className="anim-info-box absolute top-1/3 border-red-500 text-red-300"
+       >
+          <ShieldAlert size={12}/> Matrix Protected (Resistant to Rinsing)
+       </motion.div>
+    </div>
+  );
+};
+
+import { CheckCircle } from 'lucide-react'; // Helper import
+
+// ==========================================
+// --- MAIN COMPONENT ---
 // ==========================================
 
 export default function Gallery() {
@@ -562,178 +434,148 @@ export default function Gallery() {
   const [isTimerPlaying, setIsTimerPlaying] = useState(false);
   const [barWidth, setBarWidth] = useState("0%");
   
-  // NARRATIVE STATE
-  const [phase, setPhase] = useState(0);
-  const [storyText, setStoryText] = useState("");
-  
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // --- TOP 5 PLAYLIST (Rich Content) ---
+  // --- PLAYLIST ---
   const playlist = [
+    // 1. PUSH: IMPLANTS
     {
+      type: "audio",
       name: "The Bionic Tooth",
-      artist: "Surgical Science",
-      description: "Why titanium is the only material that fuses with human bone.",
-      component: <ImplantScene phase={phase} />,
-      script: [
-        { t: 0, text: "Welcome to the Biology of Implants. Let's look at what happens when you lose a tooth.", p: 0 },
-        { t: 5, text: "PHASE 1: RESORPTION. Without a root to stimulate it, your jawbone literally melts away. This causes facial collapse.", p: 1 },
-        { t: 12, text: "PHASE 2: INSERTION. We place a Grade-5 Titanium Implant. It mimics the natural tooth root perfectly.", p: 2 },
-        { t: 18, text: "PHASE 3: OSSEOINTEGRATION. This is the magic. Your bone cells (osteoblasts) attach to the titanium surface.", p: 3 },
-        { t: 25, text: "PHASE 4: RESTORATION. Once fused, we attach the crown. You now have 100% bite force restored.", p: 4 }
-      ],
+      artist: "Clinical Engineering",
+      description: "Why titanium implants are the only permanent solution for bone loss. Watch how bone integrates.",
+      component: <ImplantStory />,
       audio: "/audio/implants.mp3",
       category: "Surgery",
-      tags: ['Implants', 'Biology', 'Titanium']
+      tags: ['Implants', 'Biology']
     },
+    // 2. SHIELD: ETHICS
     {
+      type: "audio",
       name: "The Instagram Trap",
-      artist: "Cosmetic Ethics",
-      description: "The difference between 'Chiclet' teeth and Biomimetic artistry.",
-      component: <VeneerScene phase={phase} />,
-      script: [
-        { t: 0, text: "Let's analyze why some veneers look fake. We call them 'Chiclets'.", p: 0 },
-        { t: 5, text: "PROBLEM: Monolithic blocks. They are one solid color, opaque, and block light. They look dead.", p: 1 },
-        { t: 12, text: "SOLUTION: Biomimetic Layering. We mimic nature. First, a warm Dentin core.", p: 2 },
-        { t: 18, text: "Next, a translucent Enamel shell. This creates depth and allows light to pass through.", p: 3 },
-        { t: 24, text: "Finally, light refraction. Real teeth glow. We recreate that internal physics.", p: 4 }
-      ],
+      artist: "Dr. Deepak",
+      description: "Are veneers worth it? See the difference between a fake 'Chiclet' block and true biomimetic layering.",
+      component: <VeneerStory />,
       audio: "/audio/ethics.mp3", 
       category: "Ethics",
-      tags: ['Veneers', 'Truth', 'Art']
+      tags: ['Veneers', 'Truth']
     },
+    // 3. PUSH: HEALTH
     {
+      type: "audio",
       name: "The Heart-Mouth Loop",
       artist: "Systemic Health",
-      description: "Tracing the path of bacteria from gum pockets to heart valves.",
-      component: <HeartScene phase={phase} />,
-      script: [
-        { t: 0, text: "Warning: Your mouth is not isolated. It is a highway to your vital organs.", p: 0 },
-        { t: 5, text: "STEP 1: INFECTION. Plaque bacteria multiply in deep gum pockets. The tissue becomes inflamed.", p: 1 },
-        { t: 12, text: "STEP 2: THE BREACH. When you bleed, bacteria enter your bloodstream directly.", p: 2 },
-        { t: 20, text: "STEP 3: THE TARGET. These pathogens travel to the heart, lodging in valves and arteries.", p: 3 },
-        { t: 28, text: "Treating gum disease is not just about teeth. It is about stroke and heart attack prevention.", p: 3 }
-      ],
+      description: "The proven link between bleeding gums and heart disease. Bacteria travels from mouth to valves.",
+      component: <HeartMouthStory />,
       audio: "/audio/safety.mp3",
       category: "Health",
-      tags: ['Heart', 'Bacteria', 'Risk']
+      tags: ['Wellness', 'Risk']
     },
+    // 4. PUSH: ALIGNERS
     {
+      type: "journal",
       name: "Invisible Physics",
-      artist: "Orthodontics",
-      description: "How clear aligners move bone faster than metal braces.",
-      component: <AlignerScene phase={phase} />,
-      script: [
-        { t: 0, text: "How does clear plastic move a solid bone? It's simply physics.", p: 0 },
-        { t: 5, text: "Braces pull teeth. Aligners PUSH them. We apply 0.25 Newtons of constant force.", p: 1 },
-        { t: 12, text: "This stimulates osteoclasts to dissolve bone on one side, and osteoblasts to build it on the other.", p: 2 },
-        { t: 20, text: "By controlling the Center of Rotation, we can rotate roots without metal wires.", p: 3 },
-        { t: 28, text: "The result? Faster, safer movement with less pain.", p: 3 }
-      ],
+      artist: "Aligner Tech",
+      description: "The surprising engineering behind clear plastic. Constant low force allows faster movement than metal.",
+      component: <AlignerStory />,
       audio: "/audio/ortho.mp3",
       category: "Ortho",
-      tags: ['Physics', 'Aligners', 'Speed']
+      tags: ['Physics', 'Aligners']
     },
+    // 5. PUSH: AI TECH
     {
+      type: "journal",
       name: "The 3-Year Warning",
-      artist: "AI Diagnostics",
-      description: "Detecting decay years before the human eye can see it.",
-      component: <ScannerScene phase={phase} />,
-      script: [
-        { t: 0, text: "Most cavities are invisible for the first 2 years. X-rays often miss them.", p: 0 },
-        { t: 6, text: "We use Near-Infrared Laser Transillumination. It scans the density of your enamel.", p: 1 },
-        { t: 14, text: "Healthy enamel allows light to pass. Decay absorbs it, creating a shadow.", p: 2 },
-        { t: 22, text: "ALERT: We found a lesion 2mm deep. But because we caught it early...", p: 3 },
-        { t: 30, text: "We can remineralize it without drilling. Prevention is the ultimate cure.", p: 3 }
-      ],
+      artist: "Tech Analysis",
+      description: "How AI scanners detect sub-surface decay 3 years before it becomes visible to the naked eye.",
+      component: <AIStory />,
       audio: "/audio/ai.mp3", 
       category: "Technology",
-      tags: ['AI', 'Laser', 'Prevention']
+      tags: ['AI', 'Laser']
+    },
+    // 6. SHIELD: FLUORIDE
+    {
+      type: "journal",
+      name: "Fluoride Chemistry",
+      artist: "Prevention Science",
+      description: "How Fluoride ions physically replace lost minerals in the enamel lattice after acid attacks.",
+      component: <FluorideStory />,
+      audio: "/audio/kids.mp3", 
+      category: "Chemistry",
+      tags: ['Safety', 'Science']
+    },
+    // 7. PUSH: BIOFILM
+    {
+      type: "journal",
+      name: "Biofilm: The Silent Killer",
+      artist: "Hygiene Protocol",
+      description: "Why brushing isn't enough. Biofilm forms a protective matrix that resists standard rinsing.",
+      component: <BiofilmStory />,
+      audio: "/audio/safety.mp3", // Reusing safety audio
+      category: "Hygiene",
+      tags: ['Bacteria', 'Risk']
     }
   ];
 
   const currentTrack = playlist[currentTrackIndex];
 
-  // --- ENGINE LOGIC ---
-  
-  // 1. Narrative Timer
-  useEffect(() => {
-    setPhase(0);
-    setStoryText("");
-    
-    const script = currentTrack.script;
-    if (!script) return;
-
-    let timeouts: NodeJS.Timeout[] = [];
-    
-    script.forEach((step) => {
-      const timeout = setTimeout(() => {
-        setStoryText(step.text);
-        setPhase(step.p);
-      }, step.t * 1000);
-      timeouts.push(timeout);
-    });
-
-    return () => timeouts.forEach(clearTimeout);
-  }, [currentTrackIndex]);
-
-  // 2. Audio Setup
+  // --- AUDIO LOGIC ---
   useEffect(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio(playlist[0].audio);
-      audioRef.current.volume = 0.25; 
+      audioRef.current.volume = 0.2; 
     }
     const audio = audioRef.current;
     const updateProgress = () => { if (audio.duration) setBarWidth(`${(audio.currentTime / audio.duration) * 100}%`); };
-    const handleEnded = () => handleNext(); // Auto-advance
+    const handleEnded = () => handleNext();
     audio.addEventListener('timeupdate', updateProgress);
     audio.addEventListener('ended', handleEnded);
     return () => { audio.removeEventListener('timeupdate', updateProgress); audio.removeEventListener('ended', handleEnded); };
   }, []);
 
-  // 3. Track Switching
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.src = playlist[currentTrackIndex].audio;
       audioRef.current.load();
-      if (isTimerPlaying) {
-        audioRef.current.play().catch(e => { setIsTimerPlaying(false); console.log(e); });
-      } else { setBarWidth("0%"); }
+      if (isTimerPlaying) audioRef.current.play().catch(() => {});
+      else setBarWidth("0%");
     }
   }, [currentTrackIndex]);
 
-  // 4. Controls
   const togglePlay = () => {
     if(!audioRef.current) return;
     if(isTimerPlaying) { audioRef.current.pause(); setIsTimerPlaying(false); }
     else { audioRef.current.play(); setIsTimerPlaying(true); }
   };
-  const handleNext = () => { setIsTimerPlaying(true); setCurrentTrackIndex(p => (p + 1) % playlist.length); };
-  const handlePrev = () => { setIsTimerPlaying(true); setCurrentTrackIndex(p => (p - 1 + playlist.length) % playlist.length); };
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!audioRef.current) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const percent = (e.clientX - rect.left) / rect.width;
-    audioRef.current.currentTime = percent * audioRef.current.duration;
+
+  const handleNext = () => {
+    setIsTimerPlaying(true); 
+    setCurrentTrackIndex((prev) => (prev + 1) % playlist.length);
+  };
+
+  const handlePrev = () => {
+    setIsTimerPlaying(true); 
+    setCurrentTrackIndex((prev) => (prev - 1 + playlist.length) % playlist.length);
   };
 
   return (
-    <section id="gallery" className="py-24 relative bg-slate-50 dark:bg-[#0B1019] transition-colors duration-500">
-      <style jsx global>{consoleStyles}</style>
+    <section id="gallery" className="py-24 relative transition-colors duration-500 overflow-hidden bg-slate-50 dark:bg-[#0B1019]">
+      <style jsx global>{wideCardStyles}</style>
 
-      {/* HEADER */}
-      <div className="max-w-7xl mx-auto px-6 mb-16">
+      {/* Header */}
+      <div className="max-w-7xl mx-auto px-6 mb-20">
         <RevealOnScroll>
           <div className="flex flex-col items-center text-center">
-             <div className="inline-flex items-center gap-2 text-blue-600 dark:text-cyan-400 font-bold tracking-[0.3em] text-[10px] uppercase mb-4 border border-blue-200 dark:border-blue-900 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/10">
-                <Sparkles size={14} /> Knowledge Engine
+             <div className="inline-flex items-center gap-2 text-blue-600 dark:text-cyan-400 font-bold tracking-[0.3em] text-[10px] uppercase mb-4">
+                <Sparkles size={16} /> Visual Intelligence
              </div>
              <h2 className="text-4xl md:text-7xl font-black text-slate-900 dark:text-white mb-6 tracking-tighter leading-[0.85]">
-                Clinical <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500">Console.</span>
+                Clinical <br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500">Motion Graphics.</span>
              </h2>
              <p className="text-lg text-slate-500 dark:text-slate-400 max-w-xl font-medium leading-relaxed">
-               Interactive simulations of our most complex procedures. Watch, listen, and learn.
+               Don't just read. Watch exactly how the science works inside your body.
              </p>
           </div>
         </RevealOnScroll>
@@ -741,117 +583,79 @@ export default function Gallery() {
 
       <div className="max-w-7xl mx-auto px-6">
         
-        {/* --- MAIN CONSOLE CARD --- */}
         <RevealOnScroll className="mb-24">
-           <div className="console-card group hover:shadow-2xl transition-shadow duration-500">
+           <div className="unified-player-card group">
               
-              {/* LEFT: VISUAL STAGE */}
-              <div className="visual-stage">
+              {/* Left: LIVE ANIMATION CANVAS */}
+              <div className="player-media">
                   <AnimatePresence mode="wait">
                     <motion.div 
                       key={currentTrackIndex}
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 1.05 }}
-                      transition={{ duration: 0.8, ease: "easeInOut" }}
+                      transition={{ duration: 0.6, ease: "easeInOut" }}
                       className="absolute inset-0 w-full h-full"
                     >
                        {currentTrack.component}
                     </motion.div>
                   </AnimatePresence>
                   
-                  {/* TEACHER OVERLAY */}
-                  <div className="narrative-overlay">
-                     <div className="flex items-center gap-2 text-blue-400 text-[10px] font-black uppercase tracking-widest border-b border-white/10 pb-2 mb-1">
-                        <MessageCircle size={12} /> Live Explanation
-                     </div>
-                     <Typewriter text={storyText} key={storyText} speed={30} />
+                  {/* Category Badge Overlay */}
+                  <div className="absolute bottom-6 left-6 z-30">
+                     <span className={`px-4 py-1.5 text-white text-[9px] font-black uppercase tracking-widest rounded-full inline-block shadow-lg backdrop-blur-md border border-white/10 ${currentTrack.type === 'audio' ? 'bg-blue-600/80' : 'bg-green-600/80'}`}>
+                        {currentTrack.type === 'audio' ? 'Podcast' : 'Visual Guide'}
+                     </span>
                   </div>
               </div>
 
-              {/* RIGHT: CONTROLLER PANEL */}
-              <div className="controller-panel">
-                  <div className="flex flex-col h-full justify-between">
-                    
-                    {/* Track Info */}
-                    <div>
-                        <div className="flex justify-between items-start mb-6">
-                            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-500 bg-blue-100 dark:bg-blue-900/30 px-3 py-1 rounded-full">
-                                <Bookmark size={12} /> {currentTrack.category}
-                            </div>
-                            <div className="text-[10px] font-mono text-slate-400 flex items-center gap-2">
-                                <Clock size={12} /> LESSON {currentTrackIndex + 1}/{playlist.length}
-                            </div>
-                        </div>
-
-                        <h2 className="track-title text-4xl font-black text-slate-900 dark:text-white mb-4 leading-[0.95]">
-                            {currentTrack.name}
-                        </h2>
-                        
-                        <div className="flex flex-wrap gap-2 mb-8">
-                            {currentTrack.tags.map(t => (
-                                <span key={t} className="text-[10px] font-bold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10 px-3 py-1.5 rounded-lg uppercase tracking-wider hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-default">
-                                    {t}
-                                </span>
-                            ))}
-                        </div>
-
-                        <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed font-medium pl-4 border-l-2 border-blue-500/30">
-                            {currentTrack.description}
-                        </p>
+              {/* Right: Content & Controls */}
+              <div className="player-content">
+                  <div>
+                    <h2 className="track-title text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4">{currentTrack.name}</h2>
+                    <div className="flex items-center gap-4 mb-6">
+                       {currentTrack.type === 'audio' && (
+                           <span className="text-xs font-black text-blue-600 uppercase tracking-widest flex items-center gap-2">
+                              <Activity size={14} className={isTimerPlaying ? "animate-pulse" : ""} /> Audio Explanation
+                           </span>
+                       )}
+                       <div className="flex gap-2">
+                          {currentTrack.tags.map(t => (
+                             <span key={t} className="text-[10px] font-bold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10 px-2 py-1 rounded-md uppercase tracking-wider">{t}</span>
+                          ))}
+                       </div>
                     </div>
+                    <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed line-clamp-4 md:line-clamp-none">{currentTrack.description}</p>
+                  </div>
 
-                    {/* Playback Controls */}
-                    <div className="mt-12 pt-8 border-t border-slate-100 dark:border-white/5">
-                        <div className="flex items-center justify-between mb-4">
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                <Activity size={12} className={isTimerPlaying ? "animate-pulse text-green-500" : "text-slate-600"} /> 
-                                {isTimerPlaying ? "Simulating..." : "Paused"}
-                            </span>
-                        </div>
-
-                        {/* Seeker */}
-                        <div className="relative h-1.5 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden mb-8 cursor-pointer group/bar w-full" onClick={handleSeek}>
-                            <div className="absolute top-0 left-0 h-full bg-blue-600 transition-all duration-100 ease-linear group-hover/bar:bg-blue-500 shadow-[0_0_10px_#2563eb]" style={{ width: barWidth }}></div>
-                        </div>
-                        
-                        {/* Buttons */}
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-6">
-                                <button onClick={handlePrev} className="w-12 h-12 rounded-full border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-600 dark:hover:text-white transition-all">
-                                    <SkipBack size={20} />
-                                </button>
-                                
-                                <button 
-                                    onClick={togglePlay} 
-                                    className="w-20 h-20 rounded-full bg-slate-900 dark:bg-white text-white dark:text-black flex items-center justify-center shadow-2xl hover:scale-105 active:scale-95 transition-all"
-                                >
-                                    {isTimerPlaying ? <Pause size={32} fill="currentColor" /> : <Play size={32} fill="currentColor" className="ml-1" />}
-                                </button>
-                                
-                                <button onClick={handleNext} className="w-12 h-12 rounded-full border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-600 dark:hover:text-white transition-all">
-                                    <SkipForward size={20} />
-                                </button>
-                            </div>
-                            
-                            <div className="flex items-center gap-4">
-                                <button className="text-slate-300 hover:text-red-500 transition-colors hover:scale-110 p-2">
-                                    <Heart size={24} />
-                                </button>
-                                <button className="text-slate-300 hover:text-blue-500 transition-colors hover:scale-110 p-2">
-                                    <Share2 size={24} />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                  <div className="mt-8 pt-8 border-t border-slate-100 dark:border-white/5">
+                      {/* Progress Bar */}
+                      <div className="relative h-2 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden mb-8 cursor-pointer group/bar">
+                          <div className="absolute top-0 left-0 h-full bg-blue-600 transition-all duration-100 ease-linear group-hover/bar:bg-blue-500" style={{ width: barWidth }}></div>
+                      </div>
+                      
+                      {/* Controls */}
+                      <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-6 md:gap-10">
+                             <button onClick={handlePrev} className="text-slate-400 hover:text-blue-600 transition-colors transform hover:-translate-x-1"><SkipBack size={28} /></button>
+                             <button onClick={togglePlay} className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-xl hover:scale-110 active:scale-95 transition-all">
+                                {isTimerPlaying ? <Pause size={28} fill="currentColor" /> : <Play size={28} fill="currentColor" className="ml-1" />}
+                             </button>
+                             <button onClick={handleNext} className="text-slate-400 hover:text-blue-600 transition-colors transform hover:translate-x-1"><SkipForward size={28} /></button>
+                          </div>
+                          <div className="flex items-center gap-6">
+                             <button className="text-slate-300 hover:text-red-500 transition-colors hover:scale-110"><Heart size={20} /></button>
+                             <button className="text-slate-300 hover:text-blue-500 transition-colors hover:scale-110"><Share2 size={20} /></button>
+                          </div>
+                      </div>
                   </div>
               </div>
            </div>
         </RevealOnScroll>
 
-    <div className="text-center mt-16">
-           <Link href="/gallery" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-blue-600 transition-colors group">
-              View Complete Archives <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
+        <div className="text-center mt-12">
+           <Link href="/gallery" className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-blue-600 transition-colors group">
+              Open Clinical Archives <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />
            </Link>
         </div>
 
