@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { 
   ArrowRight, Play, Pause, SkipBack, SkipForward, Heart, Share2, 
   Sparkles, Bookmark, Activity, ShieldAlert, ShieldCheck,
-  Scan, Database, Wifi, ArrowDown, Zap
+  Scan, Database, Wifi, ArrowDown, Zap, AlertTriangle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
@@ -26,7 +26,7 @@ const wideCardStyles = `
   @media (min-width: 1024px) {
     .unified-player-card {
       flex-direction: row;
-      height: 550px; /* Slightly taller for complex visuals */
+      height: 550px; 
     }
   }
   .dark .unified-player-card {
@@ -36,9 +36,9 @@ const wideCardStyles = `
   }
 
   .player-media {
-    flex: 1.3; /* Give visuals more space */
+    flex: 1.3;
     position: relative;
-    background: #0f172a; /* Deep slate background for contrast */
+    background: #0f172a; 
     min-height: 350px;
     overflow: hidden;
     display: flex;
@@ -59,268 +59,371 @@ const wideCardStyles = `
     letter-spacing: -0.02em;
   }
 
-  /* Animation Info Overlay Styles */
   .anim-info-box {
-    background: rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.8);
     backdrop-filter: blur(8px);
     border: 1px solid rgba(255,255,255,0.1);
-    padding: 10px 16px;
-    border-radius: 12px;
+    padding: 8px 14px;
+    border-radius: 8px;
     position: absolute;
     color: white;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.05em;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     box-shadow: 0 10px 20px -5px rgba(0,0,0,0.3);
+    z-index: 20;
   }
 `;
 
 // ==========================================
-// --- ADVANCED NARRATIVE ANIMATIONS ---
+// --- 1. IMPLANTS: Bone Loss vs. Preservation ---
 // ==========================================
-
-// 1. IMPLANTS: The Osseointegration Process
-const AdvancedImplantsAnim = () => {
+const ImplantStory = () => {
   return (
-    <div className="relative w-full h-full flex items-center justify-center overflow-hidden bg-slate-900">
-      {/* Bone Structure Background Pattern */}
-      <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
-      
-      <div className="relative z-10 flex flex-col items-center">
-        {/* The Screw turning and descending */}
-        <motion.div
-          initial={{ y: -150, rotate: 0 }}
-          animate={{ y: 0, rotate: 720 }}
-          transition={{ duration: 4, ease: "easeInOut" }}
-          className="relative"
-        >
-          {/* Simplified Screw SVG */}
-           <svg width="80" height="160" viewBox="0 0 80 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M40 160L10 140V20L40 0L70 20V140L40 160Z" fill="url(#paint0_linear_screw)" />
-              <path d="M10 30H70M10 50H70M10 70H70M10 90H70M10 110H70M10 130H70" stroke="black" strokeOpacity="0.2" strokeWidth="2"/>
-              <defs>
-              <linearGradient id="paint0_linear_screw" x1="40" y1="0" x2="40" y2="160" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#94A3B8"/>
-              <stop offset="1" stopColor="#475569"/>
-              </linearGradient>
-              </defs>
-           </svg>
-           {/* Info Label tracking the screw */}
-           <motion.div
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 1 }}
-             transition={{ delay: 0.5 }}
-             className="anim-info-box absolute -right-32 top-1/2 -translate-y-1/2"
+    <div className="relative w-full h-full bg-slate-900 flex flex-col items-center justify-center p-8">
+      <div className="flex w-full justify-around items-end h-64">
+        
+        {/* SCENARIO A: NO IMPLANT (Bone Loss) */}
+        <div className="flex flex-col items-center relative w-1/3">
+           <motion.div 
+             className="anim-info-box mb-4 !relative !top-0 !left-0 border-red-500 text-red-400"
+             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
            >
-             <ArrowDown size={14} className="text-blue-400" /> Grade 5 Titanium
+             Without Implant
            </motion.div>
-        </motion.div>
-
-        {/* Bone fusion particles appearing after placement */}
-        <motion.div
-           initial={{ opacity: 0, scale: 0.8 }}
-           animate={{ opacity: 1, scale: 1 }}
-           transition={{ delay: 3.5, duration: 1 }}
-           className="absolute bottom-0 left-0 right-0 h-1/2 bg-blue-900/30 backdrop-blur-sm rounded-t-3xl border-t border-blue-500/30 flex items-end justify-center pb-8"
-        >
-           <div className="text-center">
+           
+           {/* Bone shrinking animation */}
+           <div className="w-full bg-slate-800 h-40 rounded-b-3xl relative overflow-hidden border-t-4 border-slate-700">
               <motion.div 
-                animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }} 
-                transition={{ duration: 2, repeat: Infinity }}
-                className="text-blue-400 mb-2"
-              >
-                 <Activity size={32} className="mx-auto"/>
-              </motion.div>
-              <h4 className="text-white font-black text-xl tracking-tighter">OSSEOINTEGRATION</h4>
-              <p className="text-blue-300 text-xs uppercase tracking-widest">Biological Fusion Complete</p>
+                initial={{ height: '100%' }}
+                animate={{ height: '40%' }}
+                transition={{ duration: 4, repeat: Infinity, repeatType: "reverse", ease: "easeInOut", delay: 1 }}
+                className="absolute bottom-0 left-0 right-0 bg-pink-900/40 w-full"
+              />
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 text-xs text-slate-500 font-mono">Bone Resorption</div>
            </div>
-           {/* Fusion particles */}
-           {[...Array(12)].map((_, i) => (
-             <motion.div
-               key={i}
-               className="absolute w-2 h-2 bg-blue-400 rounded-full"
-               initial={{ opacity: 0, x: 0, y: 0 }}
-               animate={{ 
-                 opacity: [0, 1, 0], 
-                 x: (Math.random() - 0.5) * 200, 
-                 y: (Math.random() - 0.5) * 100 - 50
-               }}
-               transition={{ duration: 3, repeat: Infinity, delay: i * 0.2 }}
-               style={{ bottom: '40%', left: '50%' }}
-             />
-           ))}
-        </motion.div>
+        </div>
+
+        {/* SCENARIO B: WITH IMPLANT (Preservation) */}
+        <div className="flex flex-col items-center relative w-1/3">
+           <motion.div 
+             className="anim-info-box mb-4 !relative !top-0 !left-0 border-green-500 text-green-400"
+             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
+           >
+             With Titanium
+           </motion.div>
+
+           {/* Bone staying strong */}
+           <div className="w-full bg-slate-800 h-40 rounded-b-3xl relative overflow-hidden border-t-4 border-slate-700 flex justify-center">
+              <div className="absolute inset-0 bg-pink-900/40 h-full"></div> {/* Full Bone Height */}
+              
+              {/* The Implant Screw */}
+              <motion.div
+                 initial={{ y: -100 }}
+                 animate={{ y: 20 }}
+                 transition={{ duration: 2, ease: "easeOut" }}
+                 className="w-4 h-24 bg-gradient-to-b from-slate-300 to-slate-500 rounded-b-lg relative z-10"
+              >
+                 {/* Screw threads */}
+                 {[...Array(6)].map((_,i) => (
+                    <div key={i} className="w-6 h-1 bg-slate-600 absolute left-[-4px]" style={{ top: i*12 + 10 }}></div>
+                 ))}
+              </motion.div>
+
+              {/* Integration lines */}
+              <motion.div 
+                 animate={{ opacity: [0, 1, 0] }} 
+                 transition={{ duration: 2, repeat: Infinity, delay: 2 }}
+                 className="absolute top-10 w-16 h-16 border-2 border-green-400 rounded-full"
+              />
+           </div>
+        </div>
       </div>
+      <p className="text-slate-400 text-xs mt-8 text-center max-w-md">
+        Bone requires stimulation to exist. Titanium mimics the tooth root, preventing facial collapse.
+      </p>
     </div>
   );
 };
 
-// 2. ETHICS: Biomimetic Layers vs. Monolithic Block
-const AdvancedEthicsAnim = () => {
+// ==========================================
+// --- 2. ETHICS: Chiclet vs Biomimetic ---
+// ==========================================
+const VeneerStory = () => {
   return (
-    <div className="relative w-full h-full bg-black flex items-center justify-center gap-8">
-      {/* The "FAKE" side */}
-      <div className="text-center opacity-40">
-         <div className="w-24 h-32 bg-white rounded-lg mb-4 mx-auto shadow-xl"></div>
-         <h4 className="text-slate-400 font-bold text-xs uppercase tracking-widest line-through">Monolithic "Chiclet"</h4>
-      </div>
+    <div className="relative w-full h-full bg-black flex flex-col items-center justify-center">
+      <div className="flex gap-12 items-center">
+         
+         {/* THE FAKE LOOK */}
+         <div className="text-center opacity-50">
+            <div className="w-24 h-32 bg-white rounded-md mb-4 shadow-[0_0_20px_rgba(255,255,255,0.8)] border-4 border-white"></div>
+            <div className="anim-info-box !static border-red-500 text-red-400 mx-auto">
+               <X size={12}/> Opaque "Chiclet"
+            </div>
+         </div>
 
-      {/* The "TRUE" side - Building up layers */}
-      <div className="text-center relative z-10">
-         <div className="relative w-32 h-40 mx-auto mb-4">
-            {/* Dentin Layer (Inner) */}
-            <motion.div 
-               initial={{ height: 0, opacity: 0 }}
-               animate={{ height: '100%', opacity: 1 }}
-               transition={{ duration: 1.5, ease: "easeOut" }}
-               className="absolute bottom-0 left-0 right-0 bg-amber-200/80 rounded-lg border border-amber-300/50 shadow-[inset_0_0_20px_rgba(251,191,36,0.5)] z-10"
-            />
-            {/* Enamel Layer (Outer Transparent) */}
-            <motion.div 
-               initial={{ height: 0, opacity: 0 }}
-               animate={{ height: '100%', opacity: 0.6 }}
-               transition={{ delay: 1.2, duration: 1.5, ease: "easeOut" }}
-               className="absolute bottom-0 left-0 right-0 bg-gradient-to-tr from-white/40 to-blue-100/30 backdrop-blur-md rounded-lg border border-white/40 z-20"
-            >
-               {/* Light reflection */}
+         {/* THE BIOMIMETIC LOOK */}
+         <div className="text-center relative">
+            <div className="relative w-24 h-32 mb-4">
+               {/* Dentin Layer (Yellow/Warm) */}
+               <motion.div 
+                  initial={{ height: 0 }} animate={{ height: '100%' }} transition={{ duration: 1 }}
+                  className="absolute bottom-0 w-full bg-amber-200/80 rounded-md z-10"
+               />
+               {/* Enamel Layer (Blue/Translucent) */}
+               <motion.div 
+                  initial={{ opacity: 0 }} animate={{ opacity: 0.6 }} transition={{ delay: 1, duration: 1 }}
+                  className="absolute inset-0 bg-gradient-to-b from-blue-100/30 to-transparent rounded-md z-20 border border-white/30 backdrop-blur-[2px]"
+               />
+               {/* Light Reflection */}
                <motion.div 
                   animate={{ left: ['-100%', '200%'] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "linear", delay: 3 }}
-                  className="absolute top-0 bottom-0 w-1/2 bg-gradient-to-r from-transparent via-white/60 to-transparent skew-x-12"
+                  transition={{ duration: 3, repeat: Infinity, delay: 2 }}
+                  className="absolute top-0 bottom-0 w-10 bg-white/40 skew-x-12 z-30 filter blur-md"
                />
-            </motion.div>
-            
-            {/* Info tags popping up */}
-            <motion.div
-               initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1 }}
-               className="anim-info-box absolute -left-36 top-1/3"
-            >
-              Dentin Core (Color)
-            </motion.div>
-            <motion.div
-               initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 2.5 }}
-               className="anim-info-box absolute -right-36 top-2/3"
-            >
-              Enamel (Translucency)
-            </motion.div>
+            </div>
+            <div className="anim-info-box !static border-green-500 text-green-400 mx-auto">
+               <CheckCircle size={12}/> Biomimetic Layering
+            </div>
          </div>
-         <h4 className="text-white font-black text-xl uppercase tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">Biomimetic Layering</h4>
+      </div>
+      <div className="absolute bottom-10 flex gap-4 text-[10px] text-slate-500 uppercase font-bold tracking-widest">
+         <span>Light Transmission</span> • <span>Natural Gradient</span> • <span>Texture</span>
       </div>
     </div>
   );
 };
 
-// 3. HEALTH: The Systemic Pathogen Highway
-const AdvancedHealthAnim = () => {
+// ==========================================
+// --- 3. HEALTH: The Systemic Highway ---
+// ==========================================
+const HeartMouthStory = () => {
   return (
-    <div className="relative w-full h-full bg-slate-900 flex items-center justify-around overflow-hidden px-8">
-      {/* Background Circuit Pattern */}
-      <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
-         <pattern id="pattern-circuits" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-            <path d="M20 0V40M0 20H40" stroke="#ef4444" strokeWidth="1"/>
-         </pattern>
-         <rect x="0" y="0" width="100%" height="100%" fill="url(#pattern-circuits)"/>
-      </svg>
+    <div className="relative w-full h-full bg-slate-950 flex flex-col items-center justify-center">
+       {/* 1. GUM POCKET */}
+       <div className="flex items-center w-full max-w-lg justify-between px-8 relative">
+          <div className="flex flex-col items-center z-10">
+             <div className="w-16 h-16 bg-red-900/40 border-2 border-red-500 rounded-full flex items-center justify-center">
+                <div className="text-xs font-black text-red-500">GUMS</div>
+             </div>
+             {/* Bacteria Spawning */}
+             {[...Array(5)].map((_, i) => (
+                <motion.div
+                   key={i}
+                   className="absolute w-2 h-2 bg-green-500 rounded-full"
+                   initial={{ x: 0, y: 0, opacity: 0 }}
+                   animate={{ x: [0, 50, 100, 150, 200], y: [0, 10, -10, 5, 0], opacity: [1, 1, 1, 1, 0] }}
+                   transition={{ duration: 3, repeat: Infinity, delay: i * 0.6, ease: "linear" }}
+                   style={{ left: '60px', top: '35px' }}
+                />
+             ))}
+          </div>
 
-      {/* MOUTH -> BLOOD -> HEART Flow */}
-      <div className="relative z-10 flex items-center justify-between w-full max-w-lg">
-         {/* Mouth Node */}
-         <div className="text-center">
-            <div className="w-20 h-20 bg-red-900/50 rounded-full border-4 border-red-500 flex items-center justify-center relative">
-               <Sparkles className="text-red-400" size={32} />
-               <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2, repeat: Infinity }} className="absolute inset-0 bg-red-500/30 rounded-full blur-xl -z-10"></motion.div>
-            </div>
-            <p className="text-red-400 text-xs font-black uppercase mt-4 tracking-widest">Inflamed Gums</p>
-         </div>
+          {/* 2. BLOOD VESSEL PIPELINE */}
+          <div className="h-2 flex-1 bg-red-900/20 mx-4 rounded-full relative overflow-hidden">
+             <div className="absolute inset-0 bg-red-600/10 animate-pulse"></div>
+          </div>
 
-         {/* Connecting Vessel */}
-         <div className="flex-1 h-4 bg-red-900/30 mx-4 rounded-full relative overflow-hidden border border-red-500/30">
-            {/* Pathogens moving */}
-            {[...Array(8)].map((_, i) => (
-               <motion.div
-                  key={i}
-                  className="absolute top-1 w-2 h-2 bg-red-500 rounded-full shadow-[0_0_10px_#ef4444]"
-                  initial={{ left: '-5%' }}
-                  animate={{ left: '105%' }}
-                  transition={{ duration: 4, repeat: Infinity, delay: i * 0.5, ease: "linear" }}
-               />
-            ))}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[8px] font-black uppercase text-red-300 tracking-[0.2em]">Bloodstream Pathogens</div>
-         </div>
-
-         {/* Heart Node */}
-         <div className="text-center">
-            <motion.div 
+          {/* 3. HEART VALVE */}
+          <div className="flex flex-col items-center z-10">
+             <motion.div 
                animate={{ scale: [1, 1.1, 1] }} 
-               transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
-               className="w-20 h-20 bg-red-600 rounded-full border-4 border-white/20 flex items-center justify-center relative shadow-[0_0_50px_#dc2626]"
-            >
-               <Heart className="text-white fill-white" size={32} />
-            </motion.div>
-             <p className="text-white text-xs font-black uppercase mt-4 tracking-widest">Systemic Risk</p>
-         </div>
-      </div>
-       
-       {/* Warning Alert */}
+               transition={{ duration: 0.8, repeat: Infinity }}
+               className="w-16 h-16 bg-red-600 border-2 border-white rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(220,38,38,0.5)]"
+             >
+                <Heart fill="white" size={24} className="text-white"/>
+             </motion.div>
+             <div className="anim-info-box !static mt-4 border-red-500 text-white">
+               <Activity size={12}/> Heart Valve Risk
+             </div>
+          </div>
+       </div>
+       <p className="text-slate-400 text-xs mt-8 text-center max-w-xs px-4">
+          Bacteria from periodontal pockets enter the bloodstream directly, lodging in heart valves.
+       </p>
+    </div>
+  );
+};
+
+// ==========================================
+// --- 4. ALIGNERS: Physics Force Vectors ---
+// ==========================================
+const AlignerStory = () => {
+  return (
+    <div className="relative w-full h-full bg-slate-900 flex items-center justify-center">
+       {/* The Tooth */}
+       <div className="relative w-24 h-32 bg-slate-200 rounded-lg border-2 border-slate-400 flex items-center justify-center">
+          <span className="text-slate-400 font-black text-4xl opacity-20">T</span>
+          
+          {/* Aligner Overlay (Invisible) */}
+          <motion.div 
+             animate={{ opacity: [0.3, 0.6, 0.3] }}
+             transition={{ duration: 2, repeat: Infinity }}
+             className="absolute inset-[-4px] border-2 border-blue-400 rounded-xl bg-blue-400/10"
+          />
+       </div>
+
+       {/* Force Vector Arrow */}
        <motion.div
-          initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 2 }}
-          className="anim-info-box absolute bottom-8 bg-red-600/80 border-red-400"
+          initial={{ x: -100, opacity: 0 }}
+          animate={{ x: -60, opacity: 1 }}
+          transition={{ duration: 1, delay: 0.5 }}
+          className="absolute left-20 flex items-center"
        >
-         <ShieldAlert size={16} /> Warning: Bacterial Load High
+          <div className="text-blue-500 font-bold text-xs mr-2 uppercase">Constant Force</div>
+          <ArrowRight size={40} className="text-blue-500" strokeWidth={3} />
+       </motion.div>
+
+       {/* Movement Ghost */}
+       <motion.div
+          initial={{ x: 0, opacity: 0 }}
+          animate={{ x: 40, opacity: 0.5 }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute w-24 h-32 bg-slate-200/20 rounded-lg border-2 border-white/20 border-dashed"
+       />
+       
+       <div className="absolute bottom-10 anim-info-box border-blue-500 text-blue-300">
+          <Zap size={12}/> 0.25mm Movement / Tray
+       </div>
+    </div>
+  );
+};
+
+// ==========================================
+// --- 5. AI DIAGNOSTICS: The Hidden Decay ---
+// ==========================================
+const AIStory = () => {
+  return (
+    <div className="relative w-full h-full bg-black flex items-center justify-center">
+       {/* Tooth Wireframe */}
+       <svg width="200" height="200" viewBox="0 0 200 200" className="opacity-50">
+          <path d="M50 150 L50 50 Q100 0 150 50 L150 150" stroke="white" strokeWidth="2" fill="none" />
+       </svg>
+
+       {/* The "Hidden" Cavity */}
+       <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 1, 1, 0] }}
+          transition={{ duration: 4, repeat: Infinity, delay: 1 }}
+          className="absolute top-[80px] left-[90px] w-6 h-6 bg-red-600 rounded-full blur-sm z-10"
+       />
+
+       {/* Laser Scanning Beam */}
+       <motion.div
+          animate={{ top: ['10%', '90%', '10%'] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+          className="absolute left-0 right-0 h-1 bg-green-500 shadow-[0_0_20px_#22c55e] z-20 w-1/2 mx-auto"
+       />
+
+       {/* Detection Alert */}
+       <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 1.5, duration: 0.2 }}
+          className="absolute top-[40px] right-[40px] bg-red-900/90 border border-red-500 text-white p-2 rounded-lg text-xs font-bold shadow-xl flex items-center gap-2"
+       >
+          <ShieldAlert size={14} className="animate-pulse"/> 
+          <div>
+             <div>DECAY DETECTED</div>
+             <div className="text-[9px] font-normal opacity-80">Sub-surface: 2mm deep</div>
+          </div>
        </motion.div>
     </div>
   );
 };
 
-// 4. TECH: AI Laser Scanning & Data Analysis
-const AdvancedTechAnim = () => {
+// ==========================================
+// --- 6. FLUORIDE: The Lattice Repair ---
+// ==========================================
+const FluorideStory = () => {
   return (
-    <div className="relative w-full h-full bg-black flex items-center justify-center">
-      {/* Wireframe Tooth Model */}
-      <svg width="200" height="260" viewBox="0 0 200 260" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-50">
-         <path d="M100 250C100 250 160 200 160 100C160 50 130 0 100 0C70 0 40 50 40 100C40 200 100 250 100 250Z" stroke="#22c55e" strokeWidth="2" strokeDasharray="4 4"/>
-         <path d="M70 80C70 80 100 100 130 80" stroke="#22c55e" strokeWidth="1"/>
-         <circle cx="100" cy="140" r="20" stroke="#22c55e" strokeWidth="1" strokeDasharray="2 2" />
-      </svg>
+    <div className="relative w-full h-full bg-slate-900 flex items-center justify-center">
+       {/* Enamel Grid (Damaged) */}
+       <div className="grid grid-cols-4 gap-2 opacity-50">
+          {[...Array(16)].map((_, i) => (
+             <div key={i} className={`w-8 h-8 border border-white/30 rounded-sm ${[5,6,9,10].includes(i) ? 'bg-transparent' : 'bg-white/10'}`}></div>
+          ))}
+       </div>
 
-      {/* Scanning Laser Beam */}
-      <motion.div
-         initial={{ top: '0%' }}
-         animate={{ top: ['0%', '100%', '0%'] }}
-         transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-         className="absolute left-1/2 -translate-x-1/2 w-[240px] h-2 bg-green-500 shadow-[0_0_30px_#22c55e] z-20 opacity-80"
-      >
-         <Scan size={24} className="text-green-900 absolute left-1/2 -translate-x-1/2 -top-10" />
-      </motion.div>
+       {/* Acid Attack */}
+       <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 1, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="absolute text-red-500 font-bold text-xs top-10"
+       >
+          ACID ATTACK
+       </motion.div>
 
-      {/* Hidden Decay Revealing */}
-      <motion.div
-         initial={{ opacity: 0 }}
-         animate={{ opacity: [0, 1, 0] }}
-         transition={{ duration: 4, repeat: Infinity, delay: 2 }}
-         className="absolute top-[130px] left-[90px] w-5 h-5 bg-red-500 rounded-full blur-md z-10 shadow-[0_0_30px_#ef4444]"
-      />
-
-      {/* Data HUD Elements floating out */}
-      <div className="absolute inset-0 pointer-events-none">
-         <motion.div initial={{ x: -50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.5 }} className="anim-info-box absolute top-20 left-10 border-green-500 text-green-400">
-            <Wifi size={14}/> Signal: Strong
-         </motion.div>
-         <motion.div initial={{ x: 50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 1.5 }} className="anim-info-box absolute top-40 right-10 border-green-500 text-green-400">
-            <Database size={14}/> Analyzing Structure...
-         </motion.div>
-         <motion.div initial={{ y: 50, opacity: 0, scale: 0.5 }} animate={{ y: 0, opacity: 1, scale: 1 }} transition={{ delay: 2.5, type: "spring" }} className="anim-info-box absolute bottom-20 left-1/2 -translate-x-1/2 bg-red-900/80 border-red-500 text-white">
-            <ShieldAlert size={14}/> ALERT: Sub-surface Decay Detected (2mm)
-         </motion.div>
-      </div>
+       {/* Fluoride Ions Repairing */}
+       {[5,6,9,10].map((pos, i) => (
+          <motion.div
+             key={i}
+             className="absolute w-8 h-8 bg-blue-500/80 rounded-sm flex items-center justify-center text-[8px] font-bold text-white shadow-[0_0_10px_#3b82f6]"
+             initial={{ scale: 2, opacity: 0 }}
+             animate={{ scale: 1, opacity: 1 }}
+             transition={{ delay: 1 + (i*0.2), duration: 0.5 }}
+             style={{ 
+                left: `calc(50% - 36px + ${(pos % 4) * 40}px - 40px)`, 
+                top: `calc(50% - 36px + ${Math.floor(pos / 4) * 40}px - 40px)` 
+             }}
+          >
+             F-
+          </motion.div>
+       ))}
+       
+       <div className="absolute bottom-10 anim-info-box border-blue-500 text-blue-300">
+          <ShieldCheck size={12}/> Remineralization Active
+       </div>
     </div>
   );
 };
 
+// ==========================================
+// --- 7. BIOFILM: The Sticky Web ---
+// ==========================================
+const BiofilmStory = () => {
+  return (
+    <div className="relative w-full h-full bg-slate-950 flex items-center justify-center">
+       {/* Tooth Surface */}
+       <div className="w-64 h-2 bg-white/20 absolute bottom-20 rounded-full"></div>
+       <div className="text-xs text-slate-500 absolute bottom-14">Tooth Surface</div>
+
+       {/* Bacteria Multiplying */}
+       {[...Array(15)].map((_, i) => (
+          <motion.div
+             key={i}
+             className="absolute w-3 h-3 bg-green-500/60 rounded-full"
+             initial={{ y: -200, x: (Math.random() - 0.5) * 200, opacity: 0 }}
+             animate={{ y: 20, opacity: 1 }}
+             transition={{ duration: 2, delay: i * 0.1 }}
+             style={{ bottom: `${25 + Math.random() * 20}%`, left: `${40 + (Math.random() - 0.5) * 40}%` }}
+          />
+       ))}
+
+       {/* The Protective Slime Layer Forming */}
+       <motion.div
+          initial={{ width: 0, opacity: 0 }}
+          animate={{ width: 200, opacity: 1 }}
+          transition={{ delay: 2, duration: 2 }}
+          className="absolute bottom-20 h-16 bg-green-900/30 border-t-2 border-green-500/50 rounded-t-xl backdrop-blur-sm z-10"
+       />
+       
+       <motion.div 
+         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 4 }}
+         className="anim-info-box absolute top-1/3 border-red-500 text-red-300"
+       >
+          <ShieldAlert size={12}/> Matrix Protected (Resistant to Rinsing)
+       </motion.div>
+    </div>
+  );
+};
+
+import { CheckCircle } from 'lucide-react'; // Helper import
 
 // ==========================================
 // --- MAIN COMPONENT ---
@@ -335,57 +438,82 @@ export default function Gallery() {
 
   // --- PLAYLIST ---
   const playlist = [
+    // 1. PUSH: IMPLANTS
     {
       type: "audio",
       name: "The Bionic Tooth",
       artist: "Clinical Engineering",
-      description: "Why titanium implants are the only permanent solution for bone loss.",
-      component: <AdvancedImplantsAnim />, // Using the new advanced components
+      description: "Why titanium implants are the only permanent solution for bone loss. Watch how bone integrates.",
+      component: <ImplantStory />,
       audio: "/audio/implants.mp3",
       category: "Surgery",
       tags: ['Implants', 'Biology']
     },
+    // 2. SHIELD: ETHICS
     {
       type: "audio",
       name: "The Instagram Trap",
       artist: "Dr. Deepak",
-      description: "Are veneers worth it? Avoiding the 'Chiclet' look through biomimetic layering.",
-      component: <AdvancedEthicsAnim />,
+      description: "Are veneers worth it? See the difference between a fake 'Chiclet' block and true biomimetic layering.",
+      component: <VeneerStory />,
       audio: "/audio/ethics.mp3", 
       category: "Ethics",
       tags: ['Veneers', 'Truth']
     },
+    // 3. PUSH: HEALTH
     {
       type: "audio",
       name: "The Heart-Mouth Loop",
       artist: "Systemic Health",
-      description: "The proven link between bleeding gums and heart disease.",
-      component: <AdvancedHealthAnim />,
+      description: "The proven link between bleeding gums and heart disease. Bacteria travels from mouth to valves.",
+      component: <HeartMouthStory />,
       audio: "/audio/safety.mp3",
       category: "Health",
       tags: ['Wellness', 'Risk']
     },
+    // 4. PUSH: ALIGNERS
+    {
+      type: "journal",
+      name: "Invisible Physics",
+      artist: "Aligner Tech",
+      description: "The surprising engineering behind clear plastic. Constant low force allows faster movement than metal.",
+      component: <AlignerStory />,
+      audio: "/audio/ortho.mp3",
+      category: "Ortho",
+      tags: ['Physics', 'Aligners']
+    },
+    // 5. PUSH: AI TECH
     {
       type: "journal",
       name: "The 3-Year Warning",
       artist: "Tech Analysis",
-      description: "How AI scanners detect decay 3 years before it becomes visible.",
-      component: <AdvancedTechAnim />,
+      description: "How AI scanners detect sub-surface decay 3 years before it becomes visible to the naked eye.",
+      component: <AIStory />,
       audio: "/audio/ai.mp3", 
       category: "Technology",
       tags: ['AI', 'Laser']
     },
-    // Keep simpler ones for Ortho/Kids if desired, or build advanced ones for them too.
-    // For brevity, I'm reusing the Tech one for the last slot just to show the structure.
-     {
+    // 6. SHIELD: FLUORIDE
+    {
       type: "journal",
-      name: "Invisible Physics",
-      artist: "Aligner Tech",
-      description: "The engineering behind clear plastic pushing teeth.",
-      component: <AdvancedTechAnim />, // Placeholder - you can build an <AdvancedOrthoAnim />
-      audio: "/audio/ortho.mp3",
-      category: "Ortho",
-      tags: ['Physics', 'Aligners']
+      name: "Fluoride Chemistry",
+      artist: "Prevention Science",
+      description: "How Fluoride ions physically replace lost minerals in the enamel lattice after acid attacks.",
+      component: <FluorideStory />,
+      audio: "/audio/kids.mp3", 
+      category: "Chemistry",
+      tags: ['Safety', 'Science']
+    },
+    // 7. PUSH: BIOFILM
+    {
+      type: "journal",
+      name: "Biofilm: The Silent Killer",
+      artist: "Hygiene Protocol",
+      description: "Why brushing isn't enough. Biofilm forms a protective matrix that resists standard rinsing.",
+      component: <BiofilmStory />,
+      audio: "/audio/safety.mp3", // Reusing safety audio
+      category: "Hygiene",
+      tags: ['Bacteria', 'Risk']
     }
   ];
 
@@ -440,14 +568,14 @@ export default function Gallery() {
         <RevealOnScroll>
           <div className="flex flex-col items-center text-center">
              <div className="inline-flex items-center gap-2 text-blue-600 dark:text-cyan-400 font-bold tracking-[0.3em] text-[10px] uppercase mb-4">
-                <Sparkles size={16} /> Dental Intelligence
+                <Sparkles size={16} /> Visual Intelligence
              </div>
              <h2 className="text-4xl md:text-7xl font-black text-slate-900 dark:text-white mb-6 tracking-tighter leading-[0.85]">
-                Podcast & <br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500">Expert Journal.</span>
+                Clinical <br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500">Motion Graphics.</span>
              </h2>
              <p className="text-lg text-slate-500 dark:text-slate-400 max-w-xl font-medium leading-relaxed">
-               Interactive visual explanations of clinical science.
+               Don't just read. Watch exactly how the science works inside your body.
              </p>
           </div>
         </RevealOnScroll>
@@ -488,7 +616,7 @@ export default function Gallery() {
                     <div className="flex items-center gap-4 mb-6">
                        {currentTrack.type === 'audio' && (
                            <span className="text-xs font-black text-blue-600 uppercase tracking-widest flex items-center gap-2">
-                              <Activity size={14} className={isTimerPlaying ? "animate-pulse" : ""} /> Audio Active
+                              <Activity size={14} className={isTimerPlaying ? "animate-pulse" : ""} /> Audio Explanation
                            </span>
                        )}
                        <div className="flex gap-2">
