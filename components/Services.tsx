@@ -1,11 +1,14 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
-import Link from 'next/link';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectCoverflow, Autoplay, Pagination, Navigation, Keyboard } from 'swiper/modules';
-import { Activity, Zap, Smile, Users, Search, Filter, Sparkles } from 'lucide-react';
+import { 
+  Activity, Zap, Smile, Users, Search, Filter, Sparkles, 
+  Shield, Microscope, HeartPulse, ScanLine 
+} from 'lucide-react';
+import { treatmentsData } from '@/data/treatments'; // <--- IMPORT YOUR DATA
 
 // Import Swiper styles
 import 'swiper/css';
@@ -13,6 +16,7 @@ import 'swiper/css/effect-coverflow';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
+// --- STYLES (Kept exactly as you had them) ---
 const cssStyles = `
 @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 
@@ -457,6 +461,37 @@ const cssStyles = `
 }
 `;
 
+// Helper: Map Category to Color Theme
+const getTheme = (category: string) => {
+    switch(category) {
+        case 'Surgery': return { bg: 'linear-gradient(331deg, #0f172a 0%, #1e3a8a 100%)', accent: '#60A5FA' }; // Blue
+        case 'Endodontics': return { bg: 'linear-gradient(331deg, #2e1065 0%, #7e22ce 100%)', accent: '#C084FC' }; // Purple
+        case 'Orthodontics': return { bg: 'linear-gradient(331deg, #312e81 0%, #4f46e5 100%)', accent: '#818CF8' }; // Indigo
+        case 'Cosmetic': return { bg: 'linear-gradient(331deg, #0891b2 0%, #06b6d4 100%)', accent: '#67E8F9' }; // Cyan
+        case 'Kids': 
+        case 'Pediatrics': return { bg: 'linear-gradient(331deg, #7c2d12 0%, #ea580c 100%)', accent: '#FB923C' }; // Orange
+        case 'Restorative': return { bg: 'linear-gradient(331deg, #115e59 0%, #0d9488 100%)', accent: '#2DD4BF' }; // Teal
+        case 'Preventive': return { bg: 'linear-gradient(331deg, #064e3b 0%, #10b981 100%)', accent: '#34D399' }; // Green
+        case 'Wellness': return { bg: 'linear-gradient(331deg, #831843 0%, #db2777 100%)', accent: '#F472B6' }; // Pink
+        default: return { bg: 'linear-gradient(331deg, #1e293b 0%, #475569 100%)', accent: '#94A3B8' }; // Slate
+    }
+};
+
+// Helper: Map Category to Icon
+const getCategoryIcon = (category: string) => {
+    switch(category) {
+        case 'Surgery': return Activity;
+        case 'Endodontics': return Microscope;
+        case 'Orthodontics': return Smile;
+        case 'Cosmetic': return Sparkles;
+        case 'Pediatrics': return Users;
+        case 'Restorative': return Shield;
+        case 'Preventive': return HeartPulse;
+        case 'Wellness': return ScanLine;
+        default: return Zap;
+    }
+};
+
 interface ExtendedServiceItem {
     id: string;
     title: string;
@@ -477,314 +512,267 @@ interface ServicesProps {
 }
 
 const Services: React.FC<ServicesProps> = ({ onServiceClick }) => {
-  const router = useRouter();
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const progressCircle = useRef<SVGSVGElement>(null);
-  const progressBar = useRef<HTMLDivElement>(null);
-  const progressContent = useRef<HTMLSpanElement>(null);
-  const swiperRef = useRef<any>(null);
+    const router = useRouter();
+    const sectionRef = useRef<HTMLDivElement>(null);
+    const progressCircle = useRef<SVGSVGElement>(null);
+    const progressBar = useRef<HTMLDivElement>(null);
+    const progressContent = useRef<HTMLSpanElement>(null);
+    const swiperRef = useRef<any>(null);
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState('All');
-  const [filteredServices, setFilteredServices] = useState<ExtendedServiceItem[]>([]);
-
-  const allServices: ExtendedServiceItem[] = [
-    {
-      id: 'implants',
-      treatmentId: 'dental-implants',
-      title: 'Dental Implants',
-      subTitle: '#1 Permanent Solution',
-      description: 'Permanent replacement for missing teeth using titanium/zirconia implants. Supported by ITI & Mayo Clinic standards.',
-      icon: Activity,
-      bg: 'linear-gradient(331deg, #0f172a 0%, #1e3a8a 100%)',
-      accent: '#60A5FA',
-      features: ['Lifetime Warranty', 'Preserves Jawbone', 'Natural Look'],
-      image: 'https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?auto=format&fit=crop&q=80&w=800',
-      keywords: ['missing', 'tooth', 'titanium', 'surgery'],
-      category: 'Surgery'
-    },
-    {
-      id: 'root-canal',
-      treatmentId: 'root-canal',
-      title: 'Painless RCT',
-      subTitle: '#2 Advanced Endodontics',
-      description: 'Save infected teeth with single-visit painless Root Canal Treatment. Microscopic precision for zero pain.',
-      icon: Zap,
-      bg: 'linear-gradient(331deg, #115e59 0%, #0d9488 100%)',
-      accent: '#2DD4BF',
-      features: ['Single Visit', 'Microscope', 'Laser Disinfection'],
-      image: 'https://images.unsplash.com/photo-1606811971618-4486d14f3f72?auto=format&fit=crop&q=80&w=800',
-      keywords: ['pain', 'ache', 'root', 'canal', 'infection', 'hurt'],
-      category: 'Pain Relief'
-    },
-    {
-      id: 'aligners',
-      treatmentId: 'invisalign',
-      title: 'Clear Aligners',
-      subTitle: '#3 Invisible Ortho',
-      description: 'Invisalign & clear aligners to straighten teeth without braces. Eat & brush normally.',
-      icon: Smile,
-      bg: 'linear-gradient(331deg, #312e81 0%, #4f46e5 100%)',
-      accent: '#818CF8',
-      features: ['Invisible', 'Removable', 'Fast Results'],
-      image: 'https://images.unsplash.com/photo-1595867372361-597621c258d4?auto=format&fit=crop&q=80&w=800',
-      keywords: ['straight', 'braces', 'aligner', 'gap'],
-      category: 'Orthodontics'
-    },
-    {
-      id: 'whitening',
-      treatmentId: 'teeth-whitening',
-      title: 'Teeth Whitening',
-      subTitle: '#5 Cosmetic',
-      description: 'Brighten your smile with safe peroxide-based whitening gels. Instant results under dentist supervision.',
-      icon: Sparkles,
-      bg: 'linear-gradient(331deg, #0891b2 0%, #06b6d4 100%)',
-      accent: '#67E8F9',
-      features: ['Instant Results', 'Safe', 'ADA Approved'],
-      image: 'https://images.unsplash.com/photo-1609840114035-1c29046a83ea?auto=format&fit=crop&q=80&w=800',
-      keywords: ['white', 'bleach', 'stain', 'yellow'],
-      category: 'Cosmetic'
-    },
-    {
-      id: 'kids',
-      treatmentId: 'kids-dentistry',
-      title: 'Kids Dentistry',
-      subTitle: '#6 Pediatric Care',
-      description: 'Gentle dental care for infants and children. Fluoride, sealants, and no-tears approach.',
-      icon: Users,
-      bg: 'linear-gradient(331deg, #7c2d12 0%, #ea580c 100%)',
-      accent: '#FB923C',
-      features: ['Fluoride', 'Sealants', 'No Tears'],
-      image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=800',
-      keywords: ['kid', 'child', 'pediatric', 'baby'],
-      category: 'Kids'
-    }
-  ];
-
-  const filterCategories = ['All', 'Pain Relief', 'Cosmetic', 'Orthodontics', 'Surgery', 'Kids'];
-
-  useEffect(() => {
-    const query = searchQuery.toLowerCase();
-    const filtered = allServices.filter(service => {
-        const matchesSearch = service.title.toLowerCase().includes(query) || 
-                              service.keywords.some(k => k.toLowerCase().includes(query));
-        const matchesCategory = activeFilter === 'All' || service.category === activeFilter;
-        
-        return matchesSearch && matchesCategory;
-    });
-    setFilteredServices(filtered);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [activeFilter, setActiveFilter] = useState('All');
     
-    if(swiperRef.current && swiperRef.current.swiper) {
-        swiperRef.current.swiper.slideTo(0);
-    }
-  }, [searchQuery, activeFilter]);
-
-  const onAutoplayTimeLeft = (s: any, time: number, progress: number) => {
-    if (progressCircle.current) {
-        progressCircle.current.style.setProperty("--progress", String(1 - progress));
-    }
-    if (progressContent.current) {
-        progressContent.current.textContent = `${Math.ceil(time / 1000)}s`;
-    }
-    if (progressBar.current) {
-        progressBar.current.style.setProperty("--progress", `${(1 - progress) * 100}%`);
-    }
-  };
-
-  const handleSlideChange = (swiper: any) => {
-     const activeIndex = swiper.realIndex;
-     const currentService = filteredServices.length > 0 
-        ? (filteredServices[activeIndex] || filteredServices[0])
-        : allServices[0];
-     
-     if (sectionRef.current) {
-        sectionRef.current.style.setProperty("--progress-color", currentService.accent);
-        sectionRef.current.style.background = currentService.bg;
-     }
-  };
-
-  const handleClick = (id: string) => {
-    // If a callback is provided (e.g. from Homepage), use it
-    if (onServiceClick) {
-        onServiceClick(id);
-    } else {
-        // Otherwise navigate directly
-        router.push(`/treatments/${id}`);
-    }
-  };
-
-  return (
-    <section 
-        id="services" 
-        ref={sectionRef} 
-        className="services-wrapper relative py-16 lg:py-20 w-full overflow-hidden flex flex-col items-center justify-center transition-all duration-700"
-        style={{ 
-            background: allServices[0].bg,
-            "--progress-color": allServices[0].accent 
-        } as React.CSSProperties}
-    >
-        <style jsx>{cssStyles}</style>
-
-        {/* Search & Filter Header (Overlay) */}
-        <div className="absolute top-0 pt-6 lg:pt-8 w-full z-20 flex flex-col items-center pointer-events-none px-4">
-            <h3 className="text-white/60 font-bold tracking-widest text-[10px] lg:text-xs uppercase mb-3">Our Expertise</h3>
+    // --- 1. DYNAMIC DATA MAPPING ---
+    const allServices: ExtendedServiceItem[] = useMemo(() => {
+        return Object.values(treatmentsData).map((t) => {
+            const theme = getTheme(t.category);
+            const Icon = getCategoryIcon(t.category);
             
-            <div className="pointer-events-auto relative w-full max-w-sm lg:max-w-md mb-3 lg:mb-4">
-                <input 
-                    type="text" 
-                    placeholder="Search by symptom..." 
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-full py-2.5 lg:py-3 pl-10 lg:pl-12 pr-6 text-white placeholder-white/50 text-sm focus:outline-none focus:bg-white/20 focus:border-white/40 transition-all shadow-lg"
-                />
-                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70" />
-            </div>
+            return {
+                id: t.id,
+                treatmentId: t.id,
+                title: t.title,
+                subTitle: t.subtitle,
+                description: t.description,
+                icon: Icon,
+                bg: theme.bg,
+                accent: theme.accent,
+                features: t.benefits.slice(0, 3), // Take top 3 benefits
+                image: t.heroImage,
+                keywords: t.keywords,
+                category: t.category
+            };
+        });
+    }, []);
 
-            <div className="pointer-events-auto flex flex-wrap gap-1.5 lg:gap-2 justify-center max-w-2xl px-2">
-                {filterCategories.map(cat => (
-                    <button
-                        key={cat}
-                        onClick={() => setActiveFilter(cat)}
-                        className={`px-3 py-1 lg:px-4 lg:py-1.5 rounded-full text-[10px] lg:text-xs font-bold uppercase tracking-wider transition-all border ${
-                            activeFilter === cat 
-                                ? 'bg-white text-slate-900 border-white scale-105 shadow-md' 
-                                : 'bg-transparent text-white/70 border-white/20 hover:bg-white/10 hover:border-white/40'
-                        }`}
-                    >
-                        {cat}
-                    </button>
-                ))}
-            </div>
-        </div>
+    const [filteredServices, setFilteredServices] = useState<ExtendedServiceItem[]>(allServices);
 
-        <div className="autoplay-progress-bar" ref={progressBar}></div>
+    // --- 2. DYNAMIC CATEGORIES ---
+    const filterCategories = useMemo(() => {
+        const uniqueCats = Array.from(new Set(allServices.map(s => s.category)));
+        return ['All', ...uniqueCats];
+    }, [allServices]);
 
-        {filteredServices.length > 0 ? (
-            <Swiper
-                ref={swiperRef}
-                modules={[EffectCoverflow, Autoplay, Pagination, Navigation, Keyboard]}
-                effect="coverflow"
-                grabCursor={true}
-                centeredSlides={true}
-                slidesPerView={1} 
-                speed={1000}
-                coverflowEffect={{
-                    rotate: 50,
-                    stretch: 0,
-                    depth: 100,
-                    modifier: 1,
-                    slideShadows: true,
-                }}
-                keyboard={{ enabled: true }}
-                autoplay={{
-                    delay: 6000,
-                    disableOnInteraction: false,
-                    pauseOnMouseEnter: true
-                }}
-                pagination={{ clickable: true }}
-                navigation={{
-                    nextEl: '.slider-button-next',
-                    prevEl: '.slider-button-prev',
-                }}
-                onAutoplayTimeLeft={onAutoplayTimeLeft}
-                onSlideChange={handleSlideChange}
-                className="w-full h-full swiper"
-            >
-                {filteredServices.map((service) => (
-                    <SwiperSlide key={service.id} className="slide">
-                        <div 
-                            className="card" 
-                            style={{ background: service.bg, "--color": service.accent } as React.CSSProperties}
+    useEffect(() => {
+        const query = searchQuery.toLowerCase();
+        const filtered = allServices.filter(service => {
+            const matchesSearch = service.title.toLowerCase().includes(query) || 
+                                  service.keywords.some(k => k.toLowerCase().includes(query));
+            const matchesCategory = activeFilter === 'All' || service.category === activeFilter;
+            
+            return matchesSearch && matchesCategory;
+        });
+        setFilteredServices(filtered);
+        
+        if(swiperRef.current && swiperRef.current.swiper) {
+            swiperRef.current.swiper.slideTo(0);
+        }
+    }, [searchQuery, activeFilter, allServices]);
+
+    const onAutoplayTimeLeft = (s: any, time: number, progress: number) => {
+        if (progressCircle.current) {
+            progressCircle.current.style.setProperty("--progress", String(1 - progress));
+        }
+        if (progressContent.current) {
+            progressContent.current.textContent = `${Math.ceil(time / 1000)}s`;
+        }
+        if (progressBar.current) {
+            progressBar.current.style.setProperty("--progress", `${(1 - progress) * 100}%`);
+        }
+    };
+
+    const handleSlideChange = (swiper: any) => {
+         const activeIndex = swiper.realIndex;
+         const currentService = filteredServices.length > 0 
+            ? (filteredServices[activeIndex] || filteredServices[0])
+            : allServices[0];
+         
+         if (sectionRef.current && currentService) {
+            sectionRef.current.style.setProperty("--progress-color", currentService.accent);
+            sectionRef.current.style.background = currentService.bg;
+         }
+    };
+
+    const handleClick = (id: string) => {
+        if (onServiceClick) {
+            onServiceClick(id);
+        } else {
+            router.push(`/treatments/${id}`);
+        }
+    };
+
+    return (
+        <section 
+            id="services" 
+            ref={sectionRef} 
+            className="services-wrapper relative py-16 lg:py-20 w-full overflow-hidden flex flex-col items-center justify-center transition-all duration-700"
+            style={{ 
+                background: allServices[0]?.bg,
+                "--progress-color": allServices[0]?.accent 
+            } as React.CSSProperties}
+        >
+            <style jsx>{cssStyles}</style>
+
+            {/* Search & Filter Header (Overlay) */}
+            <div className="absolute top-0 pt-6 lg:pt-8 w-full z-20 flex flex-col items-center pointer-events-none px-4">
+                <h3 className="text-white/60 font-bold tracking-widest text-[10px] lg:text-xs uppercase mb-3">Our Expertise</h3>
+                
+                <div className="pointer-events-auto relative w-full max-w-sm lg:max-w-md mb-3 lg:mb-4">
+                    <input 
+                        type="text" 
+                        placeholder="Search by symptom..." 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-full py-2.5 lg:py-3 pl-10 lg:pl-12 pr-6 text-white placeholder-white/50 text-sm focus:outline-none focus:bg-white/20 focus:border-white/40 transition-all shadow-lg"
+                    />
+                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70" />
+                </div>
+
+                <div className="pointer-events-auto flex flex-wrap gap-1.5 lg:gap-2 justify-center max-w-2xl px-2">
+                    {filterCategories.map(cat => (
+                        <button
+                            key={cat}
+                            onClick={() => setActiveFilter(cat)}
+                            className={`px-3 py-1 lg:px-4 lg:py-1.5 rounded-full text-[10px] lg:text-xs font-bold uppercase tracking-wider transition-all border ${
+                                activeFilter === cat 
+                                    ? 'bg-white text-slate-900 border-white scale-105 shadow-md' 
+                                    : 'bg-transparent text-white/70 border-white/20 hover:bg-white/10 hover:border-white/40'
+                            }`}
                         >
-                            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                                <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-white/5 rounded-full blur-[100px] animate-pulse"></div>
-                            </div>
+                            {cat}
+                        </button>
+                    ))}
+                </div>
+            </div>
 
-                            <div className="svg-wrapper floating">
-                                <div className="img-container swing">
-                                    <div className="absolute inset-0 rounded-full border border-white/20 animate-[spin_10s_linear_infinite]"></div>
-                                    <img src={service.image} alt={service.title} />
-                                    <div className="absolute -bottom-4 right-10 bg-white p-3 lg:p-4 rounded-full shadow-lg">
-                                        <service.icon size={24} className="lg:w-8 lg:h-8" style={{ color: service.accent }} />
+            <div className="autoplay-progress-bar" ref={progressBar}></div>
+
+            {filteredServices.length > 0 ? (
+                <Swiper
+                    ref={swiperRef}
+                    modules={[EffectCoverflow, Autoplay, Pagination, Navigation, Keyboard]}
+                    effect="coverflow"
+                    grabCursor={true}
+                    centeredSlides={true}
+                    slidesPerView={1} 
+                    speed={1000}
+                    coverflowEffect={{
+                        rotate: 50,
+                        stretch: 0,
+                        depth: 100,
+                        modifier: 1,
+                        slideShadows: true,
+                    }}
+                    keyboard={{ enabled: true }}
+                    autoplay={{
+                        delay: 6000,
+                        disableOnInteraction: false,
+                        pauseOnMouseEnter: true
+                    }}
+                    pagination={{ clickable: true }}
+                    navigation={{
+                        nextEl: '.slider-button-next',
+                        prevEl: '.slider-button-prev',
+                    }}
+                    onAutoplayTimeLeft={onAutoplayTimeLeft}
+                    onSlideChange={handleSlideChange}
+                    className="w-full h-full swiper"
+                >
+                    {filteredServices.map((service) => (
+                        <SwiperSlide key={service.id} className="slide">
+                            <div 
+                                className="card" 
+                                style={{ background: service.bg, "--color": service.accent } as React.CSSProperties}
+                            >
+                                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                                    <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-white/5 rounded-full blur-[100px] animate-pulse"></div>
+                                </div>
+
+                                <div className="svg-wrapper floating">
+                                    <div className="img-container swing">
+                                        <div className="absolute inset-0 rounded-full border border-white/20 animate-[spin_10s_linear_infinite]"></div>
+                                        <img src={service.image} alt={service.title} />
+                                        <div className="absolute -bottom-4 right-10 bg-white p-3 lg:p-4 rounded-full shadow-lg">
+                                            <service.icon size={24} className="lg:w-8 lg:h-8" style={{ color: service.accent }} />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="card-content">
+                                    <div className="card-sub-title">{service.subTitle}</div>
+                                    <h2 className="card-title" data-text={service.title}>{service.title}</h2>
+                                    <p className="card-description">
+                                        {service.description}
+                                    </p>
+                                    <div className="card-cta">
+                                        <button 
+                                            className="cta-button"
+                                            onClick={() => handleClick(service.treatmentId)}
+                                        >
+                                            Learn More
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="card-ghost-info">
+                                    <span></span>
+                                    <div className="ghost-name">Highlights</div>
+                                    <div className="flex flex-col gap-1">
+                                        {service.features.map((f, i) => (
+                                            <div key={i} className="opacity-80 text-xs">• {f}</div>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
+                        </SwiperSlide>
+                    ))}
 
-                            <div className="card-content">
-                                <div className="card-sub-title">{service.subTitle}</div>
-                                <h2 className="card-title" data-text={service.title}>{service.title}</h2>
-                                <p className="card-description">
-                                    {service.description}
-                                </p>
-                                <div className="card-cta">
-                                    <button 
-                                        className="cta-button"
-                                        onClick={() => handleClick(service.treatmentId)}
-                                    >
-                                        Learn More
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="card-ghost-info">
-                                <span></span>
-                                <div className="ghost-name">Highlights</div>
-                                <div className="flex flex-col gap-1">
-                                    {service.features.map((f, i) => (
-                                        <div key={i} className="opacity-80 text-xs">• {f}</div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </SwiperSlide>
-                ))}
-
-                <div className="slider-button slider-button-prev">
-                    <svg viewBox="0 0 100 100">
-                        <g className="slider-svg-circle-wrap">
-                            <circle cx="50" cy="50" r="45"></circle>
-                        </g>
-                        <path className="slider-svg-arrow" d="M35 50 L65 30 L65 70 Z"/>
-                    </svg>
+                    <div className="slider-button slider-button-prev">
+                        <svg viewBox="0 0 100 100">
+                            <g className="slider-svg-circle-wrap">
+                                <circle cx="50" cy="50" r="45"></circle>
+                            </g>
+                            <path className="slider-svg-arrow" d="M35 50 L65 30 L65 70 Z"/>
+                        </svg>
+                    </div>
+                    <div className="slider-button slider-button-next">
+                        <svg viewBox="0 0 100 100">
+                            <g className="slider-svg-circle-wrap">
+                                <circle cx="50" cy="50" r="45"></circle>
+                            </g>
+                            <path className="slider-svg-arrow" d="M35 50 L65 30 L65 70 Z"/>
+                        </svg>
+                    </div>
+                </Swiper>
+            ) : (
+                <div className="relative z-10 flex flex-col items-center justify-center h-[500px] text-white">
+                    <Filter size={64} className="mb-4 opacity-50" />
+                    <h3 className="text-2xl font-bold mb-2">No treatments found</h3>
+                    <p className="text-white/60 mb-6">Try adjusting your search or filter.</p>
+                    <button 
+                        onClick={() => { setSearchQuery(''); setActiveFilter('All'); }}
+                        className="px-6 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full transition-all text-sm font-bold uppercase tracking-wider"
+                    >
+                        Clear Filters
+                    </button>
                 </div>
-                <div className="slider-button slider-button-next">
-                    <svg viewBox="0 0 100 100">
-                        <g className="slider-svg-circle-wrap">
-                            <circle cx="50" cy="50" r="45"></circle>
-                        </g>
-                        <path className="slider-svg-arrow" d="M35 50 L65 30 L65 70 Z"/>
-                    </svg>
+            )}
+
+            <div className="autoplay-progress">
+                <svg viewBox="0 0 48 48" ref={progressCircle}>
+                    <circle cx="24" cy="24" r="20"></circle>
+                </svg>
+                <span ref={progressContent}></span>
+            </div>
+
+            <div className="mouse-scroll">
+                <div className="mouse">
+                    <div className="roll"></div>
                 </div>
-            </Swiper>
-        ) : (
-            <div className="relative z-10 flex flex-col items-center justify-center h-[500px] text-white">
-                <Filter size={64} className="mb-4 opacity-50" />
-                <h3 className="text-2xl font-bold mb-2">No treatments found</h3>
-                <p className="text-white/60 mb-6">Try adjusting your search or filter.</p>
-                <button 
-                    onClick={() => { setSearchQuery(''); setActiveFilter('All'); }}
-                    className="px-6 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full transition-all text-sm font-bold uppercase tracking-wider"
-                >
-                    Clear Filters
-                </button>
+                <span>Discover Treatments</span>
             </div>
-        )}
-
-        <div className="autoplay-progress">
-            <svg viewBox="0 0 48 48" ref={progressCircle}>
-                <circle cx="24" cy="24" r="20"></circle>
-            </svg>
-            <span ref={progressContent}></span>
-        </div>
-
-        <div className="mouse-scroll">
-            <div className="mouse">
-                <div className="roll"></div>
-            </div>
-            <span>Discover Treatments</span>
-        </div>
-    </section>
-  );
+        </section>
+    );
 };
 
 export default Services;
