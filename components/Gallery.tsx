@@ -2,7 +2,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Play, Pause, SkipBack, SkipForward, Heart, Share2, Sparkles, Bookmark, Bot, Loader2, X, Search } from 'lucide-react';
+/* Added Activity to the imports below */
+import { ArrowRight, Play, Pause, SkipBack, SkipForward, Heart, Share2, Sparkles, Bookmark, Bot, Loader2, X, Search, Activity } from 'lucide-react';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
 import { filterBlogsWithAi } from '@/services/geminiService';
 
@@ -43,7 +44,7 @@ const Gallery = () => {
       category: "EPISODE 03",
       description: "Techniques to manage dental anxiety in children using the Tell-Show-Do method and positive reinforcement.",
       artist: "Dr. Sarah",
-      video: "https://videos.pexels.com/video-files/5091624/5091624-hd_1920_1080_24fps.mp4", // You can change this video if you have a kid-related one
+      video: "https://videos.pexels.com/video-files/5091624/5091624-hd_1920_1080_24fps.mp4", 
       // Gentle Piano
       source: "https://cdn.pixabay.com/download/audio/2021/11/24/audio_82339391b4.mp3?filename=piano-moment-111585.mp3",
       tags: ['Pediatrics', 'Psychology', 'Kids']
@@ -168,7 +169,6 @@ const Gallery = () => {
       audioRef.current.volume = 0.3; // Ensure volume stays low on switch
       
       // 3. Auto-play if timer is running OR just auto-play whenever user switches
-      // We set isTimerPlaying to true on click, so this should pick it up
       if (isTimerPlaying) {
         const playPromise = audioRef.current.play();
         if (playPromise !== undefined) {
