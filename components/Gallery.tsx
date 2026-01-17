@@ -2,7 +2,10 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Play, Pause, SkipBack, SkipForward, Heart, Share2, Sparkles, Bookmark, Bot, Loader2, X, Search, Activity } from 'lucide-react';
+import { 
+  ArrowRight, Play, Pause, SkipBack, SkipForward, Heart, Share2, 
+  Sparkles, Bookmark, Bot, Loader2, X, Search, Activity, ShieldCheck, Cpu 
+} from 'lucide-react';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
 import { filterBlogsWithAi } from '@/services/geminiService';
 
@@ -16,16 +19,15 @@ const Gallery = () => {
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // --- UPDATED PLAYLIST (4 Distinct, Working Tracks) ---
+  // --- EXPANDED PLAYLIST (6 Tracks based on Credentials/Clinical Topics) ---
   const tracks = [
     {
       name: "Biological Foundations of Dental Implants",
       category: "EPISODE 01",
       description: "How bone fusion (osseointegration) works on a cellular level and why Swiss titanium ensures lifetime stability.",
       artist: "Dr. Dhivakaran",
-      video: "https://videos.pexels.com/video-files/3195394/3195394-hd_1920_1080_25fps.mp4", // Science/Lab video
-      // TRACK 1: Tech/Futuristic
-      source: "https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3",
+      video: "https://videos.pexels.com/video-files/3195394/3195394-hd_1920_1080_25fps.mp4",
+      source: "/audio/implants.mp3", // Ensure file exists in public/audio/
       tags: ['Implants', 'Biology', 'Surgery']
     },
     {
@@ -33,9 +35,8 @@ const Gallery = () => {
       category: "EPISODE 02",
       description: "A deep dive into why microscopic root canals have a 99% success rate compared to traditional methods.",
       artist: "Dr. Roger",
-      video: "https://videos.pexels.com/video-files/5091624/5091624-hd_1920_1080_24fps.mp4", // Microscope/Focus video
-      // TRACK 2: Chill/Lo-Fi Focus
-      source: "https://assets.mixkit.co/music/preview/mixkit-hip-hop-02-738.mp3",
+      video: "https://videos.pexels.com/video-files/5091624/5091624-hd_1920_1080_24fps.mp4",
+      source: "/audio/endo.mp3",
       tags: ['Endo', 'Precision', 'Tech']
     },
     {
@@ -43,9 +44,8 @@ const Gallery = () => {
       category: "EPISODE 03",
       description: "Techniques to manage dental anxiety in children using the Tell-Show-Do method and positive reinforcement.",
       artist: "Dr. Sarah",
-      video: "https://videos.pexels.com/video-files/5091624/5091624-hd_1920_1080_24fps.mp4", // Kids/Friendly video (Placeholder reused for demo)
-      // TRACK 3: Gentle/Calm Piano
-      source: "https://assets.mixkit.co/music/preview/mixkit-dreaming-big-31.mp3",
+      video: "https://videos.pexels.com/video-files/5665440/5665440-hd_1920_1080_24fps.mp4", 
+      source: "/audio/kids.mp3",
       tags: ['Pediatrics', 'Psychology', 'Kids']
     },
     {
@@ -53,13 +53,34 @@ const Gallery = () => {
       category: "EPISODE 04",
       description: "Comparing the physics of pushing (Aligners) vs pulling (Braces) teeth. Which is faster?",
       artist: "Dr. Deepak",
-      video: "https://videos.pexels.com/video-files/3195394/3195394-hd_1920_1080_25fps.mp4", // Tech video reused
-      // TRACK 4: Upbeat/Energetic
-      source: "https://assets.mixkit.co/music/preview/mixkit-driving-ambition-32.mp3",
+      video: "https://videos.pexels.com/video-files/7579933/7579933-hd_1920_1080_25fps.mp4",
+      source: "/audio/ortho.mp3",
       tags: ['Ortho', 'Invisalign', 'Physics']
+    },
+    // --- NEW TRACKS DERIVED FROM CREDENTIALS HTML ---
+    {
+      name: "The Invisible Shield: Sterilization Protocols",
+      category: "EPISODE 05",
+      description: "Understanding our 7-step sterilization cycle. Why we treat every patient with surgical-grade sterility.",
+      artist: "Clinical Safety Team",
+      video: "https://videos.pexels.com/video-files/3951368/3951368-hd_1920_1080_25fps.mp4", // Clean/Medical video
+      // Calm, reassuring ambient track
+      source: "https://assets.mixkit.co/music/preview/mixkit-deep-meditation-109.mp3", 
+      tags: ['Safety', 'Hygiene', 'Protocols']
+    },
+    {
+      name: "AI Diagnostics: Beyond the X-Ray",
+      category: "EPISODE 06",
+      description: "How Artificial Intelligence helps us detect decay 3 years before it becomes visible to the naked eye.",
+      artist: "Tech Dept",
+      video: "https://videos.pexels.com/video-files/8378772/8378772-hd_1920_1080_25fps.mp4", // Digital/AI video
+      // Futuristic electronic track
+      source: "https://assets.mixkit.co/music/preview/mixkit-future-technology-146.mp3",
+      tags: ['AI', 'Digital', 'Future']
     }
   ];
 
+  // --- EXPANDED BLOGS ---
   const blogPosts = [
     {
       title: "Science of Zirconia: Why it's the Gold Standard",
@@ -88,6 +109,21 @@ const Gallery = () => {
       desc: "The physics behind PETG sequential trays and why Dr. Deepak's 3D planning ensures predictable outcomes.",
       img: "https://images.unsplash.com/photo-1606811971618-4486d14f3f72?auto=format&fit=crop&q=80&w=600",
       readTime: "6 min"
+    },
+    // --- NEW BLOGS ---
+    {
+      title: "Patient Safety First: Our Sterilization Audit",
+      cat: "Safety Protocols",
+      desc: "We follow WHO-aligned infection control standards. Learn about our autoclave validation and water line purity checks.",
+      img: "https://images.unsplash.com/photo-1584036561566-b45238f2e1ef?auto=format&fit=crop&q=80&w=600",
+      readTime: "5 min"
+    },
+    {
+      title: "The Digital Workflow: From Scan to Smile",
+      cat: "Technology",
+      desc: "How we use intraoral scanners to create 3D models of your teeth, eliminating gooey impression materials forever.",
+      img: "https://images.unsplash.com/photo-1583912267550-d0d9f6522338?auto=format&fit=crop&q=80&w=600",
+      readTime: "4 min"
     }
   ];
 
@@ -130,8 +166,9 @@ const Gallery = () => {
   // 1. Initialize Audio on Mount
   useEffect(() => {
     if (!audioRef.current) {
+      // Use the first track's source (local file or URL)
       audioRef.current = new Audio(tracks[0].source);
-      audioRef.current.volume = 0.2; // <--- DEFAULT VOLUME: 20%
+      audioRef.current.volume = 0.2; // Set Volume Low (20%)
     }
     
     const audio = audioRef.current;
@@ -143,7 +180,7 @@ const Gallery = () => {
     };
 
     const handleEnded = () => {
-        handleNext();
+        handleNext(); // Auto-play next track
     };
 
     audio.addEventListener('timeupdate', updateProgress);
@@ -155,23 +192,25 @@ const Gallery = () => {
     };
   }, []);
 
-  // 2. Handle Track Switching (Crucial for changing music)
+  // 2. Handle Track Switching
   useEffect(() => {
     if (audioRef.current) {
       const audio = audioRef.current;
       
-      // Pause, Switch Source, Load
+      // Pause current
       audio.pause();
+      
+      // Switch Source
       audio.src = tracks[currentTrackIndex].source;
       audio.load();
-      audio.volume = 0.2; // Ensure volume stays low on switch
+      audio.volume = 0.2; // Ensure volume stays low
       
-      // If player was already running, or if we just switched tracks via buttons, play immediately
+      // If player was active, auto-play new track.
       if (isTimerPlaying) {
         const playPromise = audio.play();
         if (playPromise !== undefined) {
             playPromise.catch(error => {
-                console.log("Autoplay prevented by browser:", error);
+                console.log("Autoplay prevented:", error);
                 setIsTimerPlaying(false);
             });
         }
@@ -179,7 +218,7 @@ const Gallery = () => {
           setBarWidth("0%");
       }
     }
-  }, [currentTrackIndex]); // Runs whenever index changes
+  }, [currentTrackIndex]);
 
   const togglePlay = () => {
     if(!audioRef.current) return;
@@ -193,12 +232,12 @@ const Gallery = () => {
   };
 
   const handleNext = () => {
-    setIsTimerPlaying(true); // Force play on next
+    setIsTimerPlaying(true); 
     setCurrentTrackIndex((prev) => (prev + 1) % tracks.length);
   };
 
   const handlePrev = () => {
-    setIsTimerPlaying(true); // Force play on prev
+    setIsTimerPlaying(true); 
     setCurrentTrackIndex((prev) => (prev - 1 + tracks.length) % tracks.length);
   };
 
@@ -216,7 +255,7 @@ const Gallery = () => {
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500">Expert Journal.</span>
              </h2>
              <p className="text-lg text-slate-500 dark:text-slate-400 max-w-xl font-medium leading-relaxed">
-               Deep-dives into clinical science and surgical technology.
+               Deep-dives into clinical science, safety protocols, and surgical technology.
              </p>
           </div>
         </RevealOnScroll>
@@ -228,7 +267,7 @@ const Gallery = () => {
         <RevealOnScroll className="mb-24">
            <div className="unified-player-card group">
               <div className="player-media">
-                  {/* Key ensures video reloads on track change */}
+                  {/* Video Background */}
                   <video 
                     key={currentTrack.video} 
                     src={currentTrack.video} 
@@ -236,8 +275,12 @@ const Gallery = () => {
                     autoPlay loop muted playsInline 
                   />
                   <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors"></div>
+                  
+                  {/* Category Badge */}
                   <div className="absolute bottom-10 left-10 z-20">
-                     <span className="px-4 py-1.5 bg-blue-600 text-white text-[9px] font-black uppercase tracking-widest rounded-full mb-4 inline-block shadow-lg">{currentTrack.category}</span>
+                     <span className="px-4 py-1.5 bg-blue-600 text-white text-[9px] font-black uppercase tracking-widest rounded-full mb-4 inline-block shadow-lg flex items-center gap-2 w-fit">
+                        <Activity size={10} /> {currentTrack.category}
+                     </span>
                      <h3 className="text-3xl md:text-4xl font-black text-white leading-none tracking-tight drop-shadow-lg">{currentTrack.artist}</h3>
                   </div>
               </div>
@@ -247,9 +290,9 @@ const Gallery = () => {
                     <h2 className="track-title text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4">{currentTrack.name}</h2>
                     <div className="flex items-center gap-4 mb-6">
                        <span className="text-xs font-black text-blue-600 uppercase tracking-widest flex items-center gap-2">
-                          <Activity size={14} className={isTimerPlaying ? "animate-pulse" : ""} /> Now Playing
+                          <Activity size={14} className={isTimerPlaying ? "animate-pulse" : ""} /> {isTimerPlaying ? "Now Playing" : "Paused"}
                        </span>
-                       <div className="flex gap-2">
+                       <div className="flex gap-2 flex-wrap">
                           {currentTrack.tags.map(t => (
                              <span key={t} className="text-[10px] font-bold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10 px-2 py-1 rounded-md uppercase tracking-wider">{t}</span>
                           ))}
@@ -267,18 +310,19 @@ const Gallery = () => {
                       {/* Controls */}
                       <div className="flex items-center justify-between">
                           <div className="flex items-center gap-6 md:gap-10">
-                             <button onClick={handlePrev} className="text-slate-400 hover:text-blue-600 transition-colors transform hover:-translate-x-1">
+                             <button onClick={handlePrev} className="text-slate-400 hover:text-blue-600 transition-colors transform hover:-translate-x-1" aria-label="Previous Track">
                                 <SkipBack size={28} />
                              </button>
                              
                              <button 
                                 onClick={togglePlay} 
                                 className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-xl shadow-blue-600/20 hover:scale-110 hover:bg-blue-500 transition-all active:scale-95"
+                                aria-label={isTimerPlaying ? "Pause" : "Play"}
                              >
                                 {isTimerPlaying ? <Pause size={28} fill="currentColor" /> : <Play size={28} fill="currentColor" className="ml-1" />}
                              </button>
                              
-                             <button onClick={handleNext} className="text-slate-400 hover:text-blue-600 transition-colors transform hover:translate-x-1">
+                             <button onClick={handleNext} className="text-slate-400 hover:text-blue-600 transition-colors transform hover:translate-x-1" aria-label="Next Track">
                                 <SkipForward size={28} />
                              </button>
                           </div>
@@ -302,7 +346,7 @@ const Gallery = () => {
            <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-8">
               <RevealOnScroll>
                  <h3 className="text-3xl md:text-5xl font-black tracking-tight dark:text-white">Latest From The Journal</h3>
-                 <p className="text-slate-500 font-medium mt-2">Expert perspectives on modern clinical care.</p>
+                 <p className="text-slate-500 font-medium mt-2">Clinical Insights & Updates.</p>
               </RevealOnScroll>
               
               <div className="flex flex-col gap-4 w-full max-w-md">
@@ -311,7 +355,7 @@ const Gallery = () => {
                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={16}/>
                        <input 
                           type="text" 
-                          placeholder="Semantic search (e.g. 'gum health')..." 
+                          placeholder="Search topics (e.g. 'safety', 'digital')..." 
                           value={searchQuery}
                           onChange={(e) => {
                             setSearchQuery(e.target.value);
@@ -339,11 +383,6 @@ const Gallery = () => {
                        AI Search
                     </button>
                  </div>
-                 {aiFilteredIndices !== null && (
-                   <div className="px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-cyan-400 animate-in fade-in slide-in-from-left-2">
-                      Semantic Match Results: {filteredBlogs.length} Articles Found
-                   </div>
-                 )}
               </div>
            </div>
 
@@ -364,7 +403,7 @@ const Gallery = () => {
                           <div className="modern-blog-content">
                              <span className="text-[9px] font-[900] text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em] mb-3 block">{post.cat}</span>
                              <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight leading-tight">{post.title}</h4>
-                             <p className="text-sm text-slate-500 dark:text-slate-400 mb-8 line-clamp-3 leading-relaxed font-medium">{post.desc}</p>
+                             <p className="text-sm text-slate-500 dark:text-slate-300 mb-8 line-clamp-3 leading-relaxed font-medium">{post.desc}</p>
                              <div className="mt-auto pt-6 border-t border-slate-50 dark:border-white/5 flex items-center justify-between">
                                 <button className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-cyan-400 hover:gap-2.5 transition-all">
                                    Read Entry <ArrowRight size={14} />
