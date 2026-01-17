@@ -45,6 +45,17 @@ const customStyles = `
     border: 1px solid rgba(255, 255, 255, 0.05);
   }
 
+  /* Gradient Text Animation */
+  @keyframes gradient-x {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .animate-gradient-x {
+    background-size: 200% 200%;
+    animation: gradient-x 6s ease infinite;
+  }
+
   /* Floating Animation */
   @keyframes float {
     0% { transform: translateY(0px); }
@@ -140,7 +151,7 @@ export default function DentalImplantsPage() {
       noble: "₹35,000 - ₹42,000",
       warranty: "Lifetime (Global)",
       desc: "The inventors of modern implants. High stability in soft bone situations.",
-      style: "border-amber-400/50 bg-amber-50/50 dark:bg-amber-900/10 shadow-amber-500/10"
+      style: "border-amber-400/50 bg-amber-50/50 dark:bg-amber-900/10 shadow-amber-500/10 ring-1 ring-amber-500/20"
     },
     {
       tier: "Elite Platinum",
@@ -152,24 +163,15 @@ export default function DentalImplantsPage() {
       noble: "₹52,000 - ₹58,000",
       warranty: "Lifetime + Card",
       desc: "The world's #1 implant. Chemical surface attracts blood for ultra-fast healing.",
-      style: "border-slate-400 dark:border-slate-500 bg-slate-100 dark:bg-slate-800/50 shadow-blue-500/10"
+      style: "border-indigo-400 dark:border-indigo-500 bg-indigo-50/50 dark:bg-indigo-900/10 shadow-indigo-500/10"
     }
   ];
 
   // --- DATA: ANATOMY ---
   const anatomyLayers = [
-    { id: 1, name: "Zirconia Crown", role: "The Visible Tooth", desc: "Diamond-hard ceramic that mimics natural enamel translucency. Stain-proof.", color: "bg-white text-slate-900 shadow-xl" },
-    { id: 2, name: "Titanium Abutment", role: "The Shock Absorber", desc: "Connects the crown to the screw. Absorbs biting forces to protect the jaw.", color: "bg-slate-200 text-slate-800" },
+    { id: 1, name: "Zirconia Crown", role: "The Visible Tooth", desc: "Diamond-hard ceramic that mimics natural enamel translucency. Stain-proof.", color: "bg-white text-slate-900 shadow-xl border border-slate-200" },
+    { id: 2, name: "Titanium Abutment", role: "The Shock Absorber", desc: "Connects the crown to the screw. Absorbs biting forces to protect the jaw.", color: "bg-slate-300 text-slate-800" },
     { id: 3, name: "The Implant Screw", role: "The Artificial Root", desc: "Biocompatible Titanium Grade-5. Fuses with bone (Osseointegration).", color: "bg-slate-800 text-white" }
-  ];
-
-  // --- DATA: LIFECYCLE STEPS ---
-  const lifecycleSteps = [
-    { title: "Digital Scan & CBCT", sub: "Phase 01", desc: "3D CBCT imaging reveals bone anatomy, nerves, and implant position for guided planning.", icon: Target },
-    { title: "Virtual Planning", sub: "Phase 02", desc: "AI-guided simulation ensures precision implant placement with minimal trauma.", icon: ScanLine },
-    { title: "PRF Biologic Healing", sub: "Phase 03", desc: "We use your blood to prepare PRF membranes that enhance bone & soft-tissue healing naturally.", icon: Droplets },
-    { title: "Guided Surgery", sub: "Phase 04", desc: "Digitally printed guides direct exact implant angle, depth, and position — fast & painless.", icon: CrosshairIcon },
-    { title: "Crown Placement", sub: "Phase 05", desc: "Your final crown is 3D designed, shade-matched, and digitally aligned for your bite.", icon: Sparkles }
   ];
 
   return (
@@ -177,18 +179,19 @@ export default function DentalImplantsPage() {
       <style>{customStyles}</style>
       
       {/* ================= HERO SECTION ================= */}
-      <div className="relative min-h-[90vh] w-full flex items-center justify-center overflow-hidden bg-[#020617] text-white">
+      <div className="relative min-h-[90vh] w-full flex items-center justify-center overflow-hidden bg-gradient-to-b from-white to-slate-50 dark:from-[#020617] dark:to-[#0B1019] transition-colors duration-500">
         {/* Dynamic Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-teal-500/10 rounded-full blur-[120px] animate-pulse duration-[4000ms]"></div>
-            <div className="absolute bottom-[-10%] left-[-20%] w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[150px]"></div>
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay"></div>
+            {/* Light Mode Blobs */}
+            <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-teal-200/40 dark:bg-teal-500/10 rounded-full blur-[120px] animate-pulse duration-[4000ms]"></div>
+            <div className="absolute bottom-[-10%] left-[-20%] w-[600px] h-[600px] bg-blue-200/40 dark:bg-blue-600/10 rounded-full blur-[150px]"></div>
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
             {/* Grid Overlay */}
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:50px_50px] opacity-20"></div>
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.03)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:50px_50px] opacity-20"></div>
         </div>
 
         <div className="absolute top-6 left-6 z-30">
-             <Link href="/treatments" className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white hover:bg-white/10 transition-all text-[10px] font-bold uppercase tracking-widest group">
+             <Link href="/treatments" className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/50 dark:bg-white/5 backdrop-blur-md border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white hover:bg-white hover:shadow-md dark:hover:bg-white/10 transition-all text-[10px] font-bold uppercase tracking-widest group">
                 <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> Back to Catalog
              </Link>
         </div>
@@ -196,26 +199,26 @@ export default function DentalImplantsPage() {
         <div className="max-w-[1600px] mx-auto px-6 relative z-10 w-full grid lg:grid-cols-2 gap-16 items-center">
             <div className="space-y-10 order-2 lg:order-1">
                 <RevealOnScroll>
-                    <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-teal-900/30 border border-teal-500/30 text-teal-400 font-bold text-[10px] uppercase tracking-[0.3em] mb-8 shadow-[0_0_20px_rgba(20,184,166,0.3)]">
+                    <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-teal-50 dark:bg-teal-900/30 border border-teal-200 dark:border-teal-500/30 text-teal-700 dark:text-teal-400 font-bold text-[10px] uppercase tracking-[0.3em] mb-8 shadow-lg shadow-teal-500/10">
                         <Award size={14} /> ITI & ADA Certified Center
                     </div>
-                    <h1 className="text-6xl md:text-8xl lg:text-[7rem] font-black text-white leading-[0.85] tracking-tighter">
-                        Biological <br/>
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-blue-400 to-teal-200 animate-gradient-x">Architecture.</span>
+                    <h1 className="text-6xl md:text-8xl lg:text-[6.5rem] font-black text-slate-900 dark:text-white leading-[0.9] tracking-tighter">
+                        Precision <br/>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 via-blue-600 to-indigo-600 dark:from-teal-400 dark:via-blue-400 dark:to-indigo-300 animate-gradient-x">Dental Implants.</span>
                     </h1>
-                    <p className="text-xl text-slate-300 font-light leading-relaxed max-w-lg border-l-2 border-teal-500/50 pl-6 my-10">
-                        Restore function with Swiss-Grade Titanium. <br/>
-                        <span className="font-bold text-teal-400">99.2% Success Rate</span> via Guided Surgery Protocols.
+                    <p className="text-xl text-slate-600 dark:text-slate-300 font-medium leading-relaxed max-w-lg border-l-4 border-teal-500 pl-6 my-10">
+                        Replace missing teeth with Swiss-Grade Titanium. <br/>
+                        <span className="font-black text-teal-600 dark:text-teal-400">99.2% Success Rate</span> via Guided Surgery Protocols.
                     </p>
 
                     <div className="flex flex-wrap gap-5">
                         <button 
                             onClick={() => document.getElementById('self-check')?.scrollIntoView({behavior: 'smooth'})}
-                            className="px-10 py-5 bg-teal-500 text-[#020617] rounded-full font-black uppercase tracking-widest text-xs shadow-[0_0_30px_rgba(20,184,166,0.4)] hover:bg-teal-400 hover:scale-105 transition-all flex items-center gap-3"
+                            className="px-10 py-5 bg-teal-600 dark:bg-teal-500 text-white dark:text-[#020617] rounded-full font-black uppercase tracking-widest text-xs shadow-xl shadow-teal-500/30 hover:bg-teal-700 dark:hover:bg-teal-400 hover:scale-105 transition-all flex items-center gap-3 animate-pulse hover:animate-none"
                         >
                             <ShieldCheck size={18} /> Check Eligibility
                         </button>
-                        <button className="px-10 py-5 bg-white/5 border border-white/10 text-white rounded-full font-bold uppercase tracking-widest text-xs transition-all flex items-center gap-3 hover:bg-white/10">
+                        <button className="px-10 py-5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white rounded-full font-bold uppercase tracking-widest text-xs transition-all flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-white/10 hover:shadow-lg">
                             <Play size={16} fill="currentColor" /> Watch 3D Demo
                         </button>
                     </div>
@@ -226,8 +229,8 @@ export default function DentalImplantsPage() {
             <div className="order-1 lg:order-2 flex flex-col items-center justify-center">
                 <div className="relative w-full max-w-md perspective-1000">
                     <div className="text-center mb-12">
-                         <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-teal-500 mb-3 animate-pulse">Interactive Schematic</h3>
-                         <p className="text-2xl font-bold text-white tracking-tight">Deconstruct the Bionic Tooth</p>
+                         <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-teal-600 dark:text-teal-500 mb-3">Interactive Schematic</h3>
+                         <p className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Deconstruct the Bionic Tooth</p>
                     </div>
                     
                     <div className="space-y-4">
@@ -239,8 +242,8 @@ export default function DentalImplantsPage() {
                               className={`
                                 anatomy-layer cursor-pointer p-6 rounded-3xl border transition-all duration-500
                                 ${activeLayer === layer.id 
-                                    ? 'bg-white/10 border-teal-500/50 scale-105 shadow-[0_0_40px_rgba(20,184,166,0.1)] z-10' 
-                                    : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/20'
+                                    ? 'bg-white dark:bg-white/10 border-teal-500 shadow-2xl scale-105 z-10 ring-1 ring-teal-500/20' 
+                                    : 'bg-white/60 dark:bg-white/5 border-slate-200 dark:border-white/5 hover:border-teal-500/30'
                                 }
                               `}
                            >
@@ -249,13 +252,13 @@ export default function DentalImplantsPage() {
                                     {layer.id}
                                  </div>
                                  <div>
-                                    <h4 className="font-black text-white uppercase tracking-wider text-sm mb-1">{layer.name}</h4>
-                                    <p className="text-[10px] font-bold text-teal-400 uppercase tracking-widest mb-1">{layer.role}</p>
+                                    <h4 className="font-black text-slate-900 dark:text-white uppercase tracking-wider text-sm mb-1">{layer.name}</h4>
+                                    <p className="text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-widest mb-1">{layer.role}</p>
                                     <div className={`overflow-hidden transition-all duration-500 ease-out ${activeLayer === layer.id ? 'max-h-20 opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
-                                       <p className="text-xs text-slate-400 leading-relaxed">{layer.desc}</p>
+                                       <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{layer.desc}</p>
                                     </div>
                                  </div>
-                                 <ChevronRight className={`ml-auto text-slate-500 transition-all duration-300 ${activeLayer === layer.id ? 'rotate-90 text-teal-400 translate-x-1' : ''}`} />
+                                 <ChevronRight className={`ml-auto text-slate-400 transition-all duration-300 ${activeLayer === layer.id ? 'rotate-90 text-teal-500 translate-x-1' : ''}`} />
                               </div>
                            </div>
                         ))}
@@ -279,7 +282,7 @@ export default function DentalImplantsPage() {
          <div className="max-w-7xl mx-auto px-6 relative z-10">
             <RevealOnScroll>
                <div className="text-center mb-20">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-200 dark:bg-white/5 rounded-full text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-white dark:bg-white/5 rounded-full text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4 border border-slate-200 dark:border-white/10 shadow-sm">
                      <Activity size={12} /> AI-Powered Pre-Screening
                   </div>
                   <h2 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tight">Are You Eligible?</h2>
