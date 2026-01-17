@@ -2,7 +2,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-/* Added Activity to the imports below */
 import { ArrowRight, Play, Pause, SkipBack, SkipForward, Heart, Share2, Sparkles, Bookmark, Bot, Loader2, X, Search, Activity } from 'lucide-react';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
 import { filterBlogsWithAi } from '@/services/geminiService';
@@ -17,16 +16,16 @@ const Gallery = () => {
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // --- UPDATED PLAYLIST (4 Tracks with Distinct Audio) ---
+  // --- UPDATED PLAYLIST (4 Distinct, Working Tracks) ---
   const tracks = [
     {
       name: "Biological Foundations of Dental Implants",
       category: "EPISODE 01",
       description: "How bone fusion (osseointegration) works on a cellular level and why Swiss titanium ensures lifetime stability.",
       artist: "Dr. Dhivakaran",
-      video: "https://videos.pexels.com/video-files/3195394/3195394-hd_1920_1080_25fps.mp4",
-      // Tech/Corporate Background
-      source: "https://cdn.pixabay.com/download/audio/2022/03/24/audio_18d3509238.mp3?filename=technology-abstract-8027.mp3",
+      video: "https://videos.pexels.com/video-files/3195394/3195394-hd_1920_1080_25fps.mp4", // Science/Lab video
+      // TRACK 1: Tech/Futuristic
+      source: "https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3",
       tags: ['Implants', 'Biology', 'Surgery']
     },
     {
@@ -34,9 +33,9 @@ const Gallery = () => {
       category: "EPISODE 02",
       description: "A deep dive into why microscopic root canals have a 99% success rate compared to traditional methods.",
       artist: "Dr. Roger",
-      video: "https://videos.pexels.com/video-files/5091624/5091624-hd_1920_1080_24fps.mp4",
-      // Lo-Fi Chill
-      source: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112762.mp3",
+      video: "https://videos.pexels.com/video-files/5091624/5091624-hd_1920_1080_24fps.mp4", // Microscope/Focus video
+      // TRACK 2: Chill/Lo-Fi Focus
+      source: "https://assets.mixkit.co/music/preview/mixkit-hip-hop-02-738.mp3",
       tags: ['Endo', 'Precision', 'Tech']
     },
     {
@@ -44,9 +43,9 @@ const Gallery = () => {
       category: "EPISODE 03",
       description: "Techniques to manage dental anxiety in children using the Tell-Show-Do method and positive reinforcement.",
       artist: "Dr. Sarah",
-      video: "https://videos.pexels.com/video-files/5091624/5091624-hd_1920_1080_24fps.mp4", 
-      // Gentle Piano
-      source: "https://cdn.pixabay.com/download/audio/2021/11/24/audio_82339391b4.mp3?filename=piano-moment-111585.mp3",
+      video: "https://videos.pexels.com/video-files/5091624/5091624-hd_1920_1080_24fps.mp4", // Kids/Friendly video (Placeholder reused for demo)
+      // TRACK 3: Gentle/Calm Piano
+      source: "https://assets.mixkit.co/music/preview/mixkit-dreaming-big-31.mp3",
       tags: ['Pediatrics', 'Psychology', 'Kids']
     },
     {
@@ -54,9 +53,9 @@ const Gallery = () => {
       category: "EPISODE 04",
       description: "Comparing the physics of pushing (Aligners) vs pulling (Braces) teeth. Which is faster?",
       artist: "Dr. Deepak",
-      video: "https://videos.pexels.com/video-files/3195394/3195394-hd_1920_1080_25fps.mp4",
-      // Upbeat Innovation
-      source: "https://cdn.pixabay.com/download/audio/2021/04/07/audio_03d6e15309.mp3?filename=corporate-uplifting-chill-12493.mp3",
+      video: "https://videos.pexels.com/video-files/3195394/3195394-hd_1920_1080_25fps.mp4", // Tech video reused
+      // TRACK 4: Upbeat/Energetic
+      source: "https://assets.mixkit.co/music/preview/mixkit-driving-ambition-32.mp3",
       tags: ['Ortho', 'Invisalign', 'Physics']
     }
   ];
@@ -131,9 +130,8 @@ const Gallery = () => {
   // 1. Initialize Audio on Mount
   useEffect(() => {
     if (!audioRef.current) {
-      // Create new audio instance with the first track
       audioRef.current = new Audio(tracks[0].source);
-      audioRef.current.volume = 0.3; // <--- SET LOW VOLUME HERE (30%)
+      audioRef.current.volume = 0.2; // <--- DEFAULT VOLUME: 20%
     }
     
     const audio = audioRef.current;
@@ -157,20 +155,20 @@ const Gallery = () => {
     };
   }, []);
 
-  // 2. Handle Track Switching
+  // 2. Handle Track Switching (Crucial for changing music)
   useEffect(() => {
     if (audioRef.current) {
-      // 1. Pause current
-      audioRef.current.pause();
+      const audio = audioRef.current;
       
-      // 2. Load new source
-      audioRef.current.src = tracks[currentTrackIndex].source;
-      audioRef.current.load();
-      audioRef.current.volume = 0.3; // Ensure volume stays low on switch
+      // Pause, Switch Source, Load
+      audio.pause();
+      audio.src = tracks[currentTrackIndex].source;
+      audio.load();
+      audio.volume = 0.2; // Ensure volume stays low on switch
       
-      // 3. Auto-play if timer is running OR just auto-play whenever user switches
+      // If player was already running, or if we just switched tracks via buttons, play immediately
       if (isTimerPlaying) {
-        const playPromise = audioRef.current.play();
+        const playPromise = audio.play();
         if (playPromise !== undefined) {
             playPromise.catch(error => {
                 console.log("Autoplay prevented by browser:", error);
@@ -181,7 +179,7 @@ const Gallery = () => {
           setBarWidth("0%");
       }
     }
-  }, [currentTrackIndex]); // <--- Reruns whenever index changes
+  }, [currentTrackIndex]); // Runs whenever index changes
 
   const togglePlay = () => {
     if(!audioRef.current) return;
@@ -195,12 +193,12 @@ const Gallery = () => {
   };
 
   const handleNext = () => {
-    setIsTimerPlaying(true); // Set playing state to TRUE immediately
+    setIsTimerPlaying(true); // Force play on next
     setCurrentTrackIndex((prev) => (prev + 1) % tracks.length);
   };
 
   const handlePrev = () => {
-    setIsTimerPlaying(true); // Set playing state to TRUE immediately
+    setIsTimerPlaying(true); // Force play on prev
     setCurrentTrackIndex((prev) => (prev - 1 + tracks.length) % tracks.length);
   };
 
@@ -230,7 +228,7 @@ const Gallery = () => {
         <RevealOnScroll className="mb-24">
            <div className="unified-player-card group">
               <div className="player-media">
-                  {/* Key is crucial here: it forces React to replace the video element when track changes */}
+                  {/* Key ensures video reloads on track change */}
                   <video 
                     key={currentTrack.video} 
                     src={currentTrack.video} 
