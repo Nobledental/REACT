@@ -381,4 +381,3 @@ export const treatmentsData: Record<string, TreatmentData> = {
     keywords: ["smile makeover", "hollywood smile", "chips", "gaps", "white teeth", "laminates"]
   }
 };
-};
