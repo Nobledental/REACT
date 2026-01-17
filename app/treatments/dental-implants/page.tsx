@@ -8,33 +8,78 @@ import {
   Beaker, ShieldCheck, Microscope, Info, Zap,
   TrendingUp, Dna, Layers, Target, ChevronRight, ChevronLeft,
   Sparkles, DollarSign, TrendingDown, AlertCircle, XCircle, Play, 
-  Bone, Scale, Clock, FileText
+  Bone, Scale, Clock, FileText, Calculator, RefreshCw, ThumbsUp,
+  HeartPulse, Brain, Baby, Cigarette, Pill, Thermometer, CheckCircle2,
+  AlertTriangle, HelpCircle, Phone
 } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectCoverflow, Autoplay, Pagination, Navigation } from 'swiper/modules';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
 
-// Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
-// Custom styles
 const customStyles = `
-  .implant-swiper .swiper-pagination-bullet { background: #3b82f6; opacity: 0.5; }
-  .implant-swiper .swiper-pagination-bullet-active { background: #14b8a6; opacity: 1; width: 24px; border-radius: 4px; }
-  .bone-pattern { background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 10px 10px; }
-  .dark .bone-pattern { background-image: radial-gradient(#334155 1px, transparent 1px); }
+  .implant-swiper .swiper-pagination-bullet { background: #14b8a6; opacity: 0.5; }
+  .implant-swiper .swiper-pagination-bullet-active { background: #0d9488; opacity: 1; width: 24px; border-radius: 4px; }
+  .clip-path-slant { clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%); }
+  .anatomy-layer:hover { transform: translateX(10px) scale(1.02); }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 `;
 
 export default function DentalImplantsPage() {
-  const [boneSlider, setBoneSlider] = useState(50); // 0 = Bridge (Bone Loss), 100 = Implant (Healthy)
-  const [activeBrand, setActiveBrand] = useState<string | null>(null);
+  const [boneSlider, setBoneSlider] = useState(50);
+  const [activeLayer, setActiveLayer] = useState<number | null>(null);
+  const [calculatorYears, setCalculatorYears] = useState(20);
+  
+  // Self Check State
+  const [activeTab, setActiveTab] = useState('heart');
+  const [riskScore, setRiskScore] = useState(0);
+  const [riskFactors, setRiskFactors] = useState<string[]>([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // --- DATA: ELIGIBILITY CHECK ---
+  const eligibilityCategories = [
+    { id: 'heart', label: 'Heart', icon: HeartPulse, questions: [
+        { q: "BP stable (≤140/90)", risk: 0 },
+        { q: "Taking Blood Thinners (Aspirin/Clopidogrel)", risk: 10 },
+        { q: "Heart Attack / Stroke (<6 months ago)", risk: 50 },
+        { q: "Pacemaker Installed", risk: 5 }
+    ]},
+    { id: 'diabetes', label: 'Sugar', icon: Droplets, questions: [
+        { q: "HbA1c ≤ 7.5% (Controlled)", risk: 0 },
+        { q: "HbA1c 7.6% – 8.5%", risk: 20 },
+        { q: "HbA1c > 8.5% (Uncontrolled)", risk: 50 },
+        { q: "Heavy Smoking (>10/day)", risk: 30 }
+    ]},
+    { id: 'bone', label: 'Bone', icon: Bone, questions: [
+        { q: "Taking Bisphosphonates (Bone density drugs)", risk: 40 },
+        { q: "History of Jaw Radiation", risk: 60 },
+        { q: "Severe Osteoporosis", risk: 20 }
+    ]}
+  ];
+
+  const handleRiskChange = (risk: number, isChecked: boolean, label: string) => {
+    if (isChecked) {
+        setRiskScore(prev => prev + risk);
+        setRiskFactors(prev => [...prev, label]);
+    } else {
+        setRiskScore(prev => Math.max(0, prev - risk));
+        setRiskFactors(prev => prev.filter(f => f !== label));
+    }
+  };
+
+  const getRiskLevel = () => {
+      if (riskScore === 0) return { label: "Ideal Candidate", color: "text-emerald-500", bg: "bg-emerald-500" };
+      if (riskScore < 30) return { label: "Moderate Risk (Needs Prep)", color: "text-amber-500", bg: "bg-amber-500" };
+      return { label: "High Risk (Consult Specialist)", color: "text-red-500", bg: "bg-red-500" };
+  };
 
   // --- DATA: IMPLANT TIERS ---
   const implantTiers = [
@@ -70,29 +115,27 @@ export default function DentalImplantsPage() {
       noble: "₹52,000 - ₹58,000",
       warranty: "Lifetime + Card",
       desc: "The world's #1 implant. Chemical surface attracts blood for ultra-fast healing. Safe for diabetics."
-    },
-    {
-      tier: "Metal-Free (Zirconia)",
-      brand: "Z-Systems / CeraRoot",
-      origin: "Germany 🇩🇪",
-      surface: "Zirconia Ceramic",
-      healing: "12 Weeks",
-      market: "₹90,000 - ₹1.2L",
-      noble: "₹75,000 - ₹85,000",
-      warranty: "20 Years",
-      desc: "100% white, metal-free. Perfect for patients with metal allergies or thin gums."
     }
   ];
 
+  // --- DATA: ANATOMY ---
+  const anatomyLayers = [
+    { id: 1, name: "Zirconia Crown", role: "The Visible Tooth", desc: "Diamond-hard ceramic that mimics natural enamel translucency. Stain-proof.", color: "bg-white text-slate-900" },
+    { id: 2, name: "Titanium Abutment", role: "The Shock Absorber", desc: "Connects the crown to the screw. Absorbs biting forces to protect the jaw.", color: "bg-slate-300 text-slate-800" },
+    { id: 3, name: "The Implant Screw", role: "The Artificial Root", desc: "Biocompatible Titanium Grade-5. Fuses with bone (Osseointegration).", color: "bg-slate-500 text-white" }
+  ];
+
+  // --- DATA: LIFECYCLE STEPS ---
   const lifecycleSteps = [
-    { title: "CBCT Bio-Mapping", sub: "Phase 01", desc: "3D imaging captures bone volume with 0.1mm accuracy to avoid nerves.", icon: Target },
-    { title: "3D Guided Surgery", sub: "Phase 02", desc: "A printed template guides the drill, ensuring perfect angulation and depth.", icon: ScanLine },
-    { title: "Osseointegration", sub: "Phase 03", desc: "Titanium fuses with bone. We use SLActive surface to cut healing time by 50%.", icon: Dna },
-    { title: "Zirconia Loading", sub: "Phase 04", desc: "Computer-milled ceramic teeth are fixed. They reflect light exactly like enamel.", icon: Sparkles }
+    { title: "Digital Scan & CBCT", sub: "Phase 01", desc: "3D CBCT imaging reveals bone anatomy, nerves, and implant position for guided planning.", icon: Target },
+    { title: "Virtual Planning", sub: "Phase 02", desc: "AI-guided simulation ensures precision implant placement with minimal trauma.", icon: ScanLine },
+    { title: "PRF Biologic Healing", sub: "Phase 03", desc: "We use your blood to prepare PRF membranes that enhance bone & soft-tissue healing naturally.", icon: Droplets },
+    { title: "Guided Surgery", sub: "Phase 04", desc: "Digitally printed guides direct exact implant angle, depth, and position — fast & painless.", icon: CrosshairIcon },
+    { title: "Crown Placement", sub: "Phase 05", desc: "Your final crown is 3D designed, shade-matched, and digitally aligned for your bite.", icon: Sparkles }
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans transition-colors duration-500 overflow-x-hidden pt-20">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-200 font-sans transition-colors duration-500 overflow-x-hidden pt-20">
       <style>{customStyles}</style>
       
       {/* ================= HERO SECTION ================= */}
@@ -105,7 +148,7 @@ export default function DentalImplantsPage() {
 
         <div className="absolute top-6 left-6 z-30">
              <Link href="/treatments" className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 dark:bg-white/5 backdrop-blur-md border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white hover:bg-white dark:hover:bg-white/10 transition-all text-xs font-bold uppercase tracking-widest group">
-                <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> Back
+                <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> Back to Catalog
              </Link>
         </div>
 
@@ -125,145 +168,202 @@ export default function DentalImplantsPage() {
                     </p>
 
                     <div className="flex flex-wrap gap-4">
-                        <button className="px-8 py-4 bg-teal-600 hover:bg-teal-500 text-white rounded-full font-bold shadow-xl shadow-teal-500/20 transition-all flex items-center gap-2">
-                            Book 3D Scan
+                        <button 
+                            onClick={() => document.getElementById('self-check')?.scrollIntoView({behavior: 'smooth'})}
+                            className="px-8 py-4 bg-teal-600 hover:bg-teal-500 text-white rounded-full font-bold shadow-xl shadow-teal-500/20 transition-all flex items-center gap-2"
+                        >
+                            <ShieldCheck size={18} /> Check Eligibility
                         </button>
                         <button className="px-8 py-4 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white rounded-full font-bold transition-all flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-white/10">
-                            <Play size={16} fill="currentColor" /> Virtual Surgery
+                            <Play size={16} fill="currentColor" /> Virtual Surgery Demo
                         </button>
                     </div>
                 </RevealOnScroll>
             </div>
 
-            {/* ANIMATED IMPLANT VISUAL */}
-            <div className="order-1 lg:order-2 relative h-[500px] bg-slate-50 dark:bg-slate-900/50 backdrop-blur-md rounded-[3rem] border border-slate-200 dark:border-white/10 flex items-center justify-center overflow-hidden shadow-2xl group">
-                {/* Tech Grid Background */}
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.03)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
-
-                {/* Animated Implant Screw SVG */}
-                <svg viewBox="0 0 200 400" className="w-64 h-full relative z-10 drop-shadow-2xl">
-                   <defs>
-                      <linearGradient id="metalGradient" x1="0" y1="0" x2="1" y2="0">
-                         <stop offset="0%" stopColor="#334155" />
-                         <stop offset="50%" stopColor="#94a3b8" />
-                         <stop offset="100%" stopColor="#334155" />
-                      </linearGradient>
-                      <filter id="glow">
-                          <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
-                          <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
-                      </filter>
-                   </defs>
-                   
-                   {/* Bone Mask (Pulsing) */}
-                   <path d="M0,220 Q100,240 200,220 V400 H0 Z" fill="#f43f5e" fillOpacity="0.05" className="animate-pulse" />
-                   
-                   {/* Screw Rotating Animation */}
-                   <g className="animate-[spin_4s_linear_infinite_reverse]" style={{ transformOrigin: '100px 250px' }}>
-                      {/* Threads */}
-                      <path d="M70,150 L130,150 L140,170 L60,170 Z M60,180 L140,180 L130,200 L70,200 Z M70,210 L130,210 L140,230 L60,230 Z M60,240 L140,240 L130,260 L70,260 Z" fill="url(#metalGradient)" />
-                      {/* Core */}
-                      <rect x="80" y="260" width="40" height="100" fill="url(#metalGradient)" rx="5" />
-                   </g>
-                   
-                   {/* Crown Loading Animation */}
-                   <g className="animate-[bounce_3s_infinite]">
-                      <rect x="75" y="100" width="50" height="40" fill="white" rx="5" stroke="#94a3b8" strokeWidth="2" />
-                      <path d="M75,100 L125,100 L130,80 L70,80 Z" fill="white" opacity="0.8" />
-                   </g>
-                </svg>
-
-                {/* Floating Specs */}
-                <div className="absolute top-10 right-10 bg-white/80 dark:bg-black/50 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest backdrop-blur-md border border-slate-200 dark:border-white/10 shadow-lg flex flex-col gap-1">
-                   <div className="flex items-center gap-2 text-teal-600 dark:text-teal-400"><Ruler size={12}/> Length: 11.5mm</div>
-                   <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400"><Scale size={12}/> Torque: 35 Ncm</div>
-                </div>
-
-                <div className="absolute bottom-10 bg-white/80 dark:bg-black/50 px-6 py-3 rounded-full text-xs font-bold text-slate-900 dark:text-white backdrop-blur-md border border-slate-200 dark:border-white/20 shadow-lg flex items-center gap-2">
-                   <Activity size={14} className="text-teal-500 animate-pulse" /> Osseointegration Active
+            {/* INTERACTIVE ANATOMY DEMO */}
+            <div className="order-1 lg:order-2 flex flex-col items-center justify-center">
+                <div className="relative w-full max-w-md perspective-1000">
+                    <div className="text-center mb-8">
+                         <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 mb-2">Interactive Schematic</h3>
+                         <p className="text-lg font-bold text-slate-900 dark:text-white">Deconstruct the Bionic Tooth</p>
+                    </div>
+                    
+                    <div className="space-y-4">
+                        {anatomyLayers.map((layer) => (
+                           <div 
+                              key={layer.id}
+                              onMouseEnter={() => setActiveLayer(layer.id)}
+                              onMouseLeave={() => setActiveLayer(null)}
+                              className={`anatomy-layer cursor-pointer p-6 rounded-3xl border border-slate-200 dark:border-white/10 transition-all duration-300 shadow-lg ${activeLayer === layer.id ? 'scale-105 shadow-2xl ring-2 ring-teal-500 z-10' : 'bg-white/80 dark:bg-[#151b2b]/80 backdrop-blur-md'}`}
+                           >
+                              <div className="flex items-center gap-4">
+                                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg shadow-inner ${layer.color}`}>
+                                    {layer.id}
+                                 </div>
+                                 <div>
+                                    <h4 className="font-black text-slate-900 dark:text-white uppercase tracking-wider text-sm">{layer.name}</h4>
+                                    <p className="text-xs font-bold text-teal-600 dark:text-teal-400 uppercase tracking-widest mb-1">{layer.role}</p>
+                                    <div className={`overflow-hidden transition-all duration-300 ${activeLayer === layer.id ? 'max-h-20 opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
+                                       <p className="text-sm text-slate-500 dark:text-slate-400 leading-snug">{layer.desc}</p>
+                                    </div>
+                                 </div>
+                                 <ChevronRight className={`ml-auto text-slate-300 transition-transform ${activeLayer === layer.id ? 'rotate-90 text-teal-500' : ''}`} />
+                              </div>
+                           </div>
+                        ))}
+                    </div>
+                    <div className="mt-6 flex justify-center">
+                       <div className="h-16 w-px bg-gradient-to-b from-teal-500 to-transparent"></div>
+                    </div>
                 </div>
             </div>
         </div>
       </div>
 
-      {/* ================= GLOBAL BRAND TIER LIST (PRICING) ================= */}
-      <div className="bg-slate-50 dark:bg-[#0f172a] border-y border-slate-200 dark:border-white/5 py-32">
-          <div className="max-w-7xl mx-auto px-6">
-              <RevealOnScroll>
-                  <div className="text-center mb-16">
-                      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-xs font-bold uppercase tracking-widest mb-4 border border-green-200 dark:border-green-800">
-                          <TrendingDown size={14} /> Price Transparency Promise
-                      </div>
-                      <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">Choose Your Foundation</h2>
-                      <p className="text-slate-600 dark:text-slate-400">
-                          We categorize implants by bio-activity and origin. All options are FDA approved.
-                      </p>
+      {/* ================= ELIGIBILITY SELF-CHECK ================= */}
+      <section id="self-check" className="py-24 bg-slate-100 dark:bg-[#0b1221]">
+         <div className="max-w-6xl mx-auto px-6">
+            <RevealOnScroll>
+               <div className="text-center mb-16">
+                  <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">Are You Eligible?</h2>
+                  <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+                     A quick screening to estimate your implant readiness. <br/>
+                     <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">*Informational only. Final decision via CBCT.</span>
+                  </p>
+               </div>
+
+               <div className="grid lg:grid-cols-3 gap-8">
+                  {/* Tabs */}
+                  <div className="space-y-2">
+                     {eligibilityCategories.map(cat => (
+                        <button
+                           key={cat.id}
+                           onClick={() => setActiveTab(cat.id)}
+                           className={`w-full flex items-center gap-4 p-4 rounded-2xl border transition-all ${activeTab === cat.id ? 'bg-white dark:bg-[#151b2b] border-teal-500 shadow-lg' : 'bg-transparent border-transparent hover:bg-white/50 dark:hover:bg-white/5'}`}
+                        >
+                           <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${activeTab === cat.id ? 'bg-teal-100 text-teal-600' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}>
+                              <cat.icon size={20} />
+                           </div>
+                           <span className={`font-bold ${activeTab === cat.id ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>{cat.label} Check</span>
+                           <ChevronRight size={16} className={`ml-auto ${activeTab === cat.id ? 'text-teal-500' : 'opacity-0'}`} />
+                        </button>
+                     ))}
                   </div>
 
-                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                      {implantTiers.map((item, i) => (
-                          <div 
-                            key={i} 
-                            onMouseEnter={() => setActiveBrand(item.brand)}
-                            className="relative group bg-white dark:bg-[#151b2b] rounded-[2.5rem] border border-slate-200 dark:border-white/5 p-8 hover:border-teal-500/50 transition-all duration-300 hover:-translate-y-2 overflow-hidden shadow-xl"
-                          >
-                              {/* Tier Badge */}
-                              <div className={`absolute top-0 left-0 w-full h-2 ${i===2 ? 'bg-gradient-to-r from-yellow-400 to-amber-600' : 'bg-gradient-to-r from-slate-300 to-slate-400'} opacity-80`}></div>
-                              
-                              <div className="relative z-10">
-                                  <div className="flex justify-between items-start mb-4">
-                                      <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{item.tier}</div>
-                                      <div className="text-[10px] bg-slate-100 dark:bg-white/10 px-2 py-1 rounded text-slate-600 dark:text-slate-300">{item.origin}</div>
-                                  </div>
-                                  
-                                  <div className="text-xl font-black text-slate-900 dark:text-white mb-1 leading-tight h-14 flex items-center">{item.brand}</div>
-                                  
-                                  {/* Pricing Block */}
-                                  <div className="my-6 p-4 bg-slate-50 dark:bg-black/20 rounded-2xl border border-slate-100 dark:border-white/5">
-                                      <div className="flex justify-between items-end mb-1">
-                                          <span className="text-xs text-slate-400 uppercase">Noble Price</span>
-                                          <span className="text-lg font-black text-teal-600 dark:text-teal-400">{item.noble}</span>
-                                      </div>
-                                      <div className="flex justify-between items-center text-[10px] text-slate-400 border-t border-slate-200 dark:border-white/10 pt-2 mt-2">
-                                          <span>Market Avg</span>
-                                          <span className="line-through decoration-red-400">{item.market}</span>
-                                      </div>
-                                  </div>
-
-                                  <ul className="space-y-3 mb-6">
-                                      <li className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 font-medium">
-                                          <ShieldCheck size={14} className="text-teal-500" /> {item.surface}
-                                      </li>
-                                      <li className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 font-medium">
-                                          <Clock size={14} className="text-blue-500" /> Healing: {item.healing}
-                                      </li>
-                                      <li className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 font-medium">
-                                          <Award size={14} className="text-amber-500" /> {item.warranty}
-                                      </li>
-                                  </ul>
-
-                                  <button className="w-full py-3 rounded-xl border border-slate-200 dark:border-white/10 font-bold text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-colors">
-                                      Select {item.brand.split(' ')[0]}
-                                  </button>
+                  {/* Question Panel */}
+                  <div className="lg:col-span-2 bg-white dark:bg-[#151b2b] rounded-[2.5rem] p-8 md:p-12 border border-slate-200 dark:border-white/5 shadow-xl relative overflow-hidden">
+                     {eligibilityCategories.map(cat => (
+                        activeTab === cat.id && (
+                           <div key={cat.id} className="animate-in fade-in slide-in-from-right-4 duration-300">
+                              <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-6 flex items-center gap-3">
+                                 <cat.icon className="text-teal-500"/> {cat.label} Assessment
+                              </h3>
+                              <div className="space-y-4">
+                                 {cat.questions.map((q, i) => (
+                                    <label key={i} className="flex items-start gap-4 p-4 rounded-xl border border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 cursor-pointer transition-colors">
+                                       <input 
+                                          type="checkbox" 
+                                          onChange={(e) => handleRiskChange(q.risk, e.target.checked, q.q)}
+                                          className="mt-1 w-5 h-5 accent-teal-500 rounded focus:ring-teal-500"
+                                       />
+                                       <div>
+                                          <span className="font-bold text-slate-700 dark:text-slate-200 block">{q.q}</span>
+                                          {q.risk > 0 && <span className="text-[10px] uppercase font-bold text-amber-500 tracking-wider">Risk Factor</span>}
+                                       </div>
+                                    </label>
+                                 ))}
                               </div>
-                          </div>
-                      ))}
-                  </div>
-              </RevealOnScroll>
-          </div>
-      </div>
+                           </div>
+                        )
+                     ))}
 
-      {/* ================= BONE LOSS SIMULATOR (COMPARISON) ================= */}
-      <div className="max-w-7xl mx-auto px-6 py-32">
+                     {/* Result Gauge */}
+                     <div className="mt-12 pt-8 border-t border-slate-100 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div className="flex items-center gap-4">
+                           <div className={`w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg ${getRiskLevel().bg}`}>
+                              {riskScore === 0 ? <CheckCircle2 size={32} /> : <AlertTriangle size={32} />}
+                           </div>
+                           <div>
+                              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Eligibility Status</p>
+                              <p className={`text-xl font-black ${getRiskLevel().color}`}>{getRiskLevel().label}</p>
+                           </div>
+                        </div>
+                        <button className="px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-bold text-sm hover:scale-105 transition-transform">
+                           Book Consultation
+                        </button>
+                     </div>
+                  </div>
+               </div>
+            </RevealOnScroll>
+         </div>
+      </section>
+
+      {/* ================= IMPLANT TYPES (SOLUTIONS) ================= */}
+      <section className="py-24 max-w-7xl mx-auto px-6">
+         <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">Types of Solutions</h2>
+            <p className="text-slate-600 dark:text-slate-400">Based on bone quality and number of missing teeth.</p>
+         </div>
+         <div className="grid md:grid-cols-3 gap-8">
+            {/* Single */}
+            <div className="bg-white dark:bg-[#151b2b] rounded-[2rem] p-8 border border-slate-200 dark:border-white/5 hover:border-teal-500 transition-colors group">
+               <div className="w-14 h-14 bg-teal-50 dark:bg-teal-900/20 rounded-2xl flex items-center justify-center text-teal-600 mb-6 group-hover:scale-110 transition-transform">
+                  <div className="font-black text-2xl">1</div>
+               </div>
+               <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">Single Tooth</h3>
+               <p className="text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+                  Replaces the root of a single missing tooth. The zirconia crown restores 100% function and looks identical to your natural teeth.
+               </p>
+               <ul className="space-y-2 mb-6">
+                  <li className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300"><Check size={14} className="text-teal-500"/> Preserves adjacent teeth</li>
+                  <li className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300"><Check size={14} className="text-teal-500"/> Prevents bone loss</li>
+               </ul>
+            </div>
+
+            {/* Bridge */}
+            <div className="bg-white dark:bg-[#151b2b] rounded-[2rem] p-8 border border-slate-200 dark:border-white/5 hover:border-teal-500 transition-colors group">
+               <div className="w-14 h-14 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center text-blue-600 mb-6 group-hover:scale-110 transition-transform">
+                  <div className="font-black text-2xl">3+</div>
+               </div>
+               <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">Implant Bridge</h3>
+               <p className="text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+                  Ideal for 3 or more missing teeth. Two implants can support a bridge of 3-4 teeth, reducing cost without compromising stability.
+               </p>
+               <ul className="space-y-2 mb-6">
+                  <li className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300"><Check size={14} className="text-blue-500"/> Economical for gaps</li>
+                  <li className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300"><Check size={14} className="text-blue-500"/> No loose dentures</li>
+               </ul>
+            </div>
+
+            {/* Full Arch */}
+            <div className="bg-white dark:bg-[#151b2b] rounded-[2rem] p-8 border border-slate-200 dark:border-white/5 hover:border-teal-500 transition-colors group">
+               <div className="w-14 h-14 bg-purple-50 dark:bg-purple-900/20 rounded-2xl flex items-center justify-center text-purple-600 mb-6 group-hover:scale-110 transition-transform">
+                  <RefreshCw size={28}/>
+               </div>
+               <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">All-on-4 / Full Arch</h3>
+               <p className="text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+                  Complete jaw rehabilitation using 4-6 implants to support a full set of fixed teeth. A permanent alternative to dentures.
+               </p>
+               <ul className="space-y-2 mb-6">
+                  <li className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300"><Check size={14} className="text-purple-500"/> Immediate loading option</li>
+                  <li className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300"><Check size={14} className="text-purple-500"/> Restores full bite force</li>
+               </ul>
+            </div>
+         </div>
+      </section>
+
+      {/* ================= BONE LOSS SIMULATOR ================= */}
+      <div className="max-w-7xl mx-auto px-6 py-24 bg-slate-50 dark:bg-[#0b1221] rounded-[3rem]">
           <RevealOnScroll>
               <div className="text-center mb-16">
                   <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">The "Wolf's Law" Effect</h2>
                   <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-                      Bone requires stimulation to stay dense. Bridges sit <i>on top</i> of gums, causing the bone underneath to melt away (Resorption). Implants stimulate the bone like natural roots.
+                      Bone requires stimulation to stay dense. Bridges sit <i>on top</i> of gums, causing the bone underneath to melt away. Implants stimulate the bone like natural roots.
                   </p>
               </div>
 
-              <div className="relative w-full max-w-5xl mx-auto aspect-[16/9] bg-slate-100 dark:bg-black/40 rounded-[3rem] border border-slate-200 dark:border-white/10 overflow-hidden shadow-2xl group">
-                  
+              <div className="relative w-full max-w-5xl mx-auto aspect-[16/9] bg-white dark:bg-black/40 rounded-[3rem] border border-slate-200 dark:border-white/10 overflow-hidden shadow-2xl group">
                   {/* LEFT SIDE: BRIDGE (BAD) - Static Background */}
                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-50/30 dark:bg-red-900/10">
                       <div className="text-center opacity-60">
@@ -324,133 +424,177 @@ export default function DentalImplantsPage() {
           </RevealOnScroll>
       </div>
 
-      {/* ================= TECH SPECS (PRECISION) ================= */}
-      <div className="bg-slate-900 text-white py-32 border-t border-white/10">
-          <div className="max-w-7xl mx-auto px-6">
-              <div className="grid md:grid-cols-2 gap-16 items-center">
-                  <div>
-                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600/20 border border-blue-500/30 text-blue-400 font-bold text-[10px] uppercase tracking-[0.3em] mb-6">
-                          <Microscope size={12} /> Clinical Engineering
-                      </div>
-                      <h2 className="text-4xl font-bold mb-6">Micron-Level Precision.</h2>
-                      <p className="text-slate-400 text-lg leading-relaxed mb-8">
-                          Our surgical protocols follow the strict guidelines of the International Team for Implantology (ITI). We measure success not just by survival, but by bone stability down to the micron.
-                      </p>
-                      
-                      <div className="space-y-6">
-                          <div className="flex gap-4 items-start">
-                              <div className="w-12 h-12 bg-teal-500/10 rounded-xl flex items-center justify-center text-teal-400 shrink-0 border border-teal-500/20">
-                                  <Scale size={24} />
-                              </div>
-                              <div>
-                                  <h4 className="text-lg font-bold text-white">Insertion Torque: 35 Ncm</h4>
-                                  <p className="text-slate-400 text-sm">Optimal compression for immediate stability without crushing bone cells.</p>
-                              </div>
-                          </div>
-                          <div className="flex gap-4 items-start">
-                              <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400 shrink-0 border border-blue-500/20">
-                                  <Droplets size={24} />
-                              </div>
-                              <div>
-                                  <h4 className="text-lg font-bold text-white">Surface: Hydrophilic SLA</h4>
-                                  <p className="text-slate-400 text-sm">Chemically active surface attracts blood proteins in 45 seconds.</p>
-                              </div>
-                          </div>
-                      </div>
+      {/* ================= RECOVERY DASHBOARD ================= */}
+      <section className="py-24 max-w-7xl mx-auto px-6">
+         <div className="section-header mb-16">
+            <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">Patient Recovery Dashboard</h2>
+            <p className="text-slate-600 dark:text-slate-400">Monitor your healing with our clinical indicator guide.</p>
+         </div>
+
+         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="p-6 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/30 rounded-3xl">
+               <div className="flex justify-between items-center mb-4">
+                  <span className="px-3 py-1 bg-emerald-200 dark:bg-emerald-800 text-emerald-800 dark:text-emerald-200 text-[10px] font-black uppercase rounded-full tracking-widest">Normal</span>
+                  <CheckCircle2 className="text-emerald-600 dark:text-emerald-400"/>
+               </div>
+               <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">First 48 Hours</h3>
+               <p className="text-sm text-slate-600 dark:text-slate-400">Mild swelling and slight oozing are expected. Manage with cold packs and rest.</p>
+            </div>
+
+            <div className="p-6 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/30 rounded-3xl">
+               <div className="flex justify-between items-center mb-4">
+                  <span className="px-3 py-1 bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-200 text-[10px] font-black uppercase rounded-full tracking-widest">Caution</span>
+                  <AlertTriangle className="text-amber-600 dark:text-amber-400"/>
+               </div>
+               <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">Bleeding &gt; 24 Hrs</h3>
+               <p className="text-sm text-slate-600 dark:text-slate-400">If active bleeding persists beyond day 1, bite on sterile gauze for 30 mins. Contact us if it continues.</p>
+            </div>
+
+            <div className="p-6 bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800/30 rounded-3xl">
+               <div className="flex justify-between items-center mb-4">
+                  <span className="px-3 py-1 bg-rose-200 dark:bg-rose-800 text-rose-800 dark:text-rose-200 text-[10px] font-black uppercase rounded-full tracking-widest">Critical</span>
+                  <Phone className="text-rose-600 dark:text-rose-400"/>
+               </div>
+               <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">Numbness &gt; 6 Hrs</h3>
+               <p className="text-sm text-slate-600 dark:text-slate-400">Persistent numbness in lip or chin after anesthesia wears off requires immediate evaluation.</p>
+            </div>
+         </div>
+      </section>
+
+      {/* ================= BIOLOGICAL SCIENCE (PRF) ================= */}
+      <section className="py-24 bg-white dark:bg-[#151b2b]">
+         <div className="max-w-7xl mx-auto px-6">
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+               <div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-widest mb-6">
+                     <Beaker size={14} /> Bio-Hacking Healing
                   </div>
-
-                  <div className="relative bg-white/5 rounded-3xl p-8 border border-white/10 bone-pattern">
-                      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-slate-900/80"></div>
-                      <div className="relative z-10 space-y-4">
-                          {[
-                              { k: "Drill Speed", v: "800 RPM (Low Heat)" },
-                              { k: "Irrigation", v: "Saline 4°C" },
-                              { k: "Gap Distance", v: "< 10 Microns" },
-                              { k: "Abutment Seal", v: "Conical Connection" },
-                          ].map((spec, i) => (
-                              <div key={i} className="flex justify-between items-center p-4 bg-black/40 rounded-xl border border-white/5 backdrop-blur-sm">
-                                  <span className="text-slate-400 font-mono text-sm uppercase">{spec.k}</span>
-                                  <span className="text-teal-400 font-bold font-mono">{spec.v}</span>
-                              </div>
-                          ))}
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-
-      {/* ================= LIFECYCLE SWIPER ================= */}
-      <div className="max-w-7xl mx-auto px-6 py-32">
-          <RevealOnScroll>
-              <div className="flex items-center justify-between mb-12">
-                  <div>
-                      <h2 className="text-3xl font-bold text-slate-900 dark:text-white">The Surgical Roadmap</h2>
-                      <p className="text-slate-500 mt-2">From scan to smile in 4 precise phases.</p>
-                  </div>
-              </div>
-
-              <Swiper
-                  modules={[Autoplay, Pagination, Navigation, EffectCoverflow]}
-                  effect="coverflow"
-                  grabCursor={true}
-                  centeredSlides={true}
-                  slidesPerView={1}
-                  breakpoints={{
-                      768: { slidesPerView: 2 },
-                      1024: { slidesPerView: 2.5 }
-                  }}
-                  coverflowEffect={{
-                      rotate: 0, stretch: 0, depth: 100, modifier: 2.5, slideShadows: false,
-                  }}
-                  autoplay={{ delay: 5000 }}
-                  pagination={{ clickable: true }}
-                  className="implant-swiper overflow-visible pb-12"
-              >
-                  {lifecycleSteps.map((step, idx) => (
-                      <SwiperSlide key={idx}>
-                          <div className="bg-white dark:bg-[#151b2b] rounded-[2.5rem] p-10 border border-slate-100 dark:border-white/5 shadow-xl h-[350px] flex flex-col justify-between group hover:border-teal-500/30 transition-all">
-                              <div>
-                                  <div className="flex items-center justify-between mb-8">
-                                      <div className="w-14 h-14 rounded-2xl bg-teal-50 dark:bg-teal-900/20 flex items-center justify-center text-teal-600 dark:text-teal-400 group-hover:scale-110 transition-transform">
-                                          <step.icon size={28} />
-                                      </div>
-                                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{step.sub}</span>
-                                  </div>
-                                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">{step.title}</h3>
-                                  <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-sm">{step.desc}</p>
-                              </div>
-                              <div className="w-full h-1 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
-                                  <div className="h-full bg-teal-500 w-0 group-hover:w-full transition-all duration-[2s] ease-out"></div>
-                              </div>
-                          </div>
-                      </SwiperSlide>
-                  ))}
-              </Swiper>
-          </RevealOnScroll>
-      </div>
-
-      {/* ================= CTA ================= */}
-      <div className="max-w-5xl mx-auto px-6 pb-20">
-          <div className="bg-teal-600 rounded-[3rem] p-12 md:p-24 text-center text-white relative overflow-hidden shadow-2xl">
-              <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
-              <div className="relative z-10">
-                  <h2 className="text-4xl md:text-7xl font-black mb-8 leading-[1] tracking-tighter">Invest in <br/> Permanence.</h2>
-                  <p className="text-teal-100 text-xl mb-12 leading-relaxed font-medium">
-                      Don't settle for removable dentures. <br/>
-                      Get a fixed solution backed by a Lifetime Warranty.
+                  <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-6">PRF & Bone Grafting</h2>
+                  <p className="text-lg text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
+                     We don't just place metal; we engineer biology. Using <strong>Platelet Rich Fibrin (PRF)</strong> derived from your own blood, we create a "super-clot" that accelerates bone fusion by 40%.
                   </p>
-                  <div className="flex flex-col sm:flex-row justify-center gap-4">
-                      <button className="bg-white text-teal-700 px-12 py-5 rounded-full font-black text-lg hover:shadow-2xl hover:scale-105 transition-all">
-                          Request Surgical Consult
-                      </button>
-                      <button className="bg-transparent border border-white/30 text-white px-12 py-5 rounded-full font-black text-lg hover:bg-white/10 transition-all flex items-center gap-2 justify-center">
-                          <FileText size={20} /> View Pricing PDF
-                      </button>
+                  
+                  <div className="space-y-6">
+                     <div className="flex gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-900 dark:text-white"><Zap size={24} /></div>
+                        <div>
+                           <h4 className="font-bold text-slate-900 dark:text-white">Autograft (Your Bone)</h4>
+                           <p className="text-sm text-slate-500">The gold standard. Harvested from your jaw for perfect compatibility.</p>
+                        </div>
+                     </div>
+                     <div className="flex gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-900 dark:text-white"><Dna size={24} /></div>
+                        <div>
+                           <h4 className="font-bold text-slate-900 dark:text-white">Synthetic Alloplast</h4>
+                           <p className="text-sm text-slate-500">Lab-engineered calcium phosphate for predictable volume.</p>
+                        </div>
+                     </div>
                   </div>
-              </div>
+               </div>
+               <div className="relative h-[400px] bg-slate-100 dark:bg-black/20 rounded-[3rem] overflow-hidden flex items-center justify-center">
+                  <div className="absolute inset-0 opacity-20 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+                  <div className="text-center p-8">
+                     <Activity size={64} className="mx-auto mb-6 text-teal-500 animate-pulse" />
+                     <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">100% Autologous</h3>
+                     <p className="text-slate-500 dark:text-slate-400">No chemicals. Just your body's own growth factors.</p>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </section>
+
+      {/* ================= BRAND TIERS ================= */}
+      <div className="bg-slate-50 dark:bg-[#0f172a] py-32">
+          <div className="max-w-7xl mx-auto px-6">
+              <RevealOnScroll>
+                  <div className="text-center mb-16">
+                      <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">Choose Your Foundation</h2>
+                      <p className="text-slate-600 dark:text-slate-400">FDA-approved options categorized by bio-activity and origin.</p>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {implantTiers.map((item, i) => (
+                          <div key={i} className="bg-white dark:bg-[#151b2b] rounded-[2.5rem] border border-slate-200 dark:border-white/5 p-8 hover:border-teal-500/50 transition-all hover:-translate-y-2 shadow-xl flex flex-col">
+                              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{item.tier}</div>
+                              <div className="text-xl font-black text-slate-900 dark:text-white mb-6 h-12 flex items-center">{item.brand}</div>
+                              
+                              <div className="mb-6 p-4 bg-slate-50 dark:bg-black/20 rounded-2xl border border-slate-100 dark:border-white/5">
+                                 <div className="flex justify-between items-end">
+                                    <span className="text-xs text-slate-400 uppercase">Noble Price</span>
+                                    <span className="text-lg font-black text-teal-600 dark:text-teal-400">{item.noble}</span>
+                                 </div>
+                              </div>
+
+                              <ul className="space-y-3 mb-8 flex-1">
+                                  <li className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300"><ShieldCheck size={14} className="text-teal-500" /> {item.surface}</li>
+                                  <li className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300"><Clock size={14} className="text-blue-500" /> Healing: {item.healing}</li>
+                                  <li className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300"><Award size={14} className="text-amber-500" /> {item.warranty}</li>
+                              </ul>
+
+                              <button className="w-full py-3 rounded-xl border-2 border-slate-900 dark:border-white text-slate-900 dark:text-white font-bold text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-colors">Select Tier</button>
+                          </div>
+                      ))}
+                  </div>
+              </RevealOnScroll>
           </div>
+      </div>
+
+      {/* ================= FAQ ACCORDION ================= */}
+      <section className="py-24 max-w-4xl mx-auto px-6">
+         <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Common Questions</h2>
+            <p className="text-slate-500 text-sm">Reviewed by Dr. Dhivakaran & Implantology Team</p>
+         </div>
+         
+         <div className="space-y-4">
+            <details className="group bg-white dark:bg-[#151b2b] rounded-2xl border border-slate-200 dark:border-white/5 overflow-hidden">
+               <summary className="flex items-center justify-between p-6 font-bold text-slate-900 dark:text-white cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                  Is the procedure painful?
+                  <ChevronRight className="transition-transform group-open:rotate-90" size={20} />
+               </summary>
+               <div className="px-6 pb-6 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                  No. Implants are placed under local anesthesia, so you feel numb just like a filling. Most patients report less discomfort than a tooth extraction. Post-op soreness is managed easily with standard painkillers for 1-2 days.
+               </div>
+            </details>
+            <details className="group bg-white dark:bg-[#151b2b] rounded-2xl border border-slate-200 dark:border-white/5 overflow-hidden">
+               <summary className="flex items-center justify-between p-6 font-bold text-slate-900 dark:text-white cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                  How long do they last?
+                  <ChevronRight className="transition-transform group-open:rotate-90" size={20} />
+               </summary>
+               <div className="px-6 pb-6 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                  With proper hygiene (brushing/flossing), dental implants can last a lifetime. The titanium screw is permanent. The crown may need replacement after 15-20 years due to normal wear, similar to natural enamel.
+               </div>
+            </details>
+            <details className="group bg-white dark:bg-[#151b2b] rounded-2xl border border-slate-200 dark:border-white/5 overflow-hidden">
+               <summary className="flex items-center justify-between p-6 font-bold text-slate-900 dark:text-white cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                  Can I get implants if I have diabetes?
+                  <ChevronRight className="transition-transform group-open:rotate-90" size={20} />
+               </summary>
+               <div className="px-6 pb-6 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Yes, provided your diabetes is controlled (HbA1c ≤ 7.5%). We use specialized implant surfaces (like Straumann SLActive) that accelerate healing specifically for diabetic patients. Uncontrolled diabetes poses a higher failure risk.
+               </div>
+            </details>
+         </div>
+      </section>
+
+      {/* ================= FOOTER CITATIONS ================= */}
+      <div className="bg-slate-100 dark:bg-black/40 py-12 text-center text-xs text-slate-400">
+         <p className="mb-2 uppercase font-bold tracking-widest">Scientific References</p>
+         <p>Misch CE. Contemporary Implant Dentistry. 4th Ed.</p>
+         <p>ITI Consensus Report 2022 – Evidence-based implant protocols.</p>
+         <p>Mayo Clinic – Dental implant risks & success (2024).</p>
       </div>
 
     </div>
   );
 }
+
+const CrosshairIcon = ({size, className}: {size?: number, className?: string}) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="22" y1="12" x2="18" y2="12"></line>
+        <line x1="6" y1="12" x2="2" y2="12"></line>
+        <line x1="12" y1="6" x2="12" y2="2"></line>
+        <line x1="12" y1="22" x2="12" y2="18"></line>
+    </svg>
+);
