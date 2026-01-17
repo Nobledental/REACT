@@ -3,239 +3,230 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { 
-  Play, Pause, SkipBack, SkipForward, Heart, ExternalLink, 
-  Sparkles, Search, X, Loader2, Bot, Bookmark, Activity, ShieldAlert, ShieldCheck,
-  Link as LinkIcon
+  ArrowRight, Play, Pause, SkipBack, SkipForward, Heart, Share2, 
+  Sparkles, Bookmark, Activity, ShieldAlert, ShieldCheck, Zap,
+  Scan, Fingerprint, Dna, Microscope
 } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
 
-// --- STYLES: The "Mini-Player" Design ---
-const playerStyles = `
-  .wrapper {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background-size: cover;
-  }
-
-  .player {
-    background: #eef3f7;
-    width: 410px;
-    min-height: 480px;
-    box-shadow: 0px 15px 35px -5px rgba(50, 88, 130, 0.32);
-    border-radius: 15px;
-    padding: 30px;
-    position: relative;
-  }
-
-  .dark .player {
-    background: #1e293b;
-    box-shadow: 0px 15px 35px -5px rgba(0, 0, 0, 0.5);
-  }
-
-  .player__top {
-    display: flex;
-    align-items: flex-start;
-    position: relative;
-    z-index: 4;
-  }
-
-  .player-cover {
-    width: 300px;
-    height: 300px;
-    margin-left: -70px;
-    flex-shrink: 0;
-    position: relative;
-    z-index: 2;
-    border-radius: 15px;
-    z-index: 1;
-  }
-
-  .player-cover__item {
-    width: 100%;
-    height: 100%;
-    border-radius: 15px;
-    position: absolute;
-    left: 0;
-    top: 0;
-    overflow: hidden;
-  }
-  
-  .player-cover__item:before {
-    content: "";
-    background: inherit;
-    width: 100%;
-    height: 100%;
-    box-shadow: 0px 10px 40px 0px rgba(76, 70, 124, 0.5);
-    display: block;
-    z-index: 1;
-    position: absolute;
-    top: 30px;
-    transform: scale(0.9);
-    filter: blur(10px);
-    opacity: 0.9;
-    border-radius: 15px;
-  }
-
-  .cover-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    position: relative;
-    z-index: 2;
-    border-radius: 15px;
-  }
-
-  .player-controls {
-    flex: 1;
-    padding-left: 20px;
+// --- STYLES ---
+const wideCardStyles = `
+  .unified-player-card {
+    background: #fff;
+    border-radius: 40px;
+    box-shadow: 0 30px 60px -10px rgba(0,0,0,0.1);
     display: flex;
     flex-direction: column;
-    align-items: center;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.5s ease;
+  }
+  @media (min-width: 1024px) {
+    .unified-player-card {
+      flex-direction: row;
+      height: 500px;
+    }
+  }
+  .dark .unified-player-card {
+    background: #1e293b;
+    border-color: rgba(255,255,255,0.05);
+    box-shadow: 0 30px 60px -10px rgba(0,0,0,0.3);
   }
 
-  .player-controls__item {
-    display: inline-flex;
-    font-size: 30px;
-    padding: 5px;
-    margin-bottom: 10px;
-    color: #acb8cc;
-    cursor: pointer;
-    width: 50px;
-    height: 50px;
+  .player-media {
+    flex: 1.2;
+    position: relative;
+    background: #0f172a; /* Deep slate background for animations */
+    min-height: 300px;
+    overflow: hidden;
+    display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-    transition: all 0.3s ease-in-out;
   }
 
-  .player-controls__item:hover {
-    color: #532ab9;
-    transform: scale(1.1);
-  }
-  
-  .dark .player-controls__item:hover {
-    color: #3b82f6;
-  }
-
-  .player-controls__item.-xl {
-    margin-bottom: 0;
-    font-size: 95px;
-    filter: drop-shadow(0 11px 6px rgba(172, 184, 204, 0.45));
-    color: #fff;
-    width: auto;
-    height: auto;
-    display: inline-flex;
-  }
-  
-  .dark .player-controls__item.-xl {
-    filter: drop-shadow(0 11px 6px rgba(0, 0, 0, 0.45));
-    color: #3b82f6;
-  }
-
-  .progress {
-    width: 100%;
-    margin-top: -15px;
-    user-select: none;
-  }
-  
-  .progress__top {
+  .player-content {
+    flex: 1;
+    padding: 3rem;
     display: flex;
-    align-items: flex-end;
+    flex-direction: column;
     justify-content: space-between;
   }
-
-  .album-info {
-    color: #71829e;
-    flex: 1;
-    padding-right: 60px;
-    user-select: none;
-  }
   
-  .dark .album-info { color: #94a3b8; }
-
-  .album-info__name {
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 12px;
-    line-height: 1.3em;
-    color: #1e293b;
+  .track-title {
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.02em;
   }
-  
-  .dark .album-info__name { color: #fff; }
-  
-  .album-info__track {
-    font-weight: 400;
-    font-size: 14px;
-    opacity: 0.7;
-    line-height: 1.3em;
-    min-height: 52px;
-  }
-
-  .progress__duration {
-    color: #71829e;
-    font-weight: 700;
-    font-size: 20px;
-    opacity: 0.5;
-  }
-  
-  .progress__time {
-    margin-top: 2px;
-    color: #71829e;
-    font-weight: 700;
-    font-size: 16px;
-    opacity: 0.7;
-  }
-
-  .progress__bar {
-    height: 6px;
-    width: 100%;
-    cursor: pointer;
-    background-color: #d0d8e6;
-    display: inline-block;
-    border-radius: 10px;
-    position: relative;
-    margin-top: 10px;
-  }
-  .dark .progress__bar { background-color: #334155; }
-  
-  .progress__current {
-    height: inherit;
-    width: 0%;
-    background-color: #a3b3ce;
-    border-radius: 10px;
-    transition: width 0.1s linear;
-  }
-  .dark .progress__current { background-color: #3b82f6; }
 `;
+
+// --- CUSTOM ANIMATION COMPONENTS ---
+
+const ImplantsAnim = () => (
+  <div className="relative w-full h-full flex items-center justify-center">
+    <motion.div 
+      animate={{ rotate: 360 }}
+      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+      className="absolute w-[400px] h-[400px] border border-blue-500/20 rounded-full border-dashed"
+    />
+    <motion.div 
+      animate={{ scale: [1, 1.1, 1] }}
+      transition={{ duration: 4, repeat: Infinity }}
+      className="relative z-10 text-center"
+    >
+      <Dna size={80} className="text-blue-500 mx-auto mb-4" />
+      <h3 className="text-3xl font-black text-white tracking-tighter">OSSEOINTEGRATION</h3>
+      <p className="text-blue-400 text-xs font-bold uppercase tracking-[0.3em] mt-2">Titanium Fusion</p>
+    </motion.div>
+    {/* Floating Particles */}
+    {[...Array(5)].map((_, i) => (
+      <motion.div
+        key={i}
+        className="absolute w-2 h-2 bg-blue-400 rounded-full"
+        animate={{ y: [-100, 100], opacity: [0, 1, 0] }}
+        transition={{ duration: 3 + i, repeat: Infinity, delay: i * 0.5 }}
+        style={{ left: `${20 + i * 15}%` }}
+      />
+    ))}
+  </div>
+);
+
+const EthicsAnim = () => (
+  <div className="relative w-full h-full flex items-center justify-center bg-black">
+    <motion.div 
+      animate={{ opacity: [0.5, 1, 0.5] }}
+      transition={{ duration: 3, repeat: Infinity }}
+      className="absolute inset-0 bg-gradient-to-tr from-purple-900/20 to-transparent"
+    />
+    <div className="text-center z-10">
+      <div className="flex justify-center gap-4 mb-6">
+        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 2, repeat: Infinity }} className="w-16 h-24 bg-white/10 rounded-lg border border-white/20" />
+        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 2, delay: 0.2, repeat: Infinity }} className="w-16 h-24 bg-white rounded-lg shadow-[0_0_30px_rgba(255,255,255,0.5)]" />
+        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 2, delay: 0.4, repeat: Infinity }} className="w-16 h-24 bg-white/10 rounded-lg border border-white/20" />
+      </div>
+      <h3 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 tracking-tighter">TRUE AESTHETICS</h3>
+      <p className="text-purple-300 text-xs font-bold uppercase tracking-[0.3em] mt-2">Biomimetic vs Fake</p>
+    </div>
+  </div>
+);
+
+const HealthAnim = () => (
+  <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+    <motion.div 
+      animate={{ scale: [1, 1.2, 1] }}
+      transition={{ duration: 0.8, repeat: Infinity }}
+      className="absolute w-[300px] h-[300px] bg-red-600/20 rounded-full blur-3xl"
+    />
+    <div className="z-10 text-center">
+      <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 0.8, repeat: Infinity }}>
+        <Heart size={80} className="text-red-500 mx-auto mb-4 fill-red-500/20" />
+      </motion.div>
+      <h3 className="text-3xl font-black text-white tracking-tighter">SYSTEMIC LOOP</h3>
+      <div className="flex items-center justify-center gap-2 mt-4 text-red-400 text-xs font-bold uppercase tracking-widest">
+        <span>Gums</span> <ArrowRight size={12} /> <span>Heart</span> <ArrowRight size={12} /> <span>Life</span>
+      </div>
+    </div>
+  </div>
+);
+
+const TechAnim = () => (
+  <div className="relative w-full h-full flex items-center justify-center bg-slate-900">
+    {/* Scanning Line */}
+    <motion.div 
+      animate={{ top: ['0%', '100%', '0%'] }}
+      transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+      className="absolute left-0 right-0 h-1 bg-green-500 shadow-[0_0_20px_rgba(34,197,94,0.8)] z-20 opacity-50"
+    />
+    <div className="text-center z-10">
+      <Scan size={80} className="text-green-500 mx-auto mb-4" />
+      <h3 className="text-3xl font-black text-green-400 tracking-tighter font-mono">AI DIAGNOSTICS</h3>
+      <p className="text-green-600/80 text-xs font-bold uppercase tracking-[0.3em] mt-2 font-mono">Precision: 99.8%</p>
+    </div>
+    {/* Grid Background */}
+    <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,0,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,0,0.05)_1px,transparent_1px)] bg-[size:20px_20px]"></div>
+  </div>
+);
+
+const OrthoAnim = () => (
+  <div className="relative w-full h-full flex items-center justify-center">
+    <div className="flex gap-1">
+      {[...Array(6)].map((_, i) => (
+        <motion.div
+          key={i}
+          animate={{ height: [40, 80, 40], backgroundColor: ["#3b82f6", "#60a5fa", "#3b82f6"] }}
+          transition={{ duration: 1, repeat: Infinity, delay: i * 0.1 }}
+          className="w-8 rounded-full bg-blue-500 opacity-80"
+        />
+      ))}
+    </div>
+    <div className="absolute bottom-20 text-center">
+      <h3 className="text-3xl font-black text-white tracking-tighter">INVISIBLE FORCE</h3>
+      <p className="text-blue-300 text-xs font-bold uppercase tracking-[0.3em] mt-2">Sequential Movement</p>
+    </div>
+  </div>
+);
+
+// --- MAIN COMPONENT ---
 
 export default function Gallery() {
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isTimerPlaying, setIsTimerPlaying] = useState(false);
   const [barWidth, setBarWidth] = useState("0%");
-  const [duration, setDuration] = useState("00:00");
-  const [currTime, setCurrTime] = useState("00:00");
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // --- TOPICS (MERGED PLAYLIST) ---
+  // --- PLAYLIST ---
   const playlist = [
-    // PUSH TOPICS
-    { title: "The Cost of Cheap Implants", cat: "Surgery", artist: "Investigative Report", video: "/video/implants-cover.mp4", audio: "/audio/implants.mp3" },
-    { title: "Root Canals vs. Extraction", cat: "Endo", artist: "Clinical Truth", video: "/video/endo-cover.mp4", audio: "/audio/endo.mp3" },
-    { title: "The 3-Year Warning", cat: "Tech", artist: "AI Diagnostics", video: "/video/ai-cover.mp4", audio: "/audio/ai.mp3" },
-    { title: "Biofilm: The Silent Killer", cat: "Hygiene", artist: "Health Protocol", video: "/video/safety-cover.mp4", audio: "/audio/safety.mp3" },
-    { title: "Wisdom Teeth: Age 25 Rule", cat: "Surgery", artist: "Dr. Roger", video: "/video/implants-cover.mp4", audio: "/audio/implants.mp3" },
-    { title: "Invisalign Speed Test", cat: "Ortho", artist: "Physics Lab", video: "/video/ortho-cover.mp4", audio: "/audio/ortho.mp3" },
-    
-    // SHIELD TOPICS
-    { title: "The 'Turkey Teeth' Warning", cat: "Warning", artist: "Safety Alert", video: "/video/ethics-cover.mp4", audio: "/audio/ethics.mp3" },
-    { title: "Charcoal Toothpaste Risks", cat: "Myth", artist: "Trend Watch", video: "/video/safety-cover.mp4", audio: "/audio/safety.mp3" },
-    { title: "Fluorosis vs. Protection", cat: "Fact Check", artist: "Chemistry Dept", video: "/video/kids-cover.mp4", audio: "/audio/kids.mp3" },
-    { title: "DIY Aligners Disaster", cat: "Warning", artist: "Ortho Alert", video: "/video/ortho-cover.mp4", audio: "/audio/ortho.mp3" }
+    {
+      type: "audio",
+      name: "The Bionic Tooth",
+      artist: "Clinical Engineering",
+      description: "Why titanium implants are the only permanent solution for bone loss.",
+      component: <ImplantsAnim />, // Renders the animation directly
+      audio: "/audio/implants.mp3",
+      category: "Surgery",
+      tags: ['Implants', 'Biology']
+    },
+    {
+      type: "audio",
+      name: "The Instagram Trap",
+      artist: "Dr. Deepak",
+      description: "Are veneers worth it? Avoiding the 'Chiclet' look.",
+      component: <EthicsAnim />,
+      audio: "/audio/ethics.mp3", 
+      category: "Ethics",
+      tags: ['Veneers', 'Truth']
+    },
+    {
+      type: "audio",
+      name: "The Heart-Mouth Loop",
+      artist: "Systemic Health",
+      description: "The proven link between bleeding gums and heart disease.",
+      component: <HealthAnim />,
+      audio: "/audio/safety.mp3",
+      category: "Health",
+      tags: ['Wellness', 'Risk']
+    },
+    {
+      type: "journal",
+      name: "The 3-Year Warning",
+      artist: "Tech Analysis",
+      description: "How AI scanners detect decay 3 years before it becomes visible.",
+      component: <TechAnim />,
+      audio: "/audio/ai.mp3", 
+      category: "Technology",
+      tags: ['AI', 'Laser']
+    },
+    {
+      type: "journal",
+      name: "Invisible Physics",
+      artist: "Aligner Tech",
+      description: "The engineering behind clear plastic pushing teeth.",
+      component: <OrthoAnim />,
+      audio: "/audio/ortho.mp3",
+      category: "Ortho",
+      tags: ['Physics', 'Aligners']
+    }
   ];
 
   const currentTrack = playlist[currentTrackIndex];
@@ -244,35 +235,14 @@ export default function Gallery() {
   useEffect(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio(playlist[0].audio);
-      audioRef.current.volume = 0.2;
+      audioRef.current.volume = 0.2; 
     }
     const audio = audioRef.current;
-
-    const formatTime = (s: number) => {
-      const min = Math.floor(s / 60);
-      const sec = Math.floor(s % 60);
-      return `${min < 10 ? '0' + min : min}:${sec < 10 ? '0' + sec : sec}`;
-    };
-
-    const updateProgress = () => {
-      if (audio.duration) {
-        setBarWidth(`${(audio.currentTime / audio.duration) * 100}%`);
-        setCurrTime(formatTime(audio.currentTime));
-        setDuration(formatTime(audio.duration));
-      }
-    };
-
+    const updateProgress = () => { if (audio.duration) setBarWidth(`${(audio.currentTime / audio.duration) * 100}%`); };
     const handleEnded = () => handleNext();
-
     audio.addEventListener('timeupdate', updateProgress);
-    audio.addEventListener('loadedmetadata', updateProgress);
     audio.addEventListener('ended', handleEnded);
-
-    return () => {
-      audio.removeEventListener('timeupdate', updateProgress);
-      audio.removeEventListener('loadedmetadata', updateProgress);
-      audio.removeEventListener('ended', handleEnded);
-    };
+    return () => { audio.removeEventListener('timeupdate', updateProgress); audio.removeEventListener('ended', handleEnded); };
   }, []);
 
   useEffect(() => {
@@ -280,110 +250,128 @@ export default function Gallery() {
       audioRef.current.pause();
       audioRef.current.src = playlist[currentTrackIndex].audio;
       audioRef.current.load();
-      if (isPlaying) audioRef.current.play().catch(() => {});
+      if (isTimerPlaying) audioRef.current.play().catch(() => {});
       else setBarWidth("0%");
     }
   }, [currentTrackIndex]);
 
   const togglePlay = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) { audioRef.current.pause(); setIsPlaying(false); }
-    else { audioRef.current.play(); setIsPlaying(true); }
+    if(!audioRef.current) return;
+    if(isTimerPlaying) { audioRef.current.pause(); setIsTimerPlaying(false); }
+    else { audioRef.current.play(); setIsTimerPlaying(true); }
   };
 
   const handleNext = () => {
-    setIsPlaying(true);
+    setIsTimerPlaying(true); 
     setCurrentTrackIndex((prev) => (prev + 1) % playlist.length);
   };
 
   const handlePrev = () => {
-    setIsPlaying(true);
+    setIsTimerPlaying(true); 
     setCurrentTrackIndex((prev) => (prev - 1 + playlist.length) % playlist.length);
   };
 
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!audioRef.current) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const percent = (e.clientX - rect.left) / rect.width;
-    audioRef.current.currentTime = percent * audioRef.current.duration;
-  };
-
   return (
-    <section className="py-24 bg-slate-50 dark:bg-[#0B1019] relative transition-colors duration-500 overflow-hidden flex items-center justify-center">
-      <style jsx global>{playerStyles}</style>
+    <section id="gallery" className="py-24 relative transition-colors duration-500 overflow-hidden bg-slate-50 dark:bg-[#0B1019]">
+      <style jsx global>{wideCardStyles}</style>
 
-      {/* --- THE PLAYER --- */}
-      <div className="player">
+      {/* Header */}
+      <div className="max-w-7xl mx-auto px-6 mb-20">
+        <RevealOnScroll>
+          <div className="flex flex-col items-center text-center">
+             <div className="inline-flex items-center gap-2 text-blue-600 dark:text-cyan-400 font-bold tracking-[0.3em] text-[10px] uppercase mb-4">
+                <Sparkles size={16} /> Dental Intelligence
+             </div>
+             <h2 className="text-4xl md:text-7xl font-black text-slate-900 dark:text-white mb-6 tracking-tighter leading-[0.85]">
+                Podcast & <br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500">Expert Journal.</span>
+             </h2>
+             <p className="text-lg text-slate-500 dark:text-slate-400 max-w-xl font-medium leading-relaxed">
+               Interactive visual explanations of clinical science.
+             </p>
+          </div>
+        </RevealOnScroll>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6">
         
-        {/* TOP SECTION */}
-        <div className="player__top">
-           
-           {/* COVER VIDEO */}
-           <div className="player-cover">
-              <AnimatePresence mode="wait">
-                 <motion.div 
-                   key={currentTrackIndex}
-                   initial={{ opacity: 0, scale: 0.8 }}
-                   animate={{ opacity: 1, scale: 1 }}
-                   exit={{ opacity: 0, scale: 1.1 }}
-                   transition={{ duration: 0.4 }}
-                   className="player-cover__item"
-                 >
-                    <video 
-                       src={currentTrack.video}
-                       className="cover-video"
-                       autoPlay loop muted playsInline
-                    />
-                 </motion.div>
-              </AnimatePresence>
-           </div>
+        <RevealOnScroll className="mb-24">
+           <div className="unified-player-card group">
+              
+              {/* Left: LIVE ANIMATION CANVAS */}
+              <div className="player-media">
+                  <AnimatePresence mode="wait">
+                    <motion.div 
+                      key={currentTrackIndex}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 1.1 }}
+                      transition={{ duration: 0.5 }}
+                      className="absolute inset-0 w-full h-full"
+                    >
+                       {currentTrack.component}
+                    </motion.div>
+                  </AnimatePresence>
+                  
+                  {/* Category Badge Overlay */}
+                  <div className="absolute bottom-10 left-10 z-20">
+                     <span className={`px-4 py-1.5 text-white text-[9px] font-black uppercase tracking-widest rounded-full mb-4 inline-block shadow-lg ${currentTrack.type === 'audio' ? 'bg-blue-600' : 'bg-green-600'}`}>
+                        {currentTrack.type === 'audio' ? 'Podcast' : 'Visual Guide'}
+                     </span>
+                  </div>
+              </div>
 
-           {/* SIDE CONTROLS */}
-           <div className="player-controls">
-              <div className="player-controls__item" onClick={() => console.log('Fav')}>
-                 <Heart size={20} />
-              </div>
-              <div className="player-controls__item">
-                 <LinkIcon size={20} />
-              </div>
-              <div className="player-controls__item" onClick={handlePrev}>
-                 <SkipBack size={20} />
-              </div>
-              <div className="player-controls__item" onClick={handleNext}>
-                 <SkipForward size={20} />
-              </div>
-              <div className="player-controls__item -xl" onClick={togglePlay}>
-                 {isPlaying ? <Pause size={50} fill="currentColor" /> : <Play size={50} fill="currentColor" className="ml-2" />}
-              </div>
-           </div>
-        </div>
+              {/* Right: Content & Controls */}
+              <div className="player-content">
+                  <div>
+                    <h2 className="track-title text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4">{currentTrack.name}</h2>
+                    <div className="flex items-center gap-4 mb-6">
+                       {currentTrack.type === 'audio' && (
+                           <span className="text-xs font-black text-blue-600 uppercase tracking-widest flex items-center gap-2">
+                              <Activity size={14} className={isTimerPlaying ? "animate-pulse" : ""} /> Audio Active
+                           </span>
+                       )}
+                       <div className="flex gap-2">
+                          {currentTrack.tags.map(t => (
+                             <span key={t} className="text-[10px] font-bold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10 px-2 py-1 rounded-md uppercase tracking-wider">{t}</span>
+                          ))}
+                       </div>
+                    </div>
+                    <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed line-clamp-4 md:line-clamp-none">{currentTrack.description}</p>
+                  </div>
 
-        {/* BOTTOM PROGRESS */}
-        <div className="progress">
-           <div className="progress__top">
-              <div className="album-info">
-                 <div className="album-info__name">{currentTrack.title}</div>
-                 <div className="album-info__track">{currentTrack.artist}</div>
+                  <div className="mt-8 pt-8 border-t border-slate-100 dark:border-white/5">
+                      {/* Progress Bar (Visual Only) */}
+                      <div className="relative h-2 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden mb-8 cursor-pointer group/bar">
+                          <div className="absolute top-0 left-0 h-full bg-blue-600 transition-all duration-100 ease-linear group-hover/bar:bg-blue-500" style={{ width: barWidth }}></div>
+                      </div>
+                      
+                      {/* Controls */}
+                      <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-6 md:gap-10">
+                             <button onClick={handlePrev} className="text-slate-400 hover:text-blue-600 transition-colors transform hover:-translate-x-1"><SkipBack size={28} /></button>
+                             <button onClick={togglePlay} className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-xl hover:scale-110 active:scale-95 transition-all">
+                                {isTimerPlaying ? <Pause size={28} fill="currentColor" /> : <Play size={28} fill="currentColor" className="ml-1" />}
+                             </button>
+                             <button onClick={handleNext} className="text-slate-400 hover:text-blue-600 transition-colors transform hover:translate-x-1"><SkipForward size={28} /></button>
+                          </div>
+                          <div className="flex items-center gap-6">
+                             <button className="text-slate-300 hover:text-red-500 transition-colors hover:scale-110"><Heart size={20} /></button>
+                             <button className="text-slate-300 hover:text-blue-500 transition-colors hover:scale-110"><Share2 size={20} /></button>
+                          </div>
+                      </div>
+                  </div>
               </div>
-              <div className="progress__duration">{duration}</div>
            </div>
-           
-           <div className="progress__bar" onClick={handleSeek}>
-              <div className="progress__current" style={{ width: barWidth }}></div>
-           </div>
-           
-           <div className="progress__time">{currTime}</div>
+        </RevealOnScroll>
+
+        <div className="text-center mt-12">
+           <Link href="/gallery" className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-blue-600 transition-colors group">
+              Open Clinical Archives <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />
+           </Link>
         </div>
 
       </div>
-
-      {/* FOOTER HINT */}
-      <div className="absolute bottom-10 w-full text-center">
-        <Link href="/gallery" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-blue-600 transition-colors">
-            View All {playlist.length} Episodes
-        </Link>
-      </div>
-
     </section>
   );
-}
+};
