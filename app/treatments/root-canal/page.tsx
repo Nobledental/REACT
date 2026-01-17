@@ -42,7 +42,7 @@ export default function RootCanalPage() {
   }, []);
 
   // --- INTERACTIVE CLEANING LOGIC ---
-  const handleScrub = (e: React.MouseEvent) => {
+  const handleScrub = () => {
     if (cleaningProgress < 100) {
       setCleaningProgress(prev => Math.min(prev + 1.5, 100));
     }
