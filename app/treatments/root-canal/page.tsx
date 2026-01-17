@@ -56,8 +56,8 @@ export default function RootCanalPage() {
   ];
 
   const workflow = [
-    { step: "01", title: "Digital Anaesthesia", desc: "Computer-controlled 'Wand' delivery for near-zero sensation.", icon: Activity },
-    { step: "02", title: "Microscope Access", desc: "Zeiss Extaro 300 reveals hidden canals (MB2) invisible to naked eye.", icon: Microscope },
+    { step: "01", title: "Digital Anaesthesia", desc: "Computer-controlled delivery for near-zero sensation.", icon: Activity },
+    { step: "02", title: "Magnification Access", desc: "High-power loupes reveal hidden canals (MB2) invisible to naked eye.", icon: Eye },
     { step: "03", title: "Rotary Shaping", desc: "Flexible titanium files clean curved roots without trauma.", icon: Drill },
     { step: "04", title: "Laser Disinfection", desc: "Activated irrigation kills 99.9% of bacteria deep in dentin.", icon: Zap },
     { step: "05", title: "Bioceramic Seal", desc: "3D obturation with bioactive materials that promote healing.", icon: ShieldCheck },
@@ -91,13 +91,13 @@ export default function RootCanalPage() {
                     <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-purple-100 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-500/30 text-purple-700 dark:text-purple-400 font-bold text-[10px] uppercase tracking-[0.3em] mb-8 shadow-lg shadow-purple-500/10">
                         <Activity size={14} /> ISO 9001:2015 • Global Endodontic Forum
                     </div>
-                    <h1 className="text-6xl md:text-8xl lg:text-[6rem] font-black text-slate-900 dark:text-white leading-[0.9] tracking-tighter">
+                    <h1 className="text-5xl md:text-7xl lg:text-[6rem] font-black text-slate-900 dark:text-white leading-[0.9] tracking-tighter">
                         Root Canals <br/>
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-indigo-500 to-blue-500 animate-gradient-x">Quiet Pain.</span>
                     </h1>
-                    <p className="text-xl text-slate-600 dark:text-slate-300 font-medium leading-relaxed max-w-lg border-l-4 border-purple-500 pl-6 my-10">
+                    <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 font-medium leading-relaxed max-w-lg border-l-4 border-purple-500 pl-6 my-10">
                         Don't remove. <strong className="text-purple-600 dark:text-purple-400">Revitalize.</strong> <br/>
-                        We save infected teeth using Microscopes, Lasers, and 3D precision in Nallagandla.
+                        We save infected teeth using Rotary Files, Lasers, and 3D precision in Nallagandla.
                     </p>
 
                     <div className="flex flex-wrap gap-5">
@@ -112,7 +112,7 @@ export default function RootCanalPage() {
                     <div className="flex gap-8 pt-8 border-t border-slate-200 dark:border-white/10 mt-8">
                        <div>
                           <div className="text-2xl font-black text-slate-900 dark:text-white">3200+</div>
-                          <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Microscope RCTs</div>
+                          <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Successful RCTs</div>
                        </div>
                        <div>
                           <div className="text-2xl font-black text-slate-900 dark:text-white">98%</div>
@@ -131,7 +131,7 @@ export default function RootCanalPage() {
                 <div className="absolute -inset-10 bg-purple-500/20 blur-3xl rounded-full pointer-events-none"></div>
                 
                 <div 
-                  className="relative w-[380px] h-[550px] bg-slate-50 dark:bg-[#0f1420] rounded-[3rem] border border-slate-200 dark:border-white/10 overflow-hidden shadow-2xl group select-none cursor-crosshair"
+                  className="relative w-full max-w-[350px] h-[500px] bg-slate-50 dark:bg-[#0f1420] rounded-[3rem] border border-slate-200 dark:border-white/10 overflow-hidden shadow-2xl group select-none cursor-crosshair"
                   onMouseMove={handleScrub}
                   onTouchMove={handleScrub}
                 >
@@ -298,7 +298,7 @@ export default function RootCanalPage() {
                      <div className="absolute inset-0 bg-slate-900 rounded-[3rem] overflow-hidden shadow-2xl">
                         <img 
                            src="https://images.unsplash.com/photo-1606813902911-8d11c3330d55?auto=format&fit=crop&w=800&q=80" 
-                           alt="Microscope RCT" 
+                           alt="Root Canal Procedure" 
                            className="w-full h-full object-cover opacity-60 mix-blend-overlay"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
@@ -307,10 +307,10 @@ export default function RootCanalPage() {
                            <div className="p-6 bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl">
                               <div className="flex items-center gap-4 mb-4">
                                  <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white animate-pulse">
-                                    <Microscope size={24} />
+                                    <Scan size={24} />
                                  </div>
                                  <div>
-                                    <h4 className="text-white font-bold">Zeiss Extaro 300</h4>
+                                    <h4 className="text-white font-bold">Digital Apex Locator</h4>
                                     <p className="text-purple-200 text-xs">Live Feed Active</p>
                                  </div>
                               </div>
@@ -342,7 +342,7 @@ export default function RootCanalPage() {
                <div className="grid md:grid-cols-3 gap-8">
                   <div className="p-8 bg-white/5 border border-white/10 rounded-3xl hover:bg-white/10 transition-colors">
                      <div className="text-purple-400 font-bold uppercase tracking-widest text-xs mb-4">Anterior Teeth</div>
-                     <div className="text-4xl font-black mb-2">₹6,500</div>
+                     <div className="text-4xl font-black mb-2">₹4,500</div>
                      <p className="text-slate-400 text-sm mb-8">Front teeth & premolars. Single canal systems.</p>
                      <ul className="space-y-3 text-sm text-slate-300 mb-8">
                         <li className="flex gap-3"><CheckCircle2 size={16} className="text-purple-500"/> Digital Anaesthesia</li>
@@ -355,10 +355,10 @@ export default function RootCanalPage() {
                   <div className="p-8 bg-gradient-to-b from-purple-900/50 to-white/5 border border-purple-500/50 rounded-3xl relative transform scale-105 shadow-2xl">
                      <div className="absolute top-0 right-0 bg-purple-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl rounded-tr-xl uppercase">Most Common</div>
                      <div className="text-white font-bold uppercase tracking-widest text-xs mb-4">Molar Teeth</div>
-                     <div className="text-4xl font-black mb-2">₹8,500</div>
+                     <div className="text-4xl font-black mb-2">₹6,000</div>
                      <p className="text-purple-200 text-sm mb-8">Back teeth (Molars). Multiple curved canals.</p>
                      <ul className="space-y-3 text-sm text-slate-200 mb-8">
-                        <li className="flex gap-3"><CheckCircle2 size={16} className="text-green-400"/> Microscope Access</li>
+                        <li className="flex gap-3"><CheckCircle2 size={16} className="text-green-400"/> Magnification Access</li>
                         <li className="flex gap-3"><CheckCircle2 size={16} className="text-green-400"/> MB2 Canal Search</li>
                         <li className="flex gap-3"><CheckCircle2 size={16} className="text-green-400"/> Bioceramic Seal</li>
                      </ul>
@@ -367,7 +367,7 @@ export default function RootCanalPage() {
 
                   <div className="p-8 bg-white/5 border border-white/10 rounded-3xl hover:bg-white/10 transition-colors">
                      <div className="text-blue-400 font-bold uppercase tracking-widest text-xs mb-4">Re-Treatment</div>
-                     <div className="text-4xl font-black mb-2">₹12,000</div>
+                     <div className="text-4xl font-black mb-2">₹8,500</div>
                      <p className="text-slate-400 text-sm mb-8">Redoing failed root canals from other clinics.</p>
                      <ul className="space-y-3 text-sm text-slate-300 mb-8">
                         <li className="flex gap-3"><CheckCircle2 size={16} className="text-blue-500"/> GP Removal</li>
@@ -392,22 +392,22 @@ export default function RootCanalPage() {
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                <div className="flex gap-6 items-center p-6 bg-white dark:bg-[#151b2b] rounded-[2rem] border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-xl transition-all">
                   <div className="w-24 h-24 rounded-full overflow-hidden shrink-0 border-2 border-purple-500">
-                     <img src="/images/dhivakaran.webp" alt="Dr. Dhivakaran" className="w-full h-full object-cover" />
+                     <img src="/images/dhivakaran.webp" alt="Endodontist" className="w-full h-full object-cover" />
                   </div>
                   <div>
-                     <h3 className="text-xl font-bold text-slate-900 dark:text-white">Dr. Dhivakaran</h3>
-                     <p className="text-xs font-black text-purple-600 uppercase tracking-widest mb-2">Microscope Endodontist</p>
+                     <h3 className="text-xl font-bold text-slate-900 dark:text-white">Senior Endodontist</h3>
+                     <p className="text-xs font-black text-purple-600 uppercase tracking-widest mb-2">Root Canal Specialist</p>
                      <p className="text-sm text-slate-500 dark:text-slate-400">3200+ RCTs completed. Specialist in calcified canals and re-treatment cases.</p>
                   </div>
                </div>
 
                <div className="flex gap-6 items-center p-6 bg-white dark:bg-[#151b2b] rounded-[2rem] border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-xl transition-all">
                   <div className="w-24 h-24 rounded-full overflow-hidden shrink-0 border-2 border-blue-500">
-                     <img src="/images/roger.webp" alt="Dr. Roger" className="w-full h-full object-cover" />
+                     <img src="/images/roger.webp" alt="Restorative Dentist" className="w-full h-full object-cover" />
                   </div>
                   <div>
-                     <h3 className="text-xl font-bold text-slate-900 dark:text-white">Dr. Roger</h3>
-                     <p className="text-xs font-black text-blue-600 uppercase tracking-widest mb-2">Restorative Specialist</p>
+                     <h3 className="text-xl font-bold text-slate-900 dark:text-white">Prosthodontist</h3>
+                     <p className="text-xs font-black text-blue-600 uppercase tracking-widest mb-2">Crown Specialist</p>
                      <p className="text-sm text-slate-500 dark:text-slate-400">Expert in Post & Core build-ups and same-day ceramic crown bonding.</p>
                   </div>
                </div>
