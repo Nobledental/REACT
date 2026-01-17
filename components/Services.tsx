@@ -1,128 +1,483 @@
 'use client';
 
-import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectCoverflow, Autoplay, Pagination, Navigation, Keyboard } from 'swiper/modules';
 import { 
   Activity, Zap, Smile, Users, Search, Filter, Sparkles, 
-  Shield, Microscope, HeartPulse, ScanLine, ArrowRight, 
-  MousePointer2, Ruler, Cpu
+  Shield, Microscope, HeartPulse, ScanLine 
 } from 'lucide-react';
-import { treatmentsData } from '@/data/treatments';
+import { treatmentsData } from '@/data/treatments'; // <--- IMPORT YOUR DATA
 
-// --- VISUAL STYLES & ANIMATIONS ---
-// We inject this CSS to handle the complex clipping logic efficiently
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/effect-coverflow';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
+
+// --- STYLES (Kept exactly as you had them) ---
 const cssStyles = `
-  .service-stream-container {
-    perspective: 1000px;
-    overflow-x: hidden;
-  }
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 
-  .stream-track {
+.services-wrapper {
+    font-family: "Poppins", sans-serif;
+    transition: background-color 0.8s ease;
+}
+
+.services-wrapper .swiper {
+    width: 100%;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.services-wrapper .autoplay-progress {
+    position: absolute;
+    left: 30px;
+    top: 30px;
+    z-index: 20;
+    width: 48px;
+    height: 48px;
     display: flex;
-    gap: 40px;
-    width: max-content;
-    padding: 0 50vw; /* Center the first card */
-    cursor: grab;
-    touch-action: pan-x;
-  }
-  
-  .stream-track:active {
-    cursor: grabbing;
-  }
-
-  /* --- THE MAGIC CARD --- */
-  .holo-card-wrapper {
-    position: relative;
-    width: 380px;
-    height: 520px;
-    flex-shrink: 0;
-    transition: transform 0.3s ease;
-  }
-
-  /* Layer 1: The "Aesthetic" Shell (Visible by default) */
-  .card-shell {
-    position: absolute;
-    inset: 0;
-    border-radius: 40px;
-    background: #0f172a; /* Slate 900 */
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: var(--progress-color);
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(5px);
+    border-radius: 50%;
     border: 1px solid rgba(255,255,255,0.1);
-    overflow: hidden;
-    z-index: 2;
-    /* The clipping magic happens here via JS variables */
-    clip-path: polygon(
-      0% 0%, 
-      var(--clip-start) 0%, 
-      var(--clip-start) 100%, 
-      0% 100%, 
-      
-      100% 0%, 
-      100% 100%, 
-      var(--clip-end) 100%, 
-      var(--clip-end) 0%
-    );
-  }
+}
 
-  /* Layer 2: The "Clinical" Core (Revealed by Scanner) */
-  .card-core {
+.services-wrapper .autoplay-progress svg {
+    --progress: 0;
     position: absolute;
-    inset: 0;
-    border-radius: 40px;
-    background: var(--theme-bg);
-    border: 1px solid var(--theme-color);
-    box-shadow: 0 0 30px var(--theme-glow);
-    z-index: 1;
+    left: 0;
+    top: 0px;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    stroke-width: 3px;
+    stroke: var(--progress-color);
+    fill: none;
+    stroke-dashoffset: calc(125.6px * (1 - var(--progress)));
+    stroke-dasharray: 125.6;
+    transform: rotate(-90deg);
+}
+
+.services-wrapper .autoplay-progress span {
+    font-size: 14px;
+}
+
+.services-wrapper .slider-button {
+    transition: 0.5s;
+    outline: none;
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    z-index: 20;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.services-wrapper .slider-button svg {
+    display: block;
+    transition: 0.5s;
+    overflow: visible;
+}
+
+.services-wrapper .slider-button .slider-svg-circle-wrap {
+    transition: 0.5s;
+    transform-origin: center;
+}
+
+.services-wrapper .slider-button circle {
+    transition: 0.5s;
+    stroke-width: 2px;
+    stroke: var(--progress-color);
+    fill: none;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    opacity: 1;
+    r: 35px;
+    cx: 40px;
+    cy: 40px;
+    transform-origin: center;
+}
+
+.services-wrapper .slider-button .slider-svg-arrow {
+    transition: 0.5s;
+    fill: var(--progress-color);
+    transform-origin: center;
+}
+
+.services-wrapper .slider-button-prev {
+    left: 40px;
+}
+
+.services-wrapper .slider-button-next {
+    right: 40px;
+}
+
+.services-wrapper .slider-button-prev .slider-svg-arrow {
+    transform: rotate(180deg);
+}
+
+.services-wrapper .slider-button:hover .slider-svg-circle-wrap {
+    transform: scale(1.1);
+}
+
+.services-wrapper .slider-button:hover circle {
+    stroke-dasharray: 4px;
+    stroke-dashoffset: 4px;
+    opacity: 1;
+}
+
+.services-wrapper .swiper-pagination {
+    text-align: center;
+    bottom: 20px !important;
+}
+
+.services-wrapper .swiper-pagination .swiper-pagination-bullet {
+    width: 10px;
+    height: 10px;
+    margin: 0 5px;
+    background: rgba(255,255,255,0.4);
+    opacity: 1;
+    transition: 0.3s;
+}
+
+.services-wrapper .swiper-pagination .swiper-pagination-bullet.swiper-pagination-bullet-active {
+    background: var(--progress-color);
+    width: 30px;
+    border-radius: 5px;
+}
+
+.services-wrapper .autoplay-progress-bar {
+    --progress: 0;
+    height: 4px;
+    width: var(--progress);
+    background-color: var(--progress-color);
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 30;
+    transition: width 0.1s linear;
+}
+
+.floating {
+    animation: floatAnim 6s ease-in-out infinite;
+}
+
+.slide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1000px;
+}
+
+.services-wrapper .card {
+    position: relative;
+    margin: auto;
+    height: 600px;
+    width: 80vw;
+    max-width: 1100px;
+    border-radius: 50px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px -15px rgba(0,0,0,0.5);
+    background: #0F172A;
+    transition: background 0.5s ease;
+}
+
+.svg-wrapper {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: -10%;
+    pointer-events: none;
+}
+
+.slide:nth-child(odd) .svg-wrapper {
+    left: -20%;
+}
+.slide:nth-child(even) .svg-wrapper {
+    right: -20%;
+    left: auto;
+}
+
+.img-container {
+    width: 450px;
+    height: 450px;
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.img-container img {
+    width: 380px;
+    height: 380px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 8px solid rgba(255,255,255,0.1);
+    box-shadow: 0 0 50px rgba(0,0,0,0.3);
+}
+
+.card-content {
+    max-width: 450px;
+    width: 100%;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0 40px;
+    z-index: 10;
+}
+
+.slide:nth-child(odd) .card-content {
+    margin-left: auto;
+    text-align: right;
+    align-items: flex-end;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-  }
+}
+.slide:nth-child(even) .card-content {
+    margin-right: auto;
+    margin-left: 5%;
+    text-align: left;
+}
 
-  /* Technical Grid Background for Core */
-  .tech-grid {
-    background-image: 
-      linear-gradient(var(--theme-glow) 1px, transparent 1px),
-      linear-gradient(90deg, var(--theme-glow) 1px, transparent 1px);
-    background-size: 20px 20px;
-    opacity: 0.1;
-  }
-
-  /* SCANNER BEAM */
-  .laser-scanner {
+.card-ghost-info {
     position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    bottom: 8%;
+    line-height: 1.4;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.ghost-name {
+    font-size: 18px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.card-ghost-info span {
+    height: 50px;
+    display: inline-block;
     width: 2px;
-    height: 600px;
-    background: linear-gradient(to bottom, transparent, #60a5fa, #fff, #60a5fa, transparent);
-    box-shadow: 0 0 20px #3b82f6, 0 0 40px #60a5fa;
-    z-index: 50;
-    pointer-events: none;
-  }
-  
-  .laser-scanner::after {
-    content: '';
+    background-color: var(--color);
     position: absolute;
+    bottom: 0px;
+}
+.card-ghost-info span:before {
+    content: "";
+    height: 6px;
+    width: 6px;
+    background-color: var(--color);
+    position: absolute;
+    top: 0px;
     left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 600px; /* Width of the scan zone */
-    height: 520px;
-    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.05), transparent);
+    transform: translateX(-50%);
+    border-radius: 50%;
+}
+
+.slide:nth-child(odd) .card-ghost-info {
+    left: 8%;
+    text-align: right;
+}
+.slide:nth-child(odd) .card-ghost-info span {
+    right: -20px;
+}
+.slide:nth-child(even) .card-ghost-info {
+    right: 8%;
+    text-align: left;
+}
+.slide:nth-child(even) .card-ghost-info span {
+    left: -20px;
+}
+
+.card-title {
+    color: var(--color);
+    font-weight: 900;
+    font-size: clamp(32px, 5vw, 64px);
+    line-height: 1.1;
+    margin: 10px 0 20px;
+    text-transform: uppercase;
+    position: relative;
+    letter-spacing: -1px;
+    text-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.card-sub-title {
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 2px;
+    background: rgba(255,255,255,0.1);
+    padding: 5px 12px;
+    border-radius: 4px;
+    display: inline-block;
+    backdrop-filter: blur(5px);
+}
+
+.card-description {
+    color: rgba(255,255,255,0.9);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 400px;
+    margin-bottom: 20px;
+}
+
+.cta-button {
+    display: inline-flex;
+    padding: 16px 40px;
+    background-color: var(--color);
+    color: #fff;
+    font-size: 14px;
+    text-decoration: none;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 1px;
+    border-radius: 50px;
+    box-shadow: 0 10px 20px -5px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.cta-button:hover {
+    background-color: #fff;
+    color: var(--color);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px -5px rgba(0,0,0,0.4);
+}
+
+@keyframes floatAnim {
+    0%, 100% { transform: translateY(-20px); }
+    50% { transform: translateY(20px); }
+}
+
+@keyframes swing {
+    0%, 100% { transform: rotate(5deg); }
+    50% { transform: rotate(-5deg); }
+}
+
+@keyframes mouseScroll {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(14px); }
+}
+
+.mouse-scroll {
+    position: absolute;
+    bottom: 20px;
+    right: 0;
+    left: 0;
+    margin: 0 auto;
+    text-align: center;
+    color: var(--progress-color);
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 600;
+    z-index: 20;
     pointer-events: none;
-  }
+}
+.mouse {
+    width: 26px;
+    height: 40px;
+    border-radius: 15px;
+    border: 2px solid var(--progress-color);
+    position: relative;
+    margin: 0 auto 10px;
+}
+.mouse .roll {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    width: 4px;
+    margin-left: -2px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--progress-color);
+    animation: mouseScroll 1s cubic-bezier(0.7, 0, 0.3, 1) infinite alternate;
+}
+
+@media (max-width: 900px) {
+    .services-wrapper .card {
+        height: auto;
+        min-height: 520px;
+        width: 94vw;
+        border-radius: 30px;
+        padding-bottom: 20px;
+    }
+    .svg-wrapper {
+        position: relative;
+        top: 0;
+        left: 0 !important;
+        right: 0 !important;
+        height: 35vh;
+        min-height: 250px;
+        margin-top: 10px;
+    }
+    .img-container {
+        width: 240px;
+        height: 240px;
+    }
+    .img-container img {
+        width: 200px;
+        height: 200px;
+        border-width: 4px;
+    }
+    .card-content {
+        top: 0;
+        transform: none;
+        max-width: 100%;
+        text-align: center !important;
+        align-items: center !important;
+        margin: 0 !important;
+        padding: 20px;
+        height: auto;
+    }
+    .card-title {
+        font-size: 28px;
+        margin: 10px 0;
+    }
+    .card-description {
+        font-size: 14px;
+    }
+    .card-ghost-info, .mouse-scroll, .slider-button {
+        display: none;
+    }
+}
 `;
 
-// --- HELPER FUNCTIONS ---
+// Helper: Map Category to Color Theme
 const getTheme = (category: string) => {
     switch(category) {
-        case 'Surgery': return { bg: '#0f172a', color: '#3b82f6', glow: 'rgba(59, 130, 246, 0.3)' }; // Blue
-        case 'Endodontics': return { bg: '#2e1065', color: '#a855f7', glow: 'rgba(168, 85, 247, 0.3)' }; // Purple
-        case 'Orthodontics': return { bg: '#312e81', color: '#6366f1', glow: 'rgba(99, 102, 241, 0.3)' }; // Indigo
-        case 'Cosmetic': return { bg: '#0891b2', color: '#22d3ee', glow: 'rgba(34, 211, 238, 0.3)' }; // Cyan
-        default: return { bg: '#1e293b', color: '#94a3b8', glow: 'rgba(148, 163, 184, 0.3)' }; // Slate
+        case 'Surgery': return { bg: 'linear-gradient(331deg, #0f172a 0%, #1e3a8a 100%)', accent: '#60A5FA' }; // Blue
+        case 'Endodontics': return { bg: 'linear-gradient(331deg, #2e1065 0%, #7e22ce 100%)', accent: '#C084FC' }; // Purple
+        case 'Orthodontics': return { bg: 'linear-gradient(331deg, #312e81 0%, #4f46e5 100%)', accent: '#818CF8' }; // Indigo
+        case 'Cosmetic': return { bg: 'linear-gradient(331deg, #0891b2 0%, #06b6d4 100%)', accent: '#67E8F9' }; // Cyan
+        case 'Kids': 
+        case 'Pediatrics': return { bg: 'linear-gradient(331deg, #7c2d12 0%, #ea580c 100%)', accent: '#FB923C' }; // Orange
+        case 'Restorative': return { bg: 'linear-gradient(331deg, #115e59 0%, #0d9488 100%)', accent: '#2DD4BF' }; // Teal
+        case 'Preventive': return { bg: 'linear-gradient(331deg, #064e3b 0%, #10b981 100%)', accent: '#34D399' }; // Green
+        case 'Wellness': return { bg: 'linear-gradient(331deg, #831843 0%, #db2777 100%)', accent: '#F472B6' }; // Pink
+        default: return { bg: 'linear-gradient(331deg, #1e293b 0%, #475569 100%)', accent: '#94A3B8' }; // Slate
     }
 };
 
+// Helper: Map Category to Icon
 const getCategoryIcon = (category: string) => {
     switch(category) {
         case 'Surgery': return Activity;
@@ -130,257 +485,294 @@ const getCategoryIcon = (category: string) => {
         case 'Orthodontics': return Smile;
         case 'Cosmetic': return Sparkles;
         case 'Pediatrics': return Users;
+        case 'Restorative': return Shield;
+        case 'Preventive': return HeartPulse;
+        case 'Wellness': return ScanLine;
         default: return Zap;
     }
 };
 
-export default function Services() {
+interface ExtendedServiceItem {
+    id: string;
+    title: string;
+    subTitle: string;
+    description: string;
+    icon: React.ElementType;
+    bg: string;
+    accent: string;
+    features: string[];
+    image: string;
+    keywords: string[];
+    category: string;
+    treatmentId: string;
+}
+
+interface ServicesProps {
+    onServiceClick?: (id: string) => void;
+}
+
+const Services: React.FC<ServicesProps> = ({ onServiceClick }) => {
     const router = useRouter();
-    const trackRef = useRef<HTMLDivElement>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
-    const requestRef = useRef<number>();
+    const sectionRef = useRef<HTMLDivElement>(null);
+    const progressCircle = useRef<SVGSVGElement>(null);
+    const progressBar = useRef<HTMLDivElement>(null);
+    const progressContent = useRef<HTMLSpanElement>(null);
+    const swiperRef = useRef<any>(null);
+
+    const [searchQuery, setSearchQuery] = useState('');
+    const [activeFilter, setActiveFilter] = useState('All');
     
-    // Movement State
-    const [scrollX, setScrollX] = useState(0);
-    const [isDragging, setIsDragging] = useState(false);
-    const startX = useRef(0);
-    const currentTranslate = useRef(0);
-    const prevTranslate = useRef(0);
-    const autoScrollSpeed = 0.5; // Speed of auto movement
-
-    // Data Prep
-    const services = useMemo(() => Object.values(treatmentsData).map(t => ({
-        ...t,
-        theme: getTheme(t.category),
-        Icon: getCategoryIcon(t.category)
-    })), []);
-
-    // Double the array for infinite scroll illusion (if needed, or just loop)
-    const displayServices = [...services, ...services]; 
-
-    // --- ANIMATION LOOP (The Engine) ---
-    const animate = useCallback(() => {
-        if (!isDragging) {
-            currentTranslate.current -= autoScrollSpeed;
+    // --- 1. DYNAMIC DATA MAPPING ---
+    const allServices: ExtendedServiceItem[] = useMemo(() => {
+        return Object.values(treatmentsData).map((t) => {
+            const theme = getTheme(t.category);
+            const Icon = getCategoryIcon(t.category);
             
-            // Infinite Reset Logic
-            const cardWidth = 420; // 380px width + 40px gap
-            const totalWidth = (services.length * cardWidth);
-            
-            // Reset position seamlessly when we scroll past the first set
-            if (Math.abs(currentTranslate.current) >= totalWidth) {
-                currentTranslate.current += totalWidth;
-                prevTranslate.current += totalWidth;
-            }
-        }
+            return {
+                id: t.id,
+                treatmentId: t.id,
+                title: t.title,
+                subTitle: t.subtitle,
+                description: t.description,
+                icon: Icon,
+                bg: theme.bg,
+                accent: theme.accent,
+                features: t.benefits.slice(0, 3), // Take top 3 benefits
+                image: t.heroImage,
+                keywords: t.keywords,
+                category: t.category
+            };
+        });
+    }, []);
 
-        setScrollX(currentTranslate.current);
-        
-        // --- THE SCANNER LOGIC (Card Eating Effect) ---
-        if (trackRef.current && containerRef.current) {
-            const containerRect = containerRef.current.getBoundingClientRect();
-            const centerLine = containerRect.width / 2;
-            const scanWidth = 10; // Width of the "beam" impact
+    const [filteredServices, setFilteredServices] = useState<ExtendedServiceItem[]>(allServices);
 
-            // Iterate over all cards to update their clip-path based on position
-            const cards = trackRef.current.children;
-            for (let i = 0; i < cards.length; i++) {
-                const card = cards[i] as HTMLElement;
-                const rect = card.getBoundingClientRect();
-                const cardLeft = rect.left - containerRect.left;
-                const cardRight = rect.right - containerRect.left;
-                const cardWidth = rect.width;
-
-                // Calculate overlap with center line
-                const distFromCenter = (cardLeft + cardWidth/2) - centerLine;
-                
-                // Logic:
-                // If card is to the LEFT of center -> Show fully
-                // If card is to the RIGHT of center -> Show fully
-                // If card is CROSSING center -> "Eat" the shell to reveal core
-                
-                let clipStart = 0;
-                let clipEnd = 100;
-
-                // Simple Scanner Logic:
-                // We calculate a percentage (0 to 100) representing where the laser is ON THE CARD
-                const laserPosOnCard = centerLine - cardLeft;
-                const percent = (laserPosOnCard / cardWidth) * 100;
-
-                // Apply logic to CSS variables on the Shell
-                const shell = card.querySelector('.card-shell') as HTMLElement;
-                if (shell) {
-                    if (percent > 0 && percent < 100) {
-                        // Card is under scanner!
-                        // We want a gap in the shell where the laser is.
-                        // Actually, the "Eating" effect usually implies the shell is removed *after* the scan line or *during*.
-                        // Let's make the shell DISAPPEAR as it passes center to reveal the core.
-                        
-                        // Reveal Core: The shell is clipped from 0% to "Laser Pos"
-                        // Or inverted: Shell exists only on the right side of laser?
-                        
-                        // EFFECT: Shell is peeled away by the laser.
-                        // Left of laser = Core (Revealed). Right of laser = Shell (Hidden content).
-                        shell.style.setProperty('--clip-start', `${percent + 5}%`); // Add small gap
-                        shell.style.setProperty('--clip-end', '100%');
-                    } else if (percent >= 100) {
-                        // Card passed scanner (Left side of screen) -> Fully Revealed Core (Shell Hidden)
-                        shell.style.setProperty('--clip-start', '100%');
-                        shell.style.setProperty('--clip-end', '100%');
-                    } else {
-                        // Card approaching scanner (Right side) -> Fully Visible Shell
-                        shell.style.setProperty('--clip-start', '0%');
-                        shell.style.setProperty('--clip-end', '100%');
-                    }
-                }
-            }
-        }
-
-        requestRef.current = requestAnimationFrame(animate);
-    }, [isDragging, services.length]);
+    // --- 2. DYNAMIC CATEGORIES ---
+    const filterCategories = useMemo(() => {
+        const uniqueCats = Array.from(new Set(allServices.map(s => s.category)));
+        return ['All', ...uniqueCats];
+    }, [allServices]);
 
     useEffect(() => {
-        requestRef.current = requestAnimationFrame(animate);
-        return () => cancelAnimationFrame(requestRef.current!);
-    }, [animate]);
+        const query = searchQuery.toLowerCase();
+        const filtered = allServices.filter(service => {
+            const matchesSearch = service.title.toLowerCase().includes(query) || 
+                                  service.keywords.some(k => k.toLowerCase().includes(query));
+            const matchesCategory = activeFilter === 'All' || service.category === activeFilter;
+            
+            return matchesSearch && matchesCategory;
+        });
+        setFilteredServices(filtered);
+        
+        if(swiperRef.current && swiperRef.current.swiper) {
+            swiperRef.current.swiper.slideTo(0);
+        }
+    }, [searchQuery, activeFilter, allServices]);
 
-    // --- DRAG HANDLERS ---
-    const onTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
-        setIsDragging(true);
-        startX.current = 'touches' in e ? e.touches[0].clientX : e.clientX;
-        prevTranslate.current = currentTranslate.current;
+    const onAutoplayTimeLeft = (s: any, time: number, progress: number) => {
+        if (progressCircle.current) {
+            progressCircle.current.style.setProperty("--progress", String(1 - progress));
+        }
+        if (progressContent.current) {
+            progressContent.current.textContent = `${Math.ceil(time / 1000)}s`;
+        }
+        if (progressBar.current) {
+            progressBar.current.style.setProperty("--progress", `${(1 - progress) * 100}%`);
+        }
     };
 
-    const onTouchMove = (e: React.TouchEvent | React.MouseEvent) => {
-        if (!isDragging) return;
-        const currentPosition = 'touches' in e ? e.touches[0].clientX : e.clientX;
-        const diff = currentPosition - startX.current;
-        currentTranslate.current = prevTranslate.current + diff;
+    const handleSlideChange = (swiper: any) => {
+         const activeIndex = swiper.realIndex;
+         const currentService = filteredServices.length > 0 
+            ? (filteredServices[activeIndex] || filteredServices[0])
+            : allServices[0];
+         
+         if (sectionRef.current && currentService) {
+            sectionRef.current.style.setProperty("--progress-color", currentService.accent);
+            sectionRef.current.style.background = currentService.bg;
+         }
     };
 
-    const onTouchEnd = () => {
-        setIsDragging(false);
+    const handleClick = (id: string) => {
+        if (onServiceClick) {
+            onServiceClick(id);
+        } else {
+            router.push(`/treatments/${id}`);
+        }
     };
 
     return (
-        <section className="relative min-h-screen bg-[#020617] overflow-hidden flex flex-col justify-center py-20">
-            <style jsx global>{cssStyles}</style>
+        <section 
+            id="services" 
+            ref={sectionRef} 
+            className="services-wrapper relative py-16 lg:py-20 w-full overflow-hidden flex flex-col items-center justify-center transition-all duration-700"
+            style={{ 
+                background: allServices[0]?.bg,
+                "--progress-color": allServices[0]?.accent 
+            } as React.CSSProperties}
+        >
+            <style jsx>{cssStyles}</style>
 
-            {/* --- BACKGROUND AMBIENCE --- */}
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-blue-500/10 blur-[120px] rounded-full pointer-events-none"></div>
-
-            {/* --- HEADER --- */}
-            <div className="container mx-auto px-6 mb-16 relative z-20 text-center">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-blue-400 font-bold text-xs uppercase tracking-widest mb-6">
-                    <ScanLine size={14} /> Clinical Protocols v4.0
+            {/* Search & Filter Header (Overlay) */}
+            <div className="absolute top-0 pt-6 lg:pt-8 w-full z-20 flex flex-col items-center pointer-events-none px-4">
+                <h3 className="text-white/60 font-bold tracking-widest text-[10px] lg:text-xs uppercase mb-3">Our Expertise</h3>
+                
+                <div className="pointer-events-auto relative w-full max-w-sm lg:max-w-md mb-3 lg:mb-4">
+                    <input 
+                        type="text" 
+                        placeholder="Search by symptom..." 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-full py-2.5 lg:py-3 pl-10 lg:pl-12 pr-6 text-white placeholder-white/50 text-sm focus:outline-none focus:bg-white/20 focus:border-white/40 transition-all shadow-lg"
+                    />
+                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70" />
                 </div>
-                <h2 className="text-5xl md:text-7xl font-black text-white mb-4 tracking-tighter">
-                    Precision <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-teal-400">Medicine.</span>
-                </h2>
-                <p className="text-slate-400 text-sm font-bold uppercase tracking-widest flex items-center justify-center gap-2">
-                    <MousePointer2 size={14} /> Drag Stream to Scan
-                </p>
-            </div>
 
-            {/* --- THE LASER BEAM --- */}
-            <div className="laser-scanner"></div>
-
-            {/* --- INFINITE STREAM --- */}
-            <div 
-                className="service-stream-container w-full" 
-                ref={containerRef}
-                onMouseDown={onTouchStart}
-                onMouseMove={onTouchMove}
-                onMouseUp={onTouchEnd}
-                onMouseLeave={onTouchEnd}
-                onTouchStart={onTouchStart}
-                onTouchMove={onTouchMove}
-                onTouchEnd={onTouchEnd}
-            >
-                <div 
-                    className="stream-track" 
-                    ref={trackRef}
-                    style={{ transform: `translateX(${scrollX}px)` }}
-                >
-                    {displayServices.map((service, idx) => (
-                        <div 
-                            key={`${service.id}-${idx}`} 
-                            className="holo-card-wrapper"
-                            style={{ 
-                                '--theme-color': service.theme.color,
-                                '--theme-bg': service.theme.bg,
-                                '--theme-glow': service.theme.glow,
-                            } as React.CSSProperties}
-                            onClick={() => router.push(`/treatments/${service.id}`)}
+                <div className="pointer-events-auto flex flex-wrap gap-1.5 lg:gap-2 justify-center max-w-2xl px-2">
+                    {filterCategories.map(cat => (
+                        <button
+                            key={cat}
+                            onClick={() => setActiveFilter(cat)}
+                            className={`px-3 py-1 lg:px-4 lg:py-1.5 rounded-full text-[10px] lg:text-xs font-bold uppercase tracking-wider transition-all border ${
+                                activeFilter === cat 
+                                    ? 'bg-white text-slate-900 border-white scale-105 shadow-md' 
+                                    : 'bg-transparent text-white/70 border-white/20 hover:bg-white/10 hover:border-white/40'
+                            }`}
                         >
-                            {/* LAYER 1: SHELL (Aesthetic / Image) */}
-                            {/* Gets clipped away by the scanner */}
-                            <div className="card-shell group">
-                                <div className="absolute inset-0">
-                                    <img 
-                                        src={service.heroImage} 
-                                        alt={service.title} 
-                                        className="w-full h-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-110" 
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
-                                </div>
-                                <div className="absolute bottom-0 left-0 p-8 w-full">
-                                    <div className="inline-block px-3 py-1 mb-4 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[10px] font-bold uppercase tracking-widest text-white">
-                                        {service.category}
-                                    </div>
-                                    <h3 className="text-3xl font-bold text-white leading-tight">{service.title}</h3>
-                                    <p className="text-slate-400 text-sm mt-2 line-clamp-2">{service.description}</p>
-                                </div>
-                            </div>
-
-                            {/* LAYER 2: CORE (Clinical / Data) */}
-                            {/* Revealed when shell is clipped */}
-                            <div className="card-core">
-                                <div className="absolute inset-0 tech-grid"></div>
-                                
-                                <div className="p-8 flex flex-col h-full relative z-10">
-                                    <div className="flex justify-between items-start mb-6">
-                                        <div 
-                                            className="w-14 h-14 rounded-2xl flex items-center justify-center border border-white/10"
-                                            style={{ background: `${service.theme.color}20`, color: service.theme.color }}
-                                        >
-                                            <service.Icon size={28} />
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-1">Success Rate</div>
-                                            <div className="text-2xl font-black text-white">{service.stats[2]?.value || '99%'}</div>
-                                        </div>
-                                    </div>
-
-                                    <h3 className="text-2xl font-bold text-white mb-2" style={{ color: service.theme.color }}>
-                                        {service.title}
-                                    </h3>
-                                    <div className="h-1 w-12 rounded-full mb-6" style={{ background: service.theme.color }}></div>
-
-                                    {/* Tech Specs List */}
-                                    <div className="space-y-4 mb-auto">
-                                        {service.stats.slice(0, 3).map((stat, i) => (
-                                            <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-black/20 border border-white/5">
-                                                <span className="text-xs text-slate-400 uppercase font-bold">{stat.label}</span>
-                                                <span className="text-sm font-bold text-white">{stat.value}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {/* CTA */}
-                                    <div 
-                                        className="mt-6 w-full py-4 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
-                                        style={{ background: service.theme.color, color: '#fff', cursor: 'pointer' }}
-                                    >
-                                        View Protocol <ArrowRight size={14} />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                            {cat}
+                        </button>
                     ))}
                 </div>
             </div>
+
+            <div className="autoplay-progress-bar" ref={progressBar}></div>
+
+            {filteredServices.length > 0 ? (
+                <Swiper
+                    ref={swiperRef}
+                    modules={[EffectCoverflow, Autoplay, Pagination, Navigation, Keyboard]}
+                    effect="coverflow"
+                    grabCursor={true}
+                    centeredSlides={true}
+                    slidesPerView={1} 
+                    speed={1000}
+                    coverflowEffect={{
+                        rotate: 50,
+                        stretch: 0,
+                        depth: 100,
+                        modifier: 1,
+                        slideShadows: true,
+                    }}
+                    keyboard={{ enabled: true }}
+                    autoplay={{
+                        delay: 6000,
+                        disableOnInteraction: false,
+                        pauseOnMouseEnter: true
+                    }}
+                    pagination={{ clickable: true }}
+                    navigation={{
+                        nextEl: '.slider-button-next',
+                        prevEl: '.slider-button-prev',
+                    }}
+                    onAutoplayTimeLeft={onAutoplayTimeLeft}
+                    onSlideChange={handleSlideChange}
+                    className="w-full h-full swiper"
+                >
+                    {filteredServices.map((service) => (
+                        <SwiperSlide key={service.id} className="slide">
+                            <div 
+                                className="card" 
+                                style={{ background: service.bg, "--color": service.accent } as React.CSSProperties}
+                            >
+                                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                                    <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-white/5 rounded-full blur-[100px] animate-pulse"></div>
+                                </div>
+
+                                <div className="svg-wrapper floating">
+                                    <div className="img-container swing">
+                                        <div className="absolute inset-0 rounded-full border border-white/20 animate-[spin_10s_linear_infinite]"></div>
+                                        <img src={service.image} alt={service.title} />
+                                        <div className="absolute -bottom-4 right-10 bg-white p-3 lg:p-4 rounded-full shadow-lg">
+                                            <service.icon size={24} className="lg:w-8 lg:h-8" style={{ color: service.accent }} />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="card-content">
+                                    <div className="card-sub-title">{service.subTitle}</div>
+                                    <h2 className="card-title" data-text={service.title}>{service.title}</h2>
+                                    <p className="card-description">
+                                        {service.description}
+                                    </p>
+                                    <div className="card-cta">
+                                        <button 
+                                            className="cta-button"
+                                            onClick={() => handleClick(service.treatmentId)}
+                                        >
+                                            Learn More
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="card-ghost-info">
+                                    <span></span>
+                                    <div className="ghost-name">Highlights</div>
+                                    <div className="flex flex-col gap-1">
+                                        {service.features.map((f, i) => (
+                                            <div key={i} className="opacity-80 text-xs">• {f}</div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </SwiperSlide>
+                    ))}
+
+                    <div className="slider-button slider-button-prev">
+                        <svg viewBox="0 0 100 100">
+                            <g className="slider-svg-circle-wrap">
+                                <circle cx="50" cy="50" r="45"></circle>
+                            </g>
+                            <path className="slider-svg-arrow" d="M35 50 L65 30 L65 70 Z"/>
+                        </svg>
+                    </div>
+                    <div className="slider-button slider-button-next">
+                        <svg viewBox="0 0 100 100">
+                            <g className="slider-svg-circle-wrap">
+                                <circle cx="50" cy="50" r="45"></circle>
+                            </g>
+                            <path className="slider-svg-arrow" d="M35 50 L65 30 L65 70 Z"/>
+                        </svg>
+                    </div>
+                </Swiper>
+            ) : (
+                <div className="relative z-10 flex flex-col items-center justify-center h-[500px] text-white">
+                    <Filter size={64} className="mb-4 opacity-50" />
+                    <h3 className="text-2xl font-bold mb-2">No treatments found</h3>
+                    <p className="text-white/60 mb-6">Try adjusting your search or filter.</p>
+                    <button 
+                        onClick={() => { setSearchQuery(''); setActiveFilter('All'); }}
+                        className="px-6 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full transition-all text-sm font-bold uppercase tracking-wider"
+                    >
+                        Clear Filters
+                    </button>
+                </div>
+            )}
+
+            <div className="autoplay-progress">
+                <svg viewBox="0 0 48 48" ref={progressCircle}>
+                    <circle cx="24" cy="24" r="20"></circle>
+                </svg>
+                <span ref={progressContent}></span>
+            </div>
+
+            <div className="mouse-scroll">
+                <div className="mouse">
+                    <div className="roll"></div>
+                </div>
+                <span>Discover Treatments</span>
+            </div>
         </section>
     );
-}
+};
+
+export default Services;
