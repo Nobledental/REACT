@@ -347,5 +347,38 @@ export const treatmentsData: Record<string, TreatmentData> = {
       { q: "How long does it last?", a: "Results can last 1-3 years depending on dietary habits (coffee/wine intake)." }
     ],
     keywords: ["white", "bleach", "stain", "yellow", "bright", "smile"]
+  },
+  "veneers": {
+    id: "veneers",
+    title: "Porcelain Veneers",
+    subtitle: "Hollywood smile design in 2 visits.",
+    category: "Cosmetic",
+    heroImage: "https://images.unsplash.com/photo-1606811841689-230391b42a21?auto=format&fit=crop&q=80&w=1200", 
+    description: "Ultra-thin custom ceramic shells that cover the front surface of teeth to instantly correct shape, color, and alignment.",
+    longDescription: "Veneers are the secret behind most celebrity smiles. We use E.max ceramic to craft wafer-thin laminates that bond permanently to your teeth. Whether you want to close gaps, fix chips, or permanently whiten your smile, veneers offer the ultimate aesthetic transformation.",
+    stats: [
+      { label: "Material", value: "E.max Ceramic", icon: "Sparkles" },
+      { label: "Warranty", value: "15 Years", icon: "ShieldCheck" },
+      { label: "Thickness", value: "0.3mm", icon: "Ruler" }
+    ],
+    process: [
+      { title: "Smile Design", desc: "Digital scanning and creating a 'Trial Smile' you can wear." },
+      { title: "Preparation", desc: "Minimal shaping of enamel (if needed) to create space." },
+      { title: "Bonding", desc: "Permanently adhering the ceramic shells to your teeth." },
+      { title: "Polishing", desc: "Final adjustments for a bite that feels completely natural." }
+    ],
+    benefits: [
+      "Permanently White (Stain Proof)",
+      "Closes Gaps Instantly",
+      "Fixes Chipped or Worn Teeth",
+      "Custom Shape & Style",
+      "Done in just 2 Appointments"
+    ],
+    faqs: [
+      { q: "Do you have to grind my teeth?", a: "Minimal preparation is usually required (0.3mm), but in some 'No-Prep' cases, we can bond directly to enamel." },
+      { q: "Do they stain?", a: "No. Porcelain is non-porous, so it resists stains from coffee and wine better than natural teeth." }
+    ],
+    keywords: ["smile makeover", "hollywood smile", "chips", "gaps", "white teeth", "laminates"]
   }
+};
 };
