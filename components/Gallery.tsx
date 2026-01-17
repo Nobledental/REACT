@@ -4,8 +4,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   ArrowRight, Play, Pause, SkipBack, SkipForward, Heart, Share2, 
-  Sparkles, Bookmark, Activity, ShieldAlert, ShieldCheck
+  Sparkles, Bookmark, Activity, ShieldAlert, ShieldCheck, Zap,
+  Scan, Fingerprint, Dna, Microscope
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
 
 // --- STYLES ---
@@ -36,23 +38,12 @@ const wideCardStyles = `
   .player-media {
     flex: 1.2;
     position: relative;
-    background: #000;
+    background: #0f172a; /* Deep slate background for animations */
     min-height: 300px;
     overflow: hidden;
-  }
-  
-  /* The "Realistic Animation" Video */
-  .player-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.9;
-    transition: transform 0.7s ease;
-  }
-  
-  /* Zoom effect on hover */
-  .unified-player-card:hover .player-video {
-    transform: scale(1.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .player-content {
@@ -69,6 +60,114 @@ const wideCardStyles = `
   }
 `;
 
+// --- CUSTOM ANIMATION COMPONENTS ---
+
+const ImplantsAnim = () => (
+  <div className="relative w-full h-full flex items-center justify-center">
+    <motion.div 
+      animate={{ rotate: 360 }}
+      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+      className="absolute w-[400px] h-[400px] border border-blue-500/20 rounded-full border-dashed"
+    />
+    <motion.div 
+      animate={{ scale: [1, 1.1, 1] }}
+      transition={{ duration: 4, repeat: Infinity }}
+      className="relative z-10 text-center"
+    >
+      <Dna size={80} className="text-blue-500 mx-auto mb-4" />
+      <h3 className="text-3xl font-black text-white tracking-tighter">OSSEOINTEGRATION</h3>
+      <p className="text-blue-400 text-xs font-bold uppercase tracking-[0.3em] mt-2">Titanium Fusion</p>
+    </motion.div>
+    {/* Floating Particles */}
+    {[...Array(5)].map((_, i) => (
+      <motion.div
+        key={i}
+        className="absolute w-2 h-2 bg-blue-400 rounded-full"
+        animate={{ y: [-100, 100], opacity: [0, 1, 0] }}
+        transition={{ duration: 3 + i, repeat: Infinity, delay: i * 0.5 }}
+        style={{ left: `${20 + i * 15}%` }}
+      />
+    ))}
+  </div>
+);
+
+const EthicsAnim = () => (
+  <div className="relative w-full h-full flex items-center justify-center bg-black">
+    <motion.div 
+      animate={{ opacity: [0.5, 1, 0.5] }}
+      transition={{ duration: 3, repeat: Infinity }}
+      className="absolute inset-0 bg-gradient-to-tr from-purple-900/20 to-transparent"
+    />
+    <div className="text-center z-10">
+      <div className="flex justify-center gap-4 mb-6">
+        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 2, repeat: Infinity }} className="w-16 h-24 bg-white/10 rounded-lg border border-white/20" />
+        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 2, delay: 0.2, repeat: Infinity }} className="w-16 h-24 bg-white rounded-lg shadow-[0_0_30px_rgba(255,255,255,0.5)]" />
+        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 2, delay: 0.4, repeat: Infinity }} className="w-16 h-24 bg-white/10 rounded-lg border border-white/20" />
+      </div>
+      <h3 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 tracking-tighter">TRUE AESTHETICS</h3>
+      <p className="text-purple-300 text-xs font-bold uppercase tracking-[0.3em] mt-2">Biomimetic vs Fake</p>
+    </div>
+  </div>
+);
+
+const HealthAnim = () => (
+  <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+    <motion.div 
+      animate={{ scale: [1, 1.2, 1] }}
+      transition={{ duration: 0.8, repeat: Infinity }}
+      className="absolute w-[300px] h-[300px] bg-red-600/20 rounded-full blur-3xl"
+    />
+    <div className="z-10 text-center">
+      <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 0.8, repeat: Infinity }}>
+        <Heart size={80} className="text-red-500 mx-auto mb-4 fill-red-500/20" />
+      </motion.div>
+      <h3 className="text-3xl font-black text-white tracking-tighter">SYSTEMIC LOOP</h3>
+      <div className="flex items-center justify-center gap-2 mt-4 text-red-400 text-xs font-bold uppercase tracking-widest">
+        <span>Gums</span> <ArrowRight size={12} /> <span>Heart</span> <ArrowRight size={12} /> <span>Life</span>
+      </div>
+    </div>
+  </div>
+);
+
+const TechAnim = () => (
+  <div className="relative w-full h-full flex items-center justify-center bg-slate-900">
+    {/* Scanning Line */}
+    <motion.div 
+      animate={{ top: ['0%', '100%', '0%'] }}
+      transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+      className="absolute left-0 right-0 h-1 bg-green-500 shadow-[0_0_20px_rgba(34,197,94,0.8)] z-20 opacity-50"
+    />
+    <div className="text-center z-10">
+      <Scan size={80} className="text-green-500 mx-auto mb-4" />
+      <h3 className="text-3xl font-black text-green-400 tracking-tighter font-mono">AI DIAGNOSTICS</h3>
+      <p className="text-green-600/80 text-xs font-bold uppercase tracking-[0.3em] mt-2 font-mono">Precision: 99.8%</p>
+    </div>
+    {/* Grid Background */}
+    <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,0,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,0,0.05)_1px,transparent_1px)] bg-[size:20px_20px]"></div>
+  </div>
+);
+
+const OrthoAnim = () => (
+  <div className="relative w-full h-full flex items-center justify-center">
+    <div className="flex gap-1">
+      {[...Array(6)].map((_, i) => (
+        <motion.div
+          key={i}
+          animate={{ height: [40, 80, 40], backgroundColor: ["#3b82f6", "#60a5fa", "#3b82f6"] }}
+          transition={{ duration: 1, repeat: Infinity, delay: i * 0.1 }}
+          className="w-8 rounded-full bg-blue-500 opacity-80"
+        />
+      ))}
+    </div>
+    <div className="absolute bottom-20 text-center">
+      <h3 className="text-3xl font-black text-white tracking-tighter">INVISIBLE FORCE</h3>
+      <p className="text-blue-300 text-xs font-bold uppercase tracking-[0.3em] mt-2">Sequential Movement</p>
+    </div>
+  </div>
+);
+
+// --- MAIN COMPONENT ---
+
 export default function Gallery() {
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isTimerPlaying, setIsTimerPlaying] = useState(false);
@@ -76,82 +175,57 @@ export default function Gallery() {
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // --- PLAYLIST: ABSTRACT 3D ANIMATIONS (No Real Footage) ---
+  // --- PLAYLIST ---
   const playlist = [
-    // 1. IMPLANTS -> Abstract Blue Tech (Engineering feel)
     {
       type: "audio",
       name: "The Bionic Tooth",
       artist: "Clinical Engineering",
-      description: "Why titanium implants are the only permanent solution for bone loss. The biology of osseointegration.",
-      // Free Abstract Tech Loop
-      video: "https://videos.pexels.com/video-files/3129671/3129671-hd_1920_1080_30fps.mp4",
-      poster: "https://images.pexels.com/photos/3129671/pexels-photo-3129671.jpeg?auto=compress&cs=tinysrgb&w=800", // SEO Image
+      description: "Why titanium implants are the only permanent solution for bone loss.",
+      component: <ImplantsAnim />, // Renders the animation directly
       audio: "/audio/implants.mp3",
       category: "Surgery",
-      tags: ['Implants', 'Biology', 'Titanium']
+      tags: ['Implants', 'Biology']
     },
-    // 2. ETHICS -> Abstract Glass/Mirrors (Reflection/Truth feel)
     {
       type: "audio",
       name: "The Instagram Trap",
       artist: "Dr. Deepak",
-      description: "Are veneers worth it? How to avoid the 'Chiclet' look and why aggressive filing is irreversible.",
-      // Free Abstract Glass Loop
-      video: "https://videos.pexels.com/video-files/2759750/2759750-hd_1920_1080_30fps.mp4",
-      poster: "https://images.pexels.com/photos/2759750/pexels-photo-2759750.jpeg?auto=compress&cs=tinysrgb&w=800",
+      description: "Are veneers worth it? Avoiding the 'Chiclet' look.",
+      component: <EthicsAnim />,
       audio: "/audio/ethics.mp3", 
       category: "Ethics",
-      tags: ['Veneers', 'Myths', 'Cosmetic']
+      tags: ['Veneers', 'Truth']
     },
-    // 3. HEALTH -> Abstract Red Flow (Blood/Systemic feel)
     {
       type: "audio",
       name: "The Heart-Mouth Loop",
       artist: "Systemic Health",
-      description: "The proven link between bleeding gums, heart disease, and diabetes. Why hygiene is survival.",
-      // Free Abstract Fluid Loop
-      video: "https://videos.pexels.com/video-files/4762955/4762955-hd_1920_1080_30fps.mp4",
-      poster: "https://images.pexels.com/photos/4762955/pexels-photo-4762955.jpeg?auto=compress&cs=tinysrgb&w=800",
+      description: "The proven link between bleeding gums and heart disease.",
+      component: <HealthAnim />,
       audio: "/audio/safety.mp3",
       category: "Health",
-      tags: ['Heart', 'Diabetes', 'Gums']
+      tags: ['Wellness', 'Risk']
     },
-    // 4. JOURNAL: COST -> Abstract Gold/Money (Luxury feel)
     {
-        type: "journal",
-        name: "The Cost of Cheap Implants",
-        artist: "Investigative Report",
-        description: "Why ₹20k implants fail. Understanding Grade 5 Titanium vs. impure alloys that cause bone rejection.",
-        video: "https://videos.pexels.com/video-files/5527749/5527749-hd_1920_1080_25fps.mp4",
-        poster: "https://images.pexels.com/photos/5527749/pexels-photo-5527749.jpeg?auto=compress&cs=tinysrgb&w=800",
-        audio: "/audio/safety.mp3", 
-        category: "Surgery",
-        tags: ['Safety', 'Cost', 'Titanium']
+      type: "journal",
+      name: "The 3-Year Warning",
+      artist: "Tech Analysis",
+      description: "How AI scanners detect decay 3 years before it becomes visible.",
+      component: <TechAnim />,
+      audio: "/audio/ai.mp3", 
+      category: "Technology",
+      tags: ['AI', 'Laser']
     },
-    // 5. JOURNAL: TECH -> Abstract Laser/Scanning (AI feel)
     {
-        type: "journal",
-        name: "The 3-Year Warning",
-        artist: "Tech Analysis",
-        description: "How AI scanners detect decay 3 years before it becomes visible to the naked eye.",
-        video: "https://videos.pexels.com/video-files/2547367/2547367-hd_1920_1080_30fps.mp4",
-        poster: "https://images.pexels.com/photos/2547367/pexels-photo-2547367.jpeg?auto=compress&cs=tinysrgb&w=800",
-        audio: "/audio/ai.mp3", 
-        category: "Technology",
-        tags: ['AI', 'Laser', 'Future']
-    },
-    // 6. JOURNAL: ORTHO -> Abstract Lines/Geometry (Physics feel)
-    {
-        type: "journal",
-        name: "Invisible Physics",
-        artist: "Aligner Tech",
-        description: "The surprising engineering behind clear plastic. How aligners push teeth faster than metal pulls them.",
-        video: "https://videos.pexels.com/video-files/3163534/3163534-hd_1920_1080_30fps.mp4",
-        poster: "https://images.pexels.com/photos/3163534/pexels-photo-3163534.jpeg?auto=compress&cs=tinysrgb&w=800",
-        audio: "/audio/ortho.mp3",
-        category: "Ortho",
-        tags: ['Aligners', 'Physics', 'Speed']
+      type: "journal",
+      name: "Invisible Physics",
+      artist: "Aligner Tech",
+      description: "The engineering behind clear plastic pushing teeth.",
+      component: <OrthoAnim />,
+      audio: "/audio/ortho.mp3",
+      category: "Ortho",
+      tags: ['Physics', 'Aligners']
     }
   ];
 
@@ -163,51 +237,28 @@ export default function Gallery() {
       audioRef.current = new Audio(playlist[0].audio);
       audioRef.current.volume = 0.2; 
     }
-
     const audio = audioRef.current;
-
-    const updateProgress = () => {
-      if (audio.duration) {
-        setBarWidth(`${(audio.currentTime / audio.duration) * 100}%`);
-      }
-    };
-
-    const handleEnded = () => {
-        handleNext();
-    };
-
+    const updateProgress = () => { if (audio.duration) setBarWidth(`${(audio.currentTime / audio.duration) * 100}%`); };
+    const handleEnded = () => handleNext();
     audio.addEventListener('timeupdate', updateProgress);
     audio.addEventListener('ended', handleEnded);
-
-    return () => {
-      audio.removeEventListener('timeupdate', updateProgress);
-      audio.removeEventListener('ended', handleEnded);
-    };
+    return () => { audio.removeEventListener('timeupdate', updateProgress); audio.removeEventListener('ended', handleEnded); };
   }, []);
 
-  // Track Switching
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.src = playlist[currentTrackIndex].audio;
       audioRef.current.load();
-      if (isTimerPlaying) {
-        audioRef.current.play().catch(e => console.log("Autoplay blocked", e));
-      } else {
-          setBarWidth("0%");
-      }
+      if (isTimerPlaying) audioRef.current.play().catch(() => {});
+      else setBarWidth("0%");
     }
   }, [currentTrackIndex]);
 
   const togglePlay = () => {
     if(!audioRef.current) return;
-    if(isTimerPlaying) { 
-        audioRef.current.pause(); 
-        setIsTimerPlaying(false); 
-    } else { 
-        audioRef.current.play(); 
-        setIsTimerPlaying(true); 
-    }
+    if(isTimerPlaying) { audioRef.current.pause(); setIsTimerPlaying(false); }
+    else { audioRef.current.play(); setIsTimerPlaying(true); }
   };
 
   const handleNext = () => {
@@ -236,7 +287,7 @@ export default function Gallery() {
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500">Expert Journal.</span>
              </h2>
              <p className="text-lg text-slate-500 dark:text-slate-400 max-w-xl font-medium leading-relaxed">
-               Deep-dives into clinical science and surgical technology.
+               Interactive visual explanations of clinical science.
              </p>
           </div>
         </RevealOnScroll>
@@ -244,28 +295,29 @@ export default function Gallery() {
 
       <div className="max-w-7xl mx-auto px-6">
         
-        {/* --- UNIFIED WIDE PLAYER CARD (Single View) --- */}
         <RevealOnScroll className="mb-24">
            <div className="unified-player-card group">
               
-              {/* Left: Video */}
+              {/* Left: LIVE ANIMATION CANVAS */}
               <div className="player-media">
-                  <video 
-                    key={currentTrack.video} 
-                    src={currentTrack.video} 
-                    className="player-video" 
-                    poster={currentTrack.poster} /* SEO OPTIMIZATION */
-                    autoPlay loop muted playsInline 
-                  />
-                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors"></div>
+                  <AnimatePresence mode="wait">
+                    <motion.div 
+                      key={currentTrackIndex}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 1.1 }}
+                      transition={{ duration: 0.5 }}
+                      className="absolute inset-0 w-full h-full"
+                    >
+                       {currentTrack.component}
+                    </motion.div>
+                  </AnimatePresence>
+                  
+                  {/* Category Badge Overlay */}
                   <div className="absolute bottom-10 left-10 z-20">
                      <span className={`px-4 py-1.5 text-white text-[9px] font-black uppercase tracking-widest rounded-full mb-4 inline-block shadow-lg ${currentTrack.type === 'audio' ? 'bg-blue-600' : 'bg-green-600'}`}>
-                        {currentTrack.type === 'audio' ? 'Podcast Episode' : 'Journal Entry'}
+                        {currentTrack.type === 'audio' ? 'Podcast' : 'Visual Guide'}
                      </span>
-                     <div className="flex items-center gap-2 text-white/80 text-xs font-bold uppercase tracking-wider mb-2">
-                        <Bookmark size={14} /> {currentTrack.category}
-                     </div>
-                     <h3 className="text-3xl md:text-4xl font-black text-white leading-none tracking-tight drop-shadow-lg">{currentTrack.artist}</h3>
                   </div>
               </div>
 
@@ -276,7 +328,7 @@ export default function Gallery() {
                     <div className="flex items-center gap-4 mb-6">
                        {currentTrack.type === 'audio' && (
                            <span className="text-xs font-black text-blue-600 uppercase tracking-widest flex items-center gap-2">
-                              <Activity size={14} className={isTimerPlaying ? "animate-pulse" : ""} /> Now Playing
+                              <Activity size={14} className={isTimerPlaying ? "animate-pulse" : ""} /> Audio Active
                            </span>
                        )}
                        <div className="flex gap-2">
@@ -289,7 +341,7 @@ export default function Gallery() {
                   </div>
 
                   <div className="mt-8 pt-8 border-t border-slate-100 dark:border-white/5">
-                      {/* Progress Bar (Visual only for journal, functional for audio) */}
+                      {/* Progress Bar (Visual Only) */}
                       <div className="relative h-2 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden mb-8 cursor-pointer group/bar">
                           <div className="absolute top-0 left-0 h-full bg-blue-600 transition-all duration-100 ease-linear group-hover/bar:bg-blue-500" style={{ width: barWidth }}></div>
                       </div>
@@ -297,29 +349,15 @@ export default function Gallery() {
                       {/* Controls */}
                       <div className="flex items-center justify-between">
                           <div className="flex items-center gap-6 md:gap-10">
-                             <button onClick={handlePrev} className="text-slate-400 hover:text-blue-600 transition-colors transform hover:-translate-x-1" aria-label="Previous">
-                                <SkipBack size={28} />
-                             </button>
-                             
-                             <button 
-                                onClick={togglePlay} 
-                                className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-xl shadow-blue-600/20 hover:scale-110 hover:bg-blue-500 transition-all active:scale-95"
-                             >
+                             <button onClick={handlePrev} className="text-slate-400 hover:text-blue-600 transition-colors transform hover:-translate-x-1"><SkipBack size={28} /></button>
+                             <button onClick={togglePlay} className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-xl hover:scale-110 active:scale-95 transition-all">
                                 {isTimerPlaying ? <Pause size={28} fill="currentColor" /> : <Play size={28} fill="currentColor" className="ml-1" />}
                              </button>
-                             
-                             <button onClick={handleNext} className="text-slate-400 hover:text-blue-600 transition-colors transform hover:translate-x-1" aria-label="Next">
-                                <SkipForward size={28} />
-                             </button>
+                             <button onClick={handleNext} className="text-slate-400 hover:text-blue-600 transition-colors transform hover:translate-x-1"><SkipForward size={28} /></button>
                           </div>
-                          
                           <div className="flex items-center gap-6">
-                             <button className="text-slate-300 hover:text-red-500 transition-colors hover:scale-110">
-                                <Heart size={20} />
-                             </button>
-                             <button className="text-slate-300 hover:text-blue-500 transition-colors hover:scale-110">
-                                <Share2 size={20} />
-                             </button>
+                             <button className="text-slate-300 hover:text-red-500 transition-colors hover:scale-110"><Heart size={20} /></button>
+                             <button className="text-slate-300 hover:text-blue-500 transition-colors hover:scale-110"><Share2 size={20} /></button>
                           </div>
                       </div>
                   </div>
