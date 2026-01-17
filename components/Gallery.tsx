@@ -16,27 +16,47 @@ const Gallery = () => {
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // UPDATED TRACKS WITH DISTINCT MP3 SOURCES
+  // --- UPDATED PLAYLIST (4 Tracks with Distinct Audio) ---
   const tracks = [
     {
       name: "Biological Foundations of Dental Implants",
-      category: "PODCAST EP 04",
+      category: "EPISODE 01",
       description: "How bone fusion (osseointegration) works on a cellular level and why Swiss titanium ensures lifetime stability.",
       artist: "Dr. Dhivakaran",
       video: "https://videos.pexels.com/video-files/3195394/3195394-hd_1920_1080_25fps.mp4",
-      // Tech/Ambient Track
+      // Tech/Corporate Background
       source: "https://cdn.pixabay.com/download/audio/2022/03/24/audio_18d3509238.mp3?filename=technology-abstract-8027.mp3",
       tags: ['Implants', 'Biology', 'Surgery']
     },
     {
       name: "Micro-Precision: The Zeiss Difference",
-      category: "PODCAST EP 02",
+      category: "EPISODE 02",
       description: "A deep dive into why microscopic root canals have a 99% success rate compared to traditional methods.",
       artist: "Dr. Roger",
       video: "https://videos.pexels.com/video-files/5091624/5091624-hd_1920_1080_24fps.mp4",
-      // Lo-Fi/Chill Track
+      // Lo-Fi Chill
       source: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112762.mp3",
       tags: ['Endo', 'Precision', 'Tech']
+    },
+    {
+      name: "The Psychology of Pediatric Dentistry",
+      category: "EPISODE 03",
+      description: "Techniques to manage dental anxiety in children using the Tell-Show-Do method and positive reinforcement.",
+      artist: "Dr. Sarah",
+      video: "https://videos.pexels.com/video-files/5091624/5091624-hd_1920_1080_24fps.mp4", // You can change this video if you have a kid-related one
+      // Gentle Piano
+      source: "https://cdn.pixabay.com/download/audio/2021/11/24/audio_82339391b4.mp3?filename=piano-moment-111585.mp3",
+      tags: ['Pediatrics', 'Psychology', 'Kids']
+    },
+    {
+      name: "Aligner Biomechanics vs Braces",
+      category: "EPISODE 04",
+      description: "Comparing the physics of pushing (Aligners) vs pulling (Braces) teeth. Which is faster?",
+      artist: "Dr. Deepak",
+      video: "https://videos.pexels.com/video-files/3195394/3195394-hd_1920_1080_25fps.mp4",
+      // Upbeat Innovation
+      source: "https://cdn.pixabay.com/download/audio/2021/04/07/audio_03d6e15309.mp3?filename=corporate-uplifting-chill-12493.mp3",
+      tags: ['Ortho', 'Invisalign', 'Physics']
     }
   ];
 
@@ -105,12 +125,14 @@ const Gallery = () => {
   const filteredBlogs = getFilteredBlogs();
   const currentTrack = tracks[currentTrackIndex];
 
-  // --- AUDIO PLAYER LOGIC FIXED ---
+  // --- AUDIO LOGIC ---
 
-  // 1. Initialize Audio Object
+  // 1. Initialize Audio on Mount
   useEffect(() => {
     if (!audioRef.current) {
+      // Create new audio instance with the first track
       audioRef.current = new Audio(tracks[0].source);
+      audioRef.current.volume = 0.3; // <--- SET LOW VOLUME HERE (30%)
     }
     
     const audio = audioRef.current;
@@ -121,7 +143,6 @@ const Gallery = () => {
       }
     };
 
-    // Auto-play next track when ended
     const handleEnded = () => {
         handleNext();
     };
@@ -135,30 +156,32 @@ const Gallery = () => {
     };
   }, []);
 
-  // 2. Handle Track Switching (The missing piece)
+  // 2. Handle Track Switching
   useEffect(() => {
     if (audioRef.current) {
-      // Pause current
+      // 1. Pause current
       audioRef.current.pause();
-      // Swap Source
-      audioRef.current.src = tracks[currentTrackIndex].source;
-      audioRef.current.load(); // Important to reload the resource
       
-      // If player was active, auto-play new track. 
-      // Or if you want auto-play on skip regardless, just call play()
+      // 2. Load new source
+      audioRef.current.src = tracks[currentTrackIndex].source;
+      audioRef.current.load();
+      audioRef.current.volume = 0.3; // Ensure volume stays low on switch
+      
+      // 3. Auto-play if timer is running OR just auto-play whenever user switches
+      // We set isTimerPlaying to true on click, so this should pick it up
       if (isTimerPlaying) {
         const playPromise = audioRef.current.play();
         if (playPromise !== undefined) {
             playPromise.catch(error => {
-                console.error("Auto-play prevented:", error);
+                console.log("Autoplay prevented by browser:", error);
                 setIsTimerPlaying(false);
             });
         }
       } else {
-          setBarWidth("0%"); // Reset bar if paused
+          setBarWidth("0%");
       }
     }
-  }, [currentTrackIndex]); // Runs whenever index changes
+  }, [currentTrackIndex]); // <--- Reruns whenever index changes
 
   const togglePlay = () => {
     if(!audioRef.current) return;
@@ -172,15 +195,13 @@ const Gallery = () => {
   };
 
   const handleNext = () => {
+    setIsTimerPlaying(true); // Set playing state to TRUE immediately
     setCurrentTrackIndex((prev) => (prev + 1) % tracks.length);
-    // Note: We keep isTimerPlaying true so the next track plays automatically
-    // If you want it to stop on skip, set setIsTimerPlaying(false) here.
-    setIsTimerPlaying(true); 
   };
 
   const handlePrev = () => {
+    setIsTimerPlaying(true); // Set playing state to TRUE immediately
     setCurrentTrackIndex((prev) => (prev - 1 + tracks.length) % tracks.length);
-    setIsTimerPlaying(true);
   };
 
   return (
@@ -207,50 +228,70 @@ const Gallery = () => {
         
         {/* Unified Audio Player */}
         <RevealOnScroll className="mb-24">
-           <div className="unified-player-card">
+           <div className="unified-player-card group">
               <div className="player-media">
+                  {/* Key is crucial here: it forces React to replace the video element when track changes */}
                   <video 
-                    key={currentTrack.video} // Key forces video reload on track change
+                    key={currentTrack.video} 
                     src={currentTrack.video} 
                     className="player-video" 
                     autoPlay loop muted playsInline 
                   />
-                  <div className="absolute inset-0 bg-black/40"></div>
+                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors"></div>
                   <div className="absolute bottom-10 left-10 z-20">
-                     <span className="px-4 py-1.5 bg-blue-600 text-white text-[9px] font-black uppercase tracking-widest rounded-full mb-4 inline-block">{currentTrack.category}</span>
-                     <h3 className="text-4xl font-black text-white leading-none tracking-tight">{currentTrack.artist}</h3>
+                     <span className="px-4 py-1.5 bg-blue-600 text-white text-[9px] font-black uppercase tracking-widest rounded-full mb-4 inline-block shadow-lg">{currentTrack.category}</span>
+                     <h3 className="text-3xl md:text-4xl font-black text-white leading-none tracking-tight drop-shadow-lg">{currentTrack.artist}</h3>
                   </div>
               </div>
 
-              <div className="player-content">
+              <div className="player-content flex flex-col justify-between">
                   <div>
-                    <h2 className="track-title">{currentTrack.name}</h2>
-                    <div className="flex items-center gap-4 mb-8">
-                       <span className="text-xs font-black text-blue-600 uppercase tracking-widest">Episode Duration: 15min</span>
-                       <div className="flex gap-1">
+                    <h2 className="track-title text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4">{currentTrack.name}</h2>
+                    <div className="flex items-center gap-4 mb-6">
+                       <span className="text-xs font-black text-blue-600 uppercase tracking-widest flex items-center gap-2">
+                          <Activity size={14} className={isTimerPlaying ? "animate-pulse" : ""} /> Now Playing
+                       </span>
+                       <div className="flex gap-2">
                           {currentTrack.tags.map(t => (
-                             <span key={t} className="text-[9px] font-bold text-slate-400 border border-slate-200 dark:border-white/10 px-2 py-0.5 rounded-md uppercase">{t}</span>
+                             <span key={t} className="text-[10px] font-bold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10 px-2 py-1 rounded-md uppercase tracking-wider">{t}</span>
                           ))}
                        </div>
                     </div>
-                    <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed line-clamp-4">{currentTrack.description}</p>
+                    <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed line-clamp-3 md:line-clamp-none">{currentTrack.description}</p>
                   </div>
 
-                  <div className="mt-10 pt-10 border-t border-slate-100 dark:border-white/5">
-                      <div className="progress-container mb-10 h-1.5 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
-                          <div className="h-full bg-blue-600 transition-all duration-300" style={{ width: barWidth }}></div>
+                  <div className="mt-8 pt-8 border-t border-slate-100 dark:border-white/5">
+                      {/* Progress Bar */}
+                      <div className="relative h-2 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden mb-8 cursor-pointer group/bar">
+                          <div className="absolute top-0 left-0 h-full bg-blue-600 transition-all duration-100 ease-linear group-hover/bar:bg-blue-500" style={{ width: barWidth }}></div>
                       </div>
+                      
+                      {/* Controls */}
                       <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-8">
-                             <SkipBack className="text-slate-400 hover:text-blue-600 cursor-pointer transition-colors" size={24} onClick={handlePrev} />
-                             <button onClick={togglePlay} className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-2xl shadow-blue-500/30 hover:scale-105 transition-transform">
-                                {isTimerPlaying ? <Pause size={32} /> : <Play size={32} className="ml-1" />}
+                          <div className="flex items-center gap-6 md:gap-10">
+                             <button onClick={handlePrev} className="text-slate-400 hover:text-blue-600 transition-colors transform hover:-translate-x-1">
+                                <SkipBack size={28} />
                              </button>
-                             <SkipForward className="text-slate-400 hover:text-blue-600 cursor-pointer transition-colors" size={24} onClick={handleNext} />
+                             
+                             <button 
+                                onClick={togglePlay} 
+                                className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-xl shadow-blue-600/20 hover:scale-110 hover:bg-blue-500 transition-all active:scale-95"
+                             >
+                                {isTimerPlaying ? <Pause size={28} fill="currentColor" /> : <Play size={28} fill="currentColor" className="ml-1" />}
+                             </button>
+                             
+                             <button onClick={handleNext} className="text-slate-400 hover:text-blue-600 transition-colors transform hover:translate-x-1">
+                                <SkipForward size={28} />
+                             </button>
                           </div>
+                          
                           <div className="flex items-center gap-6">
-                             <Heart className="text-slate-300 hover:text-red-500 cursor-pointer transition-colors" />
-                             <Share2 className="text-slate-300 hover:text-blue-500 cursor-pointer transition-colors" />
+                             <button className="text-slate-300 hover:text-red-500 transition-colors hover:scale-110">
+                                <Heart size={20} />
+                             </button>
+                             <button className="text-slate-300 hover:text-blue-500 transition-colors hover:scale-110">
+                                <Share2 size={20} />
+                             </button>
                           </div>
                       </div>
                   </div>
