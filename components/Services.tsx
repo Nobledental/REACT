@@ -2,482 +2,25 @@
 
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { EffectCoverflow, Autoplay, Pagination, Navigation, Keyboard } from 'swiper/modules';
+import { motion, useScroll, useTransform, useSpring, useMotionValue, animate, PanInfo } from 'framer-motion';
 import { 
   Activity, Zap, Smile, Users, Search, Filter, Sparkles, 
-  Shield, Microscope, HeartPulse, ScanLine 
+  Shield, Microscope, HeartPulse, ScanLine, ArrowRight, MousePointer2 
 } from 'lucide-react';
-import { treatmentsData } from '@/data/treatments'; // <--- IMPORT YOUR DATA
+import { treatmentsData } from '@/data/treatments';
 
-// Import Swiper styles
-import 'swiper/css';
-import 'swiper/css/effect-coverflow';
-import 'swiper/css/pagination';
-import 'swiper/css/navigation';
-
-// --- STYLES (Kept exactly as you had them) ---
-const cssStyles = `
-@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
-
-.services-wrapper {
-    font-family: "Poppins", sans-serif;
-    transition: background-color 0.8s ease;
-}
-
-.services-wrapper .swiper {
-    width: 100%;
-    padding-top: 50px;
-    padding-bottom: 50px;
-}
-
-.services-wrapper .autoplay-progress {
-    position: absolute;
-    left: 30px;
-    top: 30px;
-    z-index: 20;
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    color: var(--progress-color);
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(5px);
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.1);
-}
-
-.services-wrapper .autoplay-progress svg {
-    --progress: 0;
-    position: absolute;
-    left: 0;
-    top: 0px;
-    z-index: 10;
-    width: 100%;
-    height: 100%;
-    stroke-width: 3px;
-    stroke: var(--progress-color);
-    fill: none;
-    stroke-dashoffset: calc(125.6px * (1 - var(--progress)));
-    stroke-dasharray: 125.6;
-    transform: rotate(-90deg);
-}
-
-.services-wrapper .autoplay-progress span {
-    font-size: 14px;
-}
-
-.services-wrapper .slider-button {
-    transition: 0.5s;
-    outline: none;
-    position: absolute;
-    width: 80px;
-    height: 80px;
-    z-index: 20;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-}
-
-.services-wrapper .slider-button svg {
-    display: block;
-    transition: 0.5s;
-    overflow: visible;
-}
-
-.services-wrapper .slider-button .slider-svg-circle-wrap {
-    transition: 0.5s;
-    transform-origin: center;
-}
-
-.services-wrapper .slider-button circle {
-    transition: 0.5s;
-    stroke-width: 2px;
-    stroke: var(--progress-color);
-    fill: none;
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
-    opacity: 1;
-    r: 35px;
-    cx: 40px;
-    cy: 40px;
-    transform-origin: center;
-}
-
-.services-wrapper .slider-button .slider-svg-arrow {
-    transition: 0.5s;
-    fill: var(--progress-color);
-    transform-origin: center;
-}
-
-.services-wrapper .slider-button-prev {
-    left: 40px;
-}
-
-.services-wrapper .slider-button-next {
-    right: 40px;
-}
-
-.services-wrapper .slider-button-prev .slider-svg-arrow {
-    transform: rotate(180deg);
-}
-
-.services-wrapper .slider-button:hover .slider-svg-circle-wrap {
-    transform: scale(1.1);
-}
-
-.services-wrapper .slider-button:hover circle {
-    stroke-dasharray: 4px;
-    stroke-dashoffset: 4px;
-    opacity: 1;
-}
-
-.services-wrapper .swiper-pagination {
-    text-align: center;
-    bottom: 20px !important;
-}
-
-.services-wrapper .swiper-pagination .swiper-pagination-bullet {
-    width: 10px;
-    height: 10px;
-    margin: 0 5px;
-    background: rgba(255,255,255,0.4);
-    opacity: 1;
-    transition: 0.3s;
-}
-
-.services-wrapper .swiper-pagination .swiper-pagination-bullet.swiper-pagination-bullet-active {
-    background: var(--progress-color);
-    width: 30px;
-    border-radius: 5px;
-}
-
-.services-wrapper .autoplay-progress-bar {
-    --progress: 0;
-    height: 4px;
-    width: var(--progress);
-    background-color: var(--progress-color);
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 30;
-    transition: width 0.1s linear;
-}
-
-.floating {
-    animation: floatAnim 6s ease-in-out infinite;
-}
-
-.slide {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    perspective: 1000px;
-}
-
-.services-wrapper .card {
-    position: relative;
-    margin: auto;
-    height: 600px;
-    width: 80vw;
-    max-width: 1100px;
-    border-radius: 50px;
-    overflow: hidden;
-    box-shadow: 0 30px 60px -15px rgba(0,0,0,0.5);
-    background: #0F172A;
-    transition: background 0.5s ease;
-}
-
-.svg-wrapper {
-    width: 100%;
-    height: 100%;
-    text-align: center;
-    position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    top: -10%;
-    pointer-events: none;
-}
-
-.slide:nth-child(odd) .svg-wrapper {
-    left: -20%;
-}
-.slide:nth-child(even) .svg-wrapper {
-    right: -20%;
-    left: auto;
-}
-
-.img-container {
-    width: 450px;
-    height: 450px;
-    border-radius: 50%;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.img-container img {
-    width: 380px;
-    height: 380px;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 8px solid rgba(255,255,255,0.1);
-    box-shadow: 0 0 50px rgba(0,0,0,0.3);
-}
-
-.card-content {
-    max-width: 450px;
-    width: 100%;
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
-    padding: 0 40px;
-    z-index: 10;
-}
-
-.slide:nth-child(odd) .card-content {
-    margin-left: auto;
-    text-align: right;
-    align-items: flex-end;
-    display: flex;
-    flex-direction: column;
-}
-.slide:nth-child(even) .card-content {
-    margin-right: auto;
-    margin-left: 5%;
-    text-align: left;
-}
-
-.card-ghost-info {
-    position: absolute;
-    bottom: 8%;
-    line-height: 1.4;
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: 400;
-}
-
-.ghost-name {
-    font-size: 18px;
-    text-transform: uppercase;
-    margin-bottom: 5px;
-    font-weight: 800;
-    letter-spacing: 1px;
-}
-
-.card-ghost-info span {
-    height: 50px;
-    display: inline-block;
-    width: 2px;
-    background-color: var(--color);
-    position: absolute;
-    bottom: 0px;
-}
-.card-ghost-info span:before {
-    content: "";
-    height: 6px;
-    width: 6px;
-    background-color: var(--color);
-    position: absolute;
-    top: 0px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-radius: 50%;
-}
-
-.slide:nth-child(odd) .card-ghost-info {
-    left: 8%;
-    text-align: right;
-}
-.slide:nth-child(odd) .card-ghost-info span {
-    right: -20px;
-}
-.slide:nth-child(even) .card-ghost-info {
-    right: 8%;
-    text-align: left;
-}
-.slide:nth-child(even) .card-ghost-info span {
-    left: -20px;
-}
-
-.card-title {
-    color: var(--color);
-    font-weight: 900;
-    font-size: clamp(32px, 5vw, 64px);
-    line-height: 1.1;
-    margin: 10px 0 20px;
-    text-transform: uppercase;
-    position: relative;
-    letter-spacing: -1px;
-    text-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-
-.card-sub-title {
-    color: #fff;
-    text-transform: uppercase;
-    font-weight: 700;
-    font-size: 14px;
-    letter-spacing: 2px;
-    background: rgba(255,255,255,0.1);
-    padding: 5px 12px;
-    border-radius: 4px;
-    display: inline-block;
-    backdrop-filter: blur(5px);
-}
-
-.card-description {
-    color: rgba(255,255,255,0.9);
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 1.6;
-    max-width: 400px;
-    margin-bottom: 20px;
-}
-
-.cta-button {
-    display: inline-flex;
-    padding: 16px 40px;
-    background-color: var(--color);
-    color: #fff;
-    font-size: 14px;
-    text-decoration: none;
-    align-items: center;
-    justify-content: center;
-    text-transform: uppercase;
-    font-weight: 800;
-    letter-spacing: 1px;
-    border-radius: 50px;
-    box-shadow: 0 10px 20px -5px rgba(0,0,0,0.3);
-    transition: all 0.3s ease;
-    cursor: pointer;
-    border: none;
-}
-
-.cta-button:hover {
-    background-color: #fff;
-    color: var(--color);
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px -5px rgba(0,0,0,0.4);
-}
-
-@keyframes floatAnim {
-    0%, 100% { transform: translateY(-20px); }
-    50% { transform: translateY(20px); }
-}
-
-@keyframes swing {
-    0%, 100% { transform: rotate(5deg); }
-    50% { transform: rotate(-5deg); }
-}
-
-@keyframes mouseScroll {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(14px); }
-}
-
-.mouse-scroll {
-    position: absolute;
-    bottom: 20px;
-    right: 0;
-    left: 0;
-    margin: 0 auto;
-    text-align: center;
-    color: var(--progress-color);
-    font-size: 10px;
-    text-transform: uppercase;
-    font-weight: 600;
-    z-index: 20;
-    pointer-events: none;
-}
-.mouse {
-    width: 26px;
-    height: 40px;
-    border-radius: 15px;
-    border: 2px solid var(--progress-color);
-    position: relative;
-    margin: 0 auto 10px;
-}
-.mouse .roll {
-    position: absolute;
-    top: 8px;
-    left: 50%;
-    width: 4px;
-    margin-left: -2px;
-    height: 4px;
-    border-radius: 50%;
-    background: var(--progress-color);
-    animation: mouseScroll 1s cubic-bezier(0.7, 0, 0.3, 1) infinite alternate;
-}
-
-@media (max-width: 900px) {
-    .services-wrapper .card {
-        height: auto;
-        min-height: 520px;
-        width: 94vw;
-        border-radius: 30px;
-        padding-bottom: 20px;
-    }
-    .svg-wrapper {
-        position: relative;
-        top: 0;
-        left: 0 !important;
-        right: 0 !important;
-        height: 35vh;
-        min-height: 250px;
-        margin-top: 10px;
-    }
-    .img-container {
-        width: 240px;
-        height: 240px;
-    }
-    .img-container img {
-        width: 200px;
-        height: 200px;
-        border-width: 4px;
-    }
-    .card-content {
-        top: 0;
-        transform: none;
-        max-width: 100%;
-        text-align: center !important;
-        align-items: center !important;
-        margin: 0 !important;
-        padding: 20px;
-        height: auto;
-    }
-    .card-title {
-        font-size: 28px;
-        margin: 10px 0;
-    }
-    .card-description {
-        font-size: 14px;
-    }
-    .card-ghost-info, .mouse-scroll, .slider-button {
-        display: none;
-    }
-}
-`;
-
-// Helper: Map Category to Color Theme
+// --- HELPER: MAP CATEGORY TO COLOR ---
 const getTheme = (category: string) => {
     switch(category) {
-        case 'Surgery': return { bg: 'linear-gradient(331deg, #0f172a 0%, #1e3a8a 100%)', accent: '#60A5FA' }; // Blue
-        case 'Endodontics': return { bg: 'linear-gradient(331deg, #2e1065 0%, #7e22ce 100%)', accent: '#C084FC' }; // Purple
-        case 'Orthodontics': return { bg: 'linear-gradient(331deg, #312e81 0%, #4f46e5 100%)', accent: '#818CF8' }; // Indigo
-        case 'Cosmetic': return { bg: 'linear-gradient(331deg, #0891b2 0%, #06b6d4 100%)', accent: '#67E8F9' }; // Cyan
-        case 'Kids': 
-        case 'Pediatrics': return { bg: 'linear-gradient(331deg, #7c2d12 0%, #ea580c 100%)', accent: '#FB923C' }; // Orange
-        case 'Restorative': return { bg: 'linear-gradient(331deg, #115e59 0%, #0d9488 100%)', accent: '#2DD4BF' }; // Teal
-        case 'Preventive': return { bg: 'linear-gradient(331deg, #064e3b 0%, #10b981 100%)', accent: '#34D399' }; // Green
-        case 'Wellness': return { bg: 'linear-gradient(331deg, #831843 0%, #db2777 100%)', accent: '#F472B6' }; // Pink
-        default: return { bg: 'linear-gradient(331deg, #1e293b 0%, #475569 100%)', accent: '#94A3B8' }; // Slate
+        case 'Surgery': return { from: '#0f172a', to: '#1e3a8a', accent: '#60A5FA', glow: 'rgba(96, 165, 250, 0.5)' };
+        case 'Endodontics': return { from: '#2e1065', to: '#7e22ce', accent: '#C084FC', glow: 'rgba(192, 132, 252, 0.5)' };
+        case 'Orthodontics': return { from: '#312e81', to: '#4f46e5', accent: '#818CF8', glow: 'rgba(129, 140, 248, 0.5)' };
+        case 'Cosmetic': return { from: '#0891b2', to: '#06b6d4', accent: '#67E8F9', glow: 'rgba(103, 232, 249, 0.5)' };
+        case 'Pediatrics': return { from: '#7c2d12', to: '#ea580c', accent: '#FB923C', glow: 'rgba(251, 146, 60, 0.5)' };
+        default: return { from: '#1e293b', to: '#475569', accent: '#94A3B8', glow: 'rgba(148, 163, 184, 0.5)' };
     }
 };
 
-// Helper: Map Category to Icon
 const getCategoryIcon = (category: string) => {
     switch(category) {
         case 'Surgery': return Activity;
@@ -485,158 +28,90 @@ const getCategoryIcon = (category: string) => {
         case 'Orthodontics': return Smile;
         case 'Cosmetic': return Sparkles;
         case 'Pediatrics': return Users;
-        case 'Restorative': return Shield;
-        case 'Preventive': return HeartPulse;
-        case 'Wellness': return ScanLine;
         default: return Zap;
     }
 };
 
-interface ExtendedServiceItem {
-    id: string;
-    title: string;
-    subTitle: string;
-    description: string;
-    icon: React.ElementType;
-    bg: string;
-    accent: string;
-    features: string[];
-    image: string;
-    keywords: string[];
-    category: string;
-    treatmentId: string;
-}
-
-interface ServicesProps {
-    onServiceClick?: (id: string) => void;
-}
-
-const Services: React.FC<ServicesProps> = ({ onServiceClick }) => {
+const Services = () => {
     const router = useRouter();
-    const sectionRef = useRef<HTMLDivElement>(null);
-    const progressCircle = useRef<SVGSVGElement>(null);
-    const progressBar = useRef<HTMLDivElement>(null);
-    const progressContent = useRef<HTMLSpanElement>(null);
-    const swiperRef = useRef<any>(null);
-
-    const [searchQuery, setSearchQuery] = useState('');
-    const [activeFilter, setActiveFilter] = useState('All');
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [filter, setFilter] = useState('All');
+    const [isDragging, setIsDragging] = useState(false);
     
-    // --- 1. DYNAMIC DATA MAPPING ---
-    const allServices: ExtendedServiceItem[] = useMemo(() => {
-        return Object.values(treatmentsData).map((t) => {
-            const theme = getTheme(t.category);
-            const Icon = getCategoryIcon(t.category);
-            
-            return {
-                id: t.id,
-                treatmentId: t.id,
-                title: t.title,
-                subTitle: t.subtitle,
-                description: t.description,
-                icon: Icon,
-                bg: theme.bg,
-                accent: theme.accent,
-                features: t.benefits.slice(0, 3), // Take top 3 benefits
-                image: t.heroImage,
-                keywords: t.keywords,
-                category: t.category
-            };
-        });
-    }, []);
+    // --- DATA PREP ---
+    const services = useMemo(() => Object.values(treatmentsData).map(t => ({
+        ...t,
+        theme: getTheme(t.category),
+        Icon: getCategoryIcon(t.category)
+    })), []);
 
-    const [filteredServices, setFilteredServices] = useState<ExtendedServiceItem[]>(allServices);
+    const filteredServices = useMemo(() => {
+        if (filter === 'All') return [...services, ...services]; // Duplicate for infinite loop illusion
+        return services.filter(s => s.category === filter);
+    }, [filter, services]);
 
-    // --- 2. DYNAMIC CATEGORIES ---
-    const filterCategories = useMemo(() => {
-        const uniqueCats = Array.from(new Set(allServices.map(s => s.category)));
-        return ['All', ...uniqueCats];
-    }, [allServices]);
+    const categories = ['All', ...Array.from(new Set(services.map(s => s.category)))];
 
+    // --- ANIMATION CONTROLS ---
+    const x = useMotionValue(0);
+    const velocity = useRef(0.5); // Base scroll speed
+    const frameRef = useRef(0);
+
+    // Auto-scroll logic
     useEffect(() => {
-        const query = searchQuery.toLowerCase();
-        const filtered = allServices.filter(service => {
-            const matchesSearch = service.title.toLowerCase().includes(query) || 
-                                  service.keywords.some(k => k.toLowerCase().includes(query));
-            const matchesCategory = activeFilter === 'All' || service.category === activeFilter;
-            
-            return matchesSearch && matchesCategory;
-        });
-        setFilteredServices(filtered);
-        
-        if(swiperRef.current && swiperRef.current.swiper) {
-            swiperRef.current.swiper.slideTo(0);
-        }
-    }, [searchQuery, activeFilter, allServices]);
+        const loop = () => {
+            if (!isDragging) {
+                let newX = x.get() - velocity.current;
+                
+                // Infinite loop reset logic
+                const contentWidth = filteredServices.length * 420; // Card width + gap
+                if (newX <= -contentWidth / 2 && filter === 'All') {
+                    newX = 0;
+                }
+                
+                x.set(newX);
+            }
+            frameRef.current = requestAnimationFrame(loop);
+        };
+        loop();
+        return () => cancelAnimationFrame(frameRef.current);
+    }, [isDragging, filter, filteredServices.length]);
 
-    const onAutoplayTimeLeft = (s: any, time: number, progress: number) => {
-        if (progressCircle.current) {
-            progressCircle.current.style.setProperty("--progress", String(1 - progress));
-        }
-        if (progressContent.current) {
-            progressContent.current.textContent = `${Math.ceil(time / 1000)}s`;
-        }
-        if (progressBar.current) {
-            progressBar.current.style.setProperty("--progress", `${(1 - progress) * 100}%`);
-        }
-    };
-
-    const handleSlideChange = (swiper: any) => {
-         const activeIndex = swiper.realIndex;
-         const currentService = filteredServices.length > 0 
-            ? (filteredServices[activeIndex] || filteredServices[0])
-            : allServices[0];
-         
-         if (sectionRef.current && currentService) {
-            sectionRef.current.style.setProperty("--progress-color", currentService.accent);
-            sectionRef.current.style.background = currentService.bg;
-         }
-    };
-
-    const handleClick = (id: string) => {
-        if (onServiceClick) {
-            onServiceClick(id);
-        } else {
-            router.push(`/treatments/${id}`);
-        }
+    const handleDragStart = () => setIsDragging(true);
+    const handleDragEnd = () => {
+        setIsDragging(false);
+        // Add momentum snap logic here if desired
     };
 
     return (
-        <section 
-            id="services" 
-            ref={sectionRef} 
-            className="services-wrapper relative py-16 lg:py-20 w-full overflow-hidden flex flex-col items-center justify-center transition-all duration-700"
-            style={{ 
-                background: allServices[0]?.bg,
-                "--progress-color": allServices[0]?.accent 
-            } as React.CSSProperties}
-        >
-            <style jsx>{cssStyles}</style>
+        <section className="relative min-h-screen bg-[#020617] overflow-hidden flex flex-col justify-center py-20">
+            
+            {/* BACKGROUND EFFECTS */}
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-blue-500/10 blur-[120px] rounded-full pointer-events-none"></div>
 
-            {/* Search & Filter Header (Overlay) */}
-            <div className="absolute top-0 pt-6 lg:pt-8 w-full z-20 flex flex-col items-center pointer-events-none px-4">
-                <h3 className="text-white/60 font-bold tracking-widest text-[10px] lg:text-xs uppercase mb-3">Our Expertise</h3>
-                
-                <div className="pointer-events-auto relative w-full max-w-sm lg:max-w-md mb-3 lg:mb-4">
-                    <input 
-                        type="text" 
-                        placeholder="Search by symptom..." 
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-full py-2.5 lg:py-3 pl-10 lg:pl-12 pr-6 text-white placeholder-white/50 text-sm focus:outline-none focus:bg-white/20 focus:border-white/40 transition-all shadow-lg"
-                    />
-                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70" />
-                </div>
+            {/* HEADER & FILTERS */}
+            <div className="container mx-auto px-6 mb-16 relative z-20 text-center">
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-blue-400 font-bold text-xs uppercase tracking-widest mb-6"
+                >
+                    <ScanLine size={14} /> Clinical Protocols v4.0
+                </motion.div>
+                <h2 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter">
+                    Precision <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500">Medicine.</span>
+                </h2>
 
-                <div className="pointer-events-auto flex flex-wrap gap-1.5 lg:gap-2 justify-center max-w-2xl px-2">
-                    {filterCategories.map(cat => (
+                <div className="flex flex-wrap justify-center gap-3">
+                    {categories.map((cat) => (
                         <button
                             key={cat}
-                            onClick={() => setActiveFilter(cat)}
-                            className={`px-3 py-1 lg:px-4 lg:py-1.5 rounded-full text-[10px] lg:text-xs font-bold uppercase tracking-wider transition-all border ${
-                                activeFilter === cat 
-                                    ? 'bg-white text-slate-900 border-white scale-105 shadow-md' 
-                                    : 'bg-transparent text-white/70 border-white/20 hover:bg-white/10 hover:border-white/40'
+                            onClick={() => { setFilter(cat); x.set(0); }}
+                            className={`px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+                                filter === cat 
+                                ? 'bg-white text-black scale-105 shadow-xl' 
+                                : 'bg-white/5 text-slate-400 hover:bg-white/10'
                             }`}
                         >
                             {cat}
@@ -645,133 +120,97 @@ const Services: React.FC<ServicesProps> = ({ onServiceClick }) => {
                 </div>
             </div>
 
-            <div className="autoplay-progress-bar" ref={progressBar}></div>
-
-            {filteredServices.length > 0 ? (
-                <Swiper
-                    ref={swiperRef}
-                    modules={[EffectCoverflow, Autoplay, Pagination, Navigation, Keyboard]}
-                    effect="coverflow"
-                    grabCursor={true}
-                    centeredSlides={true}
-                    slidesPerView={1} 
-                    speed={1000}
-                    coverflowEffect={{
-                        rotate: 50,
-                        stretch: 0,
-                        depth: 100,
-                        modifier: 1,
-                        slideShadows: true,
-                    }}
-                    keyboard={{ enabled: true }}
-                    autoplay={{
-                        delay: 6000,
-                        disableOnInteraction: false,
-                        pauseOnMouseEnter: true
-                    }}
-                    pagination={{ clickable: true }}
-                    navigation={{
-                        nextEl: '.slider-button-next',
-                        prevEl: '.slider-button-prev',
-                    }}
-                    onAutoplayTimeLeft={onAutoplayTimeLeft}
-                    onSlideChange={handleSlideChange}
-                    className="w-full h-full swiper"
-                >
-                    {filteredServices.map((service) => (
-                        <SwiperSlide key={service.id} className="slide">
-                            <div 
-                                className="card" 
-                                style={{ background: service.bg, "--color": service.accent } as React.CSSProperties}
-                            >
-                                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                                    <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-white/5 rounded-full blur-[100px] animate-pulse"></div>
-                                </div>
-
-                                <div className="svg-wrapper floating">
-                                    <div className="img-container swing">
-                                        <div className="absolute inset-0 rounded-full border border-white/20 animate-[spin_10s_linear_infinite]"></div>
-                                        <img src={service.image} alt={service.title} />
-                                        <div className="absolute -bottom-4 right-10 bg-white p-3 lg:p-4 rounded-full shadow-lg">
-                                            <service.icon size={24} className="lg:w-8 lg:h-8" style={{ color: service.accent }} />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="card-content">
-                                    <div className="card-sub-title">{service.subTitle}</div>
-                                    <h2 className="card-title" data-text={service.title}>{service.title}</h2>
-                                    <p className="card-description">
-                                        {service.description}
-                                    </p>
-                                    <div className="card-cta">
-                                        <button 
-                                            className="cta-button"
-                                            onClick={() => handleClick(service.treatmentId)}
-                                        >
-                                            Learn More
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="card-ghost-info">
-                                    <span></span>
-                                    <div className="ghost-name">Highlights</div>
-                                    <div className="flex flex-col gap-1">
-                                        {service.features.map((f, i) => (
-                                            <div key={i} className="opacity-80 text-xs">• {f}</div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        </SwiperSlide>
-                    ))}
-
-                    <div className="slider-button slider-button-prev">
-                        <svg viewBox="0 0 100 100">
-                            <g className="slider-svg-circle-wrap">
-                                <circle cx="50" cy="50" r="45"></circle>
-                            </g>
-                            <path className="slider-svg-arrow" d="M35 50 L65 30 L65 70 Z"/>
-                        </svg>
-                    </div>
-                    <div className="slider-button slider-button-next">
-                        <svg viewBox="0 0 100 100">
-                            <g className="slider-svg-circle-wrap">
-                                <circle cx="50" cy="50" r="45"></circle>
-                            </g>
-                            <path className="slider-svg-arrow" d="M35 50 L65 30 L65 70 Z"/>
-                        </svg>
-                    </div>
-                </Swiper>
-            ) : (
-                <div className="relative z-10 flex flex-col items-center justify-center h-[500px] text-white">
-                    <Filter size={64} className="mb-4 opacity-50" />
-                    <h3 className="text-2xl font-bold mb-2">No treatments found</h3>
-                    <p className="text-white/60 mb-6">Try adjusting your search or filter.</p>
-                    <button 
-                        onClick={() => { setSearchQuery(''); setActiveFilter('All'); }}
-                        className="px-6 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full transition-all text-sm font-bold uppercase tracking-wider"
-                    >
-                        Clear Filters
-                    </button>
-                </div>
-            )}
-
-            <div className="autoplay-progress">
-                <svg viewBox="0 0 48 48" ref={progressCircle}>
-                    <circle cx="24" cy="24" r="20"></circle>
-                </svg>
-                <span ref={progressContent}></span>
+            {/* THE SCANNER BEAM (Visual Anchor) */}
+            <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-blue-500/50 to-transparent z-10 pointer-events-none hidden md:block">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[800px] border-x border-blue-500/10 rounded-[4rem]"></div>
             </div>
 
-            <div className="mouse-scroll">
-                <div className="mouse">
-                    <div className="roll"></div>
-                </div>
-                <span>Discover Treatments</span>
+            {/* INFINITE STREAM */}
+            <div className="relative w-full h-[600px] flex items-center overflow-visible cursor-grab active:cursor-grabbing" ref={containerRef}>
+                <motion.div 
+                    className="flex gap-10 px-[50vw]"
+                    style={{ x }}
+                    drag="x"
+                    dragConstraints={{ left: -10000, right: 10000 }} // Infinite drag feel
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                >
+                    {filteredServices.map((service, idx) => (
+                        <ServiceCard key={`${service.id}-${idx}`} service={service} router={router} />
+                    ))}
+                </motion.div>
+            </div>
+
+            {/* FOOTER HINT */}
+            <div className="absolute bottom-10 left-0 w-full text-center text-slate-500 text-xs font-bold uppercase tracking-widest flex justify-center items-center gap-2 animate-pulse">
+                <MousePointer2 size={14} /> Drag to Explore
             </div>
         </section>
+    );
+};
+
+// --- SUB-COMPONENT: HOLOGRAPHIC CARD ---
+const ServiceCard = ({ service, router }: { service: any, router: any }) => {
+    return (
+        <div 
+            className="group relative w-[400px] h-[550px] shrink-0 rounded-[3rem] p-1 bg-[#0B1019] border border-white/5 hover:border-white/20 transition-all duration-500 hover:-translate-y-4 hover:shadow-2xl"
+            onClick={() => router.push(`/treatments/${service.id}`)}
+        >
+            {/* Glow Effect on Hover */}
+            <div 
+                className="absolute inset-0 rounded-[3rem] opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl -z-10"
+                style={{ background: `radial-gradient(circle at center, ${service.theme.glow}, transparent 70%)` }}
+            ></div>
+
+            <div className="relative h-full w-full bg-[#0B1019] rounded-[2.8rem] overflow-hidden flex flex-col">
+                {/* Image Area */}
+                <div className="h-[280px] relative overflow-hidden">
+                    <img 
+                        src={service.heroImage} 
+                        alt={service.title} 
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-60 group-hover:opacity-100" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B1019] via-transparent to-transparent"></div>
+                    
+                    {/* Floating Category Badge */}
+                    <div className="absolute top-6 right-6 px-4 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/10 text-[10px] font-bold uppercase tracking-widest text-white">
+                        {service.category}
+                    </div>
+                </div>
+
+                {/* Content Area */}
+                <div className="p-8 flex flex-col flex-grow">
+                    <div 
+                        className="w-12 h-12 rounded-xl flex items-center justify-center mb-6 transition-transform duration-500 group-hover:scale-110"
+                        style={{ background: `${service.theme.accent}20`, color: service.theme.accent }}
+                    >
+                        <service.Icon size={24} />
+                    </div>
+
+                    <h3 className="text-3xl font-bold text-white mb-3 leading-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-slate-400 transition-all">
+                        {service.title}
+                    </h3>
+                    
+                    <p className="text-slate-400 text-sm leading-relaxed mb-6 line-clamp-2">
+                        {service.description}
+                    </p>
+
+                    {/* Reveal on Hover Features */}
+                    <div className="mt-auto space-y-2 opacity-60 group-hover:opacity-100 transition-opacity duration-500">
+                        {service.benefits.slice(0, 2).map((b: string, i: number) => (
+                            <div key={i} className="flex items-center gap-2 text-xs font-bold text-slate-300 uppercase tracking-wide">
+                                <div className="w-1 h-1 rounded-full bg-white"></div> {b}
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Explore Button */}
+                    <div className="mt-8 flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em]" style={{ color: service.theme.accent }}>
+                        Explore Protocol <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 };
 
