@@ -1,10 +1,9 @@
-// app/treatments/page.tsx
 'use client';
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { treatmentsData } from '@/data/treatments';
-import { ArrowRight, Activity, Clock, Microscope, Search, Stethoscope } from 'lucide-react';
+import { ArrowRight, Activity, Clock, Microscope, Search, Stethoscope, Sparkles, ShieldCheck, ChevronRight } from 'lucide-react';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
 
 const TreatmentsPage = () => {
@@ -27,38 +26,66 @@ const TreatmentsPage = () => {
   }, [filter, searchQuery, treatmentsList]);
 
   return (
-    <div className="pt-32 pb-24 min-h-screen bg-slate-50 dark:bg-[#020617] transition-colors duration-500">
-      <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16">
+    <div className="relative min-h-screen bg-slate-50 dark:bg-[#020617] transition-colors duration-500 overflow-hidden">
+      
+      {/* Technical Background Grid - Adds "Precision" feel */}
+      <div className="absolute inset-0 z-0 opacity-40 dark:opacity-10 pointer-events-none bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:20px_20px]"></div>
+      
+      {/* Gradient Blobs for Depth */}
+      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div className="relative z-10 pt-32 pb-24 max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16">
         
-        {/* Advanced Clinical Header */}
-        <header className="mb-24">
+        {/* Header Section */}
+        <header className="mb-20">
           <RevealOnScroll>
-            <div className="grid lg:grid-cols-2 gap-16 items-end">
-               <div>
-                  <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-blue-600/10 border border-blue-600/20 text-blue-600 dark:text-cyan-400 font-black text-[10px] uppercase tracking-[0.4em] mb-8">
-                    <Stethoscope size={14}/> Surgical Catalog v4.0
+            <div className="flex flex-col lg:flex-row gap-12 lg:items-end justify-between">
+               <div className="max-w-3xl">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 font-bold text-[10px] uppercase tracking-[0.2em] mb-6 shadow-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                    System Operational
                   </div>
-                  <h1 className="text-6xl md:text-[7rem] font-black text-slate-900 dark:text-white leading-[0.9] tracking-tighter mb-8">
-                    Dental <br/>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500">Protocols.</span>
+                  <h1 className="text-5xl md:text-7xl lg:text-[6rem] font-bold text-slate-900 dark:text-white leading-[0.9] tracking-tight mb-6">
+                    Clinical <br/>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500">Inventory.</span>
                   </h1>
-                  <p className="text-xl text-slate-500 dark:text-slate-400 max-w-2xl font-medium leading-tight">
-                    Evidence-based procedures designed for biological longevity and patient comfort.
+                  <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-xl font-medium leading-relaxed">
+                    A curated index of evidence-based dental protocols, optimized for biological longevity and patient comfort.
                   </p>
                </div>
                
-               <div className="space-y-8">
-                  <div className="relative group">
-                     <Search size={20} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+               {/* Floating Control Panel */}
+               <div className="w-full lg:w-auto flex flex-col gap-6">
+                  <div className="relative group min-w-[320px]">
+                     <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                        <Search size={18} className="text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                     </div>
                      <input 
                         type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Describe symptoms (e.g. 'Toothache')..."
-                        className="w-full bg-white dark:bg-[#151b2b] border border-slate-200 dark:border-white/5 rounded-[3rem] py-5 pl-14 pr-8 text-base font-bold shadow-xl focus:ring-4 focus:ring-blue-600/10 outline-none transition-all dark:text-white"
+                        placeholder="Search protocols or symptoms..."
+                        className="w-full bg-white/80 dark:bg-[#151b2b]/80 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl py-4 pl-12 pr-6 text-sm font-semibold shadow-lg shadow-slate-200/50 dark:shadow-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all dark:text-white"
                      />
+                     <div className="absolute inset-y-0 right-3 flex items-center">
+                        <div className="px-2 py-1 rounded bg-slate-100 dark:bg-white/10 text-[10px] font-bold text-slate-400 border border-slate-200 dark:border-white/5">CMD+K</div>
+                     </div>
                   </div>
+
                   <div className="flex flex-wrap gap-2">
                       {categories.map(cat => (
-                         <button key={cat} onClick={() => setFilter(cat)} className={`px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border ${filter === cat ? 'bg-blue-600 text-white border-blue-600 shadow-xl' : 'bg-white dark:bg-white/5 text-slate-500 border-slate-200 dark:border-white/10 hover:border-blue-600'}`}>{cat}</button>
+                         <button 
+                            key={cat} 
+                            onClick={() => setFilter(cat)} 
+                            className={`
+                              relative px-5 py-2.5 rounded-xl text-[11px] font-bold transition-all duration-300
+                              ${filter === cat 
+                                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg shadow-slate-900/20 scale-105' 
+                                : 'bg-white dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white'
+                              }
+                            `}
+                          >
+                            {cat}
+                         </button>
                       ))}
                   </div>
                </div>
@@ -66,36 +93,69 @@ const TreatmentsPage = () => {
           </RevealOnScroll>
         </header>
 
-        {/* Treatment Grid - UPDATED FOR COMPACTNESS */}
+        {/* Treatment Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredList.map((item: any, idx: number) => (
             <RevealOnScroll key={item.id} delay={idx * 50}>
               <Link href={`/treatments/${item.id}`} className="block h-full">
                 <div 
-                  className="group relative bg-white dark:bg-[#0B1019] rounded-3xl overflow-hidden cursor-pointer border border-slate-100 dark:border-white/5 hover:border-blue-500/40 transition-all duration-500 shadow-sm hover:shadow-xl flex flex-col h-full hover:-translate-y-2"
+                  className="group relative bg-white dark:bg-[#0f1420] rounded-[1.5rem] overflow-hidden cursor-pointer border border-slate-200 dark:border-slate-800 hover:border-blue-500/30 transition-all duration-500 shadow-sm hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] flex flex-col h-full hover:-translate-y-1"
                 >
-                  {/* Compact Image Height */}
-                  <div className="relative h-52 overflow-hidden">
-                    <img src={item.heroImage} alt={item.title} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B1019] via-transparent to-transparent opacity-60"></div>
-                    <div className="absolute top-4 left-4 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-[9px] font-black uppercase tracking-widest text-white">{item.category}</div>
-                  </div>
-                  
-                  {/* Reduced Padding and Font Sizes */}
-                  <div className="p-6 md:p-8 flex flex-col flex-1">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400 text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5">
-                           <Activity size={10}/> {item.stats?.[2]?.value || '99%'} Success
-                        </div>
-                        <span className="text-[9px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-1.5"><Clock size={10}/> Fast Recovery</span>
+                  {/* Image Section */}
+                  <div className="relative h-48 overflow-hidden bg-slate-100">
+                    <img src={item.heroImage} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    
+                    {/* Dark Overlay Gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0f1420] via-transparent to-transparent opacity-40"></div>
+                    
+                    {/* Status Badge */}
+                    <div className="absolute top-4 left-4">
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/90 dark:bg-black/60 backdrop-blur-md rounded-md border border-white/20 shadow-sm">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200">Active</span>
+                      </div>
                     </div>
                     
-                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-blue-600 transition-colors tracking-tight leading-tight">{item.title}</h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed mb-6 flex-1 line-clamp-3">{item.description}</p>
+                    {/* Category Tag */}
+                    <div className="absolute bottom-3 left-4">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-white/90 drop-shadow-md">{item.category}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Content Section */}
+                  <div className="p-5 md:p-6 flex flex-col flex-1">
+                    {/* ID & Title */}
+                    <div className="mb-4">
+                        <div className="text-[10px] font-mono font-medium text-blue-500 mb-1">PRTCL-{idx + 101}</div>
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors leading-tight">{item.title}</h3>
+                    </div>
+
+                    <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400 mb-6 line-clamp-2">{item.description}</p>
                     
-                    <div className="pt-6 border-t border-slate-50 dark:border-white/5 mt-auto flex justify-between items-center">
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 dark:text-cyan-400 flex items-center gap-2">View Protocol <ArrowRight size={12}/></span>
-                        <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all"><Microscope size={14}/></div>
+                    {/* Technical Vitals Grid */}
+                    <div className="mt-auto grid grid-cols-2 gap-px bg-slate-100 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 rounded-xl overflow-hidden">
+                        <div className="bg-slate-50 dark:bg-[#131825] p-3 flex flex-col gap-1 group/stat">
+                            <span className="text-[9px] font-bold uppercase text-slate-400 tracking-wider">Success Rate</span>
+                            <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
+                                <Activity size={12} className="group-hover/stat:animate-pulse" />
+                                <span className="text-xs font-black">{item.stats?.[2]?.value || '99%'}</span>
+                            </div>
+                        </div>
+                        <div className="bg-slate-50 dark:bg-[#131825] p-3 flex flex-col gap-1">
+                            <span className="text-[9px] font-bold uppercase text-slate-400 tracking-wider">Downtime</span>
+                            <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                                <Clock size={12} />
+                                <span className="text-xs font-black">Minimal</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* View Action */}
+                    <div className="mt-5 pt-4 border-t border-slate-100 dark:border-white/5 flex items-center justify-between opacity-60 group-hover:opacity-100 transition-opacity">
+                        <span className="text-[10px] font-bold text-slate-400 group-hover:text-blue-600 transition-colors flex items-center gap-2">
+                           View Details <ChevronRight size={12} />
+                        </span>
+                        <Sparkles size={12} className="text-blue-500" />
                     </div>
                   </div>
                 </div>
@@ -104,27 +164,41 @@ const TreatmentsPage = () => {
           ))}
         </div>
 
-        {/* Clinical Disclaimer */}
-        <footer className="mt-24 p-10 bg-slate-900 rounded-[3rem] text-white relative overflow-hidden group">
-           <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[100px] group-hover:scale-110 transition-transform"></div>
-           <div className="relative z-10 grid lg:grid-cols-2 gap-10 items-center">
-              <div>
-                 <h2 className="text-3xl font-black mb-4 tracking-tight">Quality Assurance Pulse.</h2>
-                 <p className="text-lg text-slate-400 leading-relaxed font-medium">Every procedure is logged via our Healthflo Dental OS and cross-verified against international ADA safety benchmarks.</p>
-              </div>
-              <div className="flex gap-10">
-                 <div>
-                    <div className="text-4xl font-black text-blue-400 mb-2">99.8%</div>
-                    <div className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em]">Safety Compliance</div>
+        {/* Enhanced Footer with Glassmorphism */}
+        <footer className="mt-20 relative rounded-3xl overflow-hidden">
+           <div className="absolute inset-0 bg-slate-900 dark:bg-[#0B1019]"></div>
+           {/* Animated Mesh Gradient Background */}
+           <div className="absolute inset-0 opacity-30">
+              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600 rounded-full mix-blend-screen filter blur-[100px] animate-pulse"></div>
+              <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-600 rounded-full mix-blend-screen filter blur-[100px]"></div>
+           </div>
+
+           <div className="relative z-10 p-10 md:p-14 flex flex-col md:flex-row justify-between items-center gap-10">
+              <div className="max-w-xl">
+                 <div className="flex items-center gap-3 mb-4 text-blue-400">
+                    <ShieldCheck size={24} />
+                    <span className="text-xs font-black uppercase tracking-[0.2em]">Verified Protocols</span>
                  </div>
-                 <div className="h-16 w-px bg-white/10"></div>
-                 <div>
-                    <div className="text-4xl font-black text-blue-400 mb-2">24/7</div>
-                    <div className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em]">Clinical Triage</div>
+                 <h2 className="text-3xl font-bold text-white mb-4">Quality Assurance Pulse.</h2>
+                 <p className="text-slate-400 text-sm leading-relaxed">
+                    Every procedure is logged via our Healthflo Dental OS and cross-verified against international ADA safety benchmarks to ensure consistent, premium outcomes.
+                 </p>
+              </div>
+              
+              <div className="flex items-center gap-8 md:gap-16">
+                 <div className="text-center md:text-left">
+                    <div className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-400 tracking-tight">99.8%</div>
+                    <div className="text-[10px] font-bold uppercase text-slate-500 tracking-[0.2em] mt-2">Safety Compliance</div>
+                 </div>
+                 <div className="h-12 w-px bg-white/10 hidden md:block"></div>
+                 <div className="text-center md:text-left">
+                    <div className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-400 tracking-tight">24/7</div>
+                    <div className="text-[10px] font-bold uppercase text-slate-500 tracking-[0.2em] mt-2">Clinical Triage</div>
                  </div>
               </div>
            </div>
         </footer>
+
       </div>
     </div>
   );
