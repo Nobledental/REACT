@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { 
   ArrowRight, Play, Pause, SkipBack, SkipForward, Heart, Share2, 
   Sparkles, Bookmark, Activity, ShieldAlert, ShieldCheck,
-  Scan, Database, Wifi, Zap, AlertTriangle,
+  Scan, Database, Wifi, ArrowDown, Zap, AlertTriangle,
   Microscope, Layers, Droplets, Skull, Anchor, X, CheckCircle,
   MessageCircle, Clock, Info, ChevronRight
 } from 'lucide-react';
