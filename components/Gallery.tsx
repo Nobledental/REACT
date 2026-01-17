@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
 
-// --- STYLES (Restored "Wide Card" Design) ---
+// --- STYLES ---
 const wideCardStyles = `
   .unified-player-card {
     background: #fff;
@@ -40,13 +40,17 @@ const wideCardStyles = `
     min-height: 300px;
     overflow: hidden;
   }
+  
+  /* The "Realistic Animation" Video */
   .player-video {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.8;
+    opacity: 0.9;
     transition: transform 0.7s ease;
   }
+  
+  /* Zoom effect on hover */
   .unified-player-card:hover .player-video {
     transform: scale(1.05);
   }
@@ -72,66 +76,83 @@ export default function Gallery() {
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // --- COMBINED PLAYLIST (Podcasts + Visual Journal Entries) ---
-  // We treat everything as a "Track" now for the single player view.
+  // --- PLAYLIST: ABSTRACT 3D ANIMATIONS (No Real Footage) ---
   const playlist = [
-    // --- PODCASTS ---
+    // 1. IMPLANTS -> Abstract Blue Tech (Engineering feel)
     {
       type: "audio",
       name: "The Bionic Tooth",
       artist: "Clinical Engineering",
       description: "Why titanium implants are the only permanent solution for bone loss. The biology of osseointegration.",
-      video: "/video/implants-cover.mp4",
+      // Free Abstract Tech Loop
+      video: "https://videos.pexels.com/video-files/3129671/3129671-hd_1920_1080_30fps.mp4",
+      poster: "https://images.pexels.com/photos/3129671/pexels-photo-3129671.jpeg?auto=compress&cs=tinysrgb&w=800", // SEO Image
       audio: "/audio/implants.mp3",
       category: "Surgery",
       tags: ['Implants', 'Biology', 'Titanium']
     },
+    // 2. ETHICS -> Abstract Glass/Mirrors (Reflection/Truth feel)
     {
       type: "audio",
       name: "The Instagram Trap",
       artist: "Dr. Deepak",
       description: "Are veneers worth it? How to avoid the 'Chiclet' look and why aggressive filing is irreversible.",
-      video: "/video/ethics-cover.mp4",
+      // Free Abstract Glass Loop
+      video: "https://videos.pexels.com/video-files/2759750/2759750-hd_1920_1080_30fps.mp4",
+      poster: "https://images.pexels.com/photos/2759750/pexels-photo-2759750.jpeg?auto=compress&cs=tinysrgb&w=800",
       audio: "/audio/ethics.mp3", 
       category: "Ethics",
       tags: ['Veneers', 'Myths', 'Cosmetic']
     },
-    // --- JOURNAL ENTRIES (Converted to "Visual Tracks") ---
-    // Since these don't have audio files, we can either:
-    // 1. Play a generic background track (e.g. ambient)
-    // 2. Just show the visual info (No audio playback)
-    // For this implementation, I will assign a generic background audio to them so the player UI remains consistent.
+    // 3. HEALTH -> Abstract Red Flow (Blood/Systemic feel)
+    {
+      type: "audio",
+      name: "The Heart-Mouth Loop",
+      artist: "Systemic Health",
+      description: "The proven link between bleeding gums, heart disease, and diabetes. Why hygiene is survival.",
+      // Free Abstract Fluid Loop
+      video: "https://videos.pexels.com/video-files/4762955/4762955-hd_1920_1080_30fps.mp4",
+      poster: "https://images.pexels.com/photos/4762955/pexels-photo-4762955.jpeg?auto=compress&cs=tinysrgb&w=800",
+      audio: "/audio/safety.mp3",
+      category: "Health",
+      tags: ['Heart', 'Diabetes', 'Gums']
+    },
+    // 4. JOURNAL: COST -> Abstract Gold/Money (Luxury feel)
     {
         type: "journal",
         name: "The Cost of Cheap Implants",
         artist: "Investigative Report",
         description: "Why ₹20k implants fail. Understanding Grade 5 Titanium vs. impure alloys that cause bone rejection.",
-        video: "/video/implants-cover.mp4", // Reusing video or use a generic one
-        audio: "/audio/safety.mp3", // Generic ambient background
+        video: "https://videos.pexels.com/video-files/5527749/5527749-hd_1920_1080_25fps.mp4",
+        poster: "https://images.pexels.com/photos/5527749/pexels-photo-5527749.jpeg?auto=compress&cs=tinysrgb&w=800",
+        audio: "/audio/safety.mp3", 
         category: "Surgery",
         tags: ['Safety', 'Cost', 'Titanium']
     },
+    // 5. JOURNAL: TECH -> Abstract Laser/Scanning (AI feel)
     {
         type: "journal",
         name: "The 3-Year Warning",
         artist: "Tech Analysis",
         description: "How AI scanners detect decay 3 years before it becomes visible to the naked eye.",
-        video: "/video/ai-cover.mp4",
-        audio: "/audio/ai.mp3", // Generic ambient background
+        video: "https://videos.pexels.com/video-files/2547367/2547367-hd_1920_1080_30fps.mp4",
+        poster: "https://images.pexels.com/photos/2547367/pexels-photo-2547367.jpeg?auto=compress&cs=tinysrgb&w=800",
+        audio: "/audio/ai.mp3", 
         category: "Technology",
         tags: ['AI', 'Laser', 'Future']
     },
+    // 6. JOURNAL: ORTHO -> Abstract Lines/Geometry (Physics feel)
     {
         type: "journal",
-        name: "Biofilm: The Silent Killer",
-        artist: "Hygiene Protocol",
-        description: "How untreated plaque enters your bloodstream and increases risks of stroke and heart valve infection.",
-        video: "/video/safety-cover.mp4",
-        audio: "/audio/safety.mp3",
-        category: "Hygiene",
-        tags: ['Heart', 'Health', 'Stroke']
-    },
-    // ... Add more journal entries here following this structure ...
+        name: "Invisible Physics",
+        artist: "Aligner Tech",
+        description: "The surprising engineering behind clear plastic. How aligners push teeth faster than metal pulls them.",
+        video: "https://videos.pexels.com/video-files/3163534/3163534-hd_1920_1080_30fps.mp4",
+        poster: "https://images.pexels.com/photos/3163534/pexels-photo-3163534.jpeg?auto=compress&cs=tinysrgb&w=800",
+        audio: "/audio/ortho.mp3",
+        category: "Ortho",
+        tags: ['Aligners', 'Physics', 'Speed']
+    }
   ];
 
   const currentTrack = playlist[currentTrackIndex];
@@ -140,7 +161,7 @@ export default function Gallery() {
   useEffect(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio(playlist[0].audio);
-      audioRef.current.volume = 0.2; // Low volume
+      audioRef.current.volume = 0.2; 
     }
 
     const audio = audioRef.current;
@@ -233,6 +254,7 @@ export default function Gallery() {
                     key={currentTrack.video} 
                     src={currentTrack.video} 
                     className="player-video" 
+                    poster={currentTrack.poster} /* SEO OPTIMIZATION */
                     autoPlay loop muted playsInline 
                   />
                   <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors"></div>
@@ -267,7 +289,7 @@ export default function Gallery() {
                   </div>
 
                   <div className="mt-8 pt-8 border-t border-slate-100 dark:border-white/5">
-                      {/* Progress Bar (Only for Audio tracks, or purely visual for journal) */}
+                      {/* Progress Bar (Visual only for journal, functional for audio) */}
                       <div className="relative h-2 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden mb-8 cursor-pointer group/bar">
                           <div className="absolute top-0 left-0 h-full bg-blue-600 transition-all duration-100 ease-linear group-hover/bar:bg-blue-500" style={{ width: barWidth }}></div>
                       </div>
