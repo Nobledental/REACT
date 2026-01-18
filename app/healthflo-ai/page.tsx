@@ -5,11 +5,69 @@ import Link from 'next/link';
 import { 
   Bot, Send, AlertCircle, CreditCard, ExternalLink, 
   ArrowLeft, Activity, Info, Mic, MicOff, Plus, 
-  Image as ImageIcon, RefreshCcw, Microscope, FileText, UserCircle2
+  Image as ImageIcon, RefreshCcw, Microscope, FileText, UserCircle2,
+  Sparkles, BrainCircuit, Zap, ChevronRight, MessageSquare, ShieldCheck,
+  Stethoscope
 } from 'lucide-react';
 import { sendMessageToAssistant } from '@/services/geminiService';
 import { ChatMessage } from '@/types';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
+
+const aiStyles = `
+  .ai-bg { 
+    background-color: #09090b; 
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0px, transparent 50%), 
+      radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+    background-attachment: fixed;
+  }
+  
+  .ai-sidebar-glass {
+    background: rgba(18, 18, 20, 0.7);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .message-bubble-user {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .message-bubble-ai {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+  }
+
+  .input-glow {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 4px 20px rgba(0, 0, 0, 0.5);
+    background: rgba(30, 30, 35, 0.8);
+    backdrop-filter: blur(20px);
+  }
+  .input-glow:focus-within {
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.5), 0 0 30px rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.5);
+  }
+
+  .typing-dot {
+    width: 6px;
+    height: 6px;
+    background: #94a3b8;
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out both;
+  }
+  .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+  .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+  
+  @keyframes typing {
+    0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+`;
 
 const HealthfloAiPage = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -42,7 +100,7 @@ const HealthfloAiPage = () => {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, isLoading]);
 
   const toggleListening = () => {
     if (isListening) {
@@ -84,7 +142,7 @@ const HealthfloAiPage = () => {
     } catch (error) {
       setMessages(prev => [...prev, { 
         role: 'model', 
-        text: "I'm sorry, I'm experiencing a high load. Please try again or call our clinic directly.", 
+        text: "I'm having trouble connecting to the clinical database right now. Please try again or contact the clinic directly at +91 86104 25342.", 
         timestamp: Date.now() 
       }]);
     } finally {
@@ -92,183 +150,178 @@ const HealthfloAiPage = () => {
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-[150] bg-[#131314] text-[#E3E3E3] flex font-sans overflow-hidden">
-      <style jsx>{`
-        .gemini-gradient {
-          background: linear-gradient(180deg, rgba(19, 19, 20, 0) 0%, #131314 100%);
-        }
-        .gemini-sidebar {
-          background: #1e1f20;
-          border-right: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .gemini-input-wrapper {
-          background: #1e1f20;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 2rem;
-          transition: all 0.2s ease;
-        }
-        .gemini-input-wrapper:focus-within {
-          background: #282a2d;
-          border-color: #4b90ff;
-        }
-        .message-icon {
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        @keyframes subtle-pulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.7; transform: scale(0.95); }
-        }
-        .ai-loading-glow {
-          animation: subtle-pulse 2s infinite ease-in-out;
-        }
-      `}</style>
+  const suggestions = [
+    { label: "Clinical Triage", text: "I have sharp pain when eating sweets.", icon: AlertCircle, color: "text-rose-400", bg: "bg-rose-500/10 border-rose-500/20" },
+    { label: "Procedure Info", text: "Explain the Root Canal process.", icon: Microscope, color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/20" },
+    { label: "Cost Estimate", text: "How much do ceramic braces cost?", icon: CreditCard, color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
+    { label: "Post-Op Care", text: "Care instructions after extraction?", icon: FileText, color: "text-amber-400", bg: "bg-amber-500/10 border-amber-500/20" }
+  ];
 
-      {/* Left Sidebar - Gemini Style */}
-      <aside className="hidden md:flex w-64 flex-col gemini-sidebar">
-        <div className="p-4 flex flex-col gap-4">
-          <Link href="/" className="p-2 hover:bg-white/5 rounded-full w-fit transition-colors">
-            <ArrowLeft size={20} />
+  return (
+    <div className="fixed inset-0 z-[150] ai-bg text-slate-200 flex font-sans overflow-hidden">
+      <style jsx global>{aiStyles}</style>
+
+      {/* --- LEFT SIDEBAR (Desktop) --- */}
+      <aside className="hidden md:flex w-72 flex-col ai-sidebar-glass z-20">
+        <div className="p-6">
+          <Link href="/" className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors mb-8 group">
+            <div className="p-2 rounded-xl bg-white/5 border border-white/10 group-hover:bg-white/10 transition-all">
+               <ArrowLeft size={18} />
+            </div>
+            <span className="font-bold text-sm tracking-wide">Back to Clinic</span>
           </Link>
           
-          <button onClick={resetChat} className="flex items-center gap-3 px-4 py-3 bg-white/5 hover:bg-white/10 rounded-full transition-all text-sm font-medium">
-            <Plus size={20} />
-            <span>New Chat</span>
+          <button 
+            onClick={resetChat} 
+            className="w-full flex items-center gap-3 px-4 py-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-all shadow-lg shadow-blue-500/20 font-medium group"
+          >
+            <Plus size={18} className="group-hover:rotate-90 transition-transform" />
+            <span>New Consultation</span>
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-2 py-4 no-scrollbar">
-          <div className="px-4 mb-4">
-            <h3 className="text-[11px] font-bold text-[#8E918F] uppercase tracking-wider">Recent Analysis</h3>
+        <div className="flex-1 overflow-y-auto px-4 py-2 no-scrollbar">
+          <div className="px-2 mb-4 flex items-center justify-between">
+            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Recent Sessions</h3>
           </div>
           <div className="space-y-1">
             {messages.length > 0 ? (
-              <div className="px-4 py-2 bg-white/5 rounded-lg text-sm truncate text-[#C4C7C5] cursor-pointer">
-                Current Dental Case
+              <div className="group flex items-center gap-3 px-3 py-3 bg-white/5 border border-white/5 rounded-xl text-sm text-slate-300 cursor-pointer hover:border-blue-500/30 transition-all">
+                <MessageSquare size={14} className="text-blue-400" />
+                <span className="truncate">Active Session</span>
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 ml-auto animate-pulse"></div>
               </div>
             ) : (
-              <p className="px-4 py-2 text-[11px] text-[#8E918F] italic">Logs populate as you chat...</p>
+              <div className="px-3 py-8 text-center border border-dashed border-white/5 rounded-xl">
+                 <p className="text-[11px] text-slate-600">No recent history</p>
+              </div>
             )}
           </div>
         </div>
 
-        <div className="p-4 flex flex-col gap-2">
-          <button className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 rounded-full transition-colors text-sm text-[#C4C7C5]">
-            <Info size={18} />
-            <span>Help</span>
-          </button>
-          <button className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 rounded-full transition-colors text-sm text-[#C4C7C5]">
-            <Activity size={18} />
-            <span>Activity</span>
-          </button>
-          <div className="pt-2 border-t border-white/5">
-             <div className="flex items-center gap-3 px-4 py-3 text-sm">
-                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-[10px] font-bold">PT</div>
-                <span>Patient Guest</span>
-             </div>
-          </div>
+        <div className="p-4 mt-auto border-t border-white/5 bg-black/20">
+           <div className="flex items-center gap-3 px-3 py-3 rounded-xl bg-white/5 border border-white/5">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-[10px] font-bold text-white shadow-inner">
+                 AI
+              </div>
+              <div>
+                 <div className="text-xs font-bold text-white">Healthflo v2.1</div>
+                 <div className="text-[10px] text-emerald-400 flex items-center gap-1">
+                    <span className="w-1 h-1 rounded-full bg-emerald-400"></span> Online
+                 </div>
+              </div>
+           </div>
         </div>
       </aside>
 
-      {/* Main Container */}
-      <main className="flex-1 flex flex-col relative bg-[#131314]">
+      {/* --- MAIN CHAT AREA --- */}
+      <main className="flex-1 flex flex-col relative">
+        
         {/* Mobile Header */}
-        <header className="md:hidden flex items-center justify-between p-4 bg-[#1e1f20]">
+        <header className="md:hidden flex items-center justify-between p-4 bg-[#09090b]/90 backdrop-blur-md border-b border-white/5 z-50">
            <Link href="/" className="p-2"><ArrowLeft size={20}/></Link>
-           <span className="font-bold text-sm tracking-tight">Healthflo OS</span>
+           <div className="flex items-center gap-2">
+              <Sparkles size={16} className="text-blue-400" />
+              <span className="font-bold text-sm tracking-tight">Healthflo AI</span>
+           </div>
            <button onClick={resetChat} className="p-2"><RefreshCcw size={18}/></button>
         </header>
 
-        {/* Message Viewport */}
-        <div className="flex-1 overflow-y-auto no-scrollbar pt-12 pb-32">
-           <div className="max-w-3xl mx-auto px-6 w-full">
+        {/* Chat Viewport */}
+        <div className="flex-1 overflow-y-auto no-scrollbar relative">
+           <div className="max-w-4xl mx-auto px-4 md:px-8 w-full pt-8 pb-40">
+              
               {messages.length === 0 ? (
-                <div className="pt-20 flex flex-col">
-                   <RevealOnScroll>
-                      <h1 className="text-4xl md:text-5xl font-medium mb-2 text-transparent bg-clip-text bg-gradient-to-r from-[#4b90ff] to-[#ff5546]">
-                        Hello, Noble Patient
-                      </h1>
-                      <h2 className="text-3xl md:text-4xl font-medium text-[#444746] mb-12">
-                        How can I assist with your dental health today?
-                      </h2>
-                   </RevealOnScroll>
+                <div className="min-h-[60vh] flex flex-col items-center justify-center text-center animate-in fade-in zoom-in-95 duration-700">
+                   <div className="w-20 h-20 mb-8 rounded-[2rem] bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-[0_0_60px_rgba(59,130,246,0.3)]">
+                      <BrainCircuit size={40} className="text-white" />
+                   </div>
+                   
+                   <h1 className="text-4xl md:text-6xl font-medium mb-6 tracking-tight text-white">
+                      Hello, Noble Patient
+                   </h1>
+                   <p className="text-lg md:text-xl text-slate-400 max-w-xl mx-auto mb-12 leading-relaxed">
+                      I am your personal dental assistant. Ask me about symptoms, treatments, or pricing.
+                   </p>
 
                    {/* Suggestion Grid */}
-                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-12">
-                      {[
-                        { text: "Analyze my sharp tooth pain", icon: AlertCircle, color: "text-red-400" },
-                        { text: "Explain Micro-RCT procedure", icon: Microscope, color: "text-blue-400" },
-                        { text: "Estimate Invisalign treatment cost", icon: CreditCard, color: "text-teal-400" },
-                        { text: "Post-extraction care instructions", icon: FileText, color: "text-purple-400" }
-                      ].map((item, i) => (
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl">
+                      {suggestions.map((item, i) => (
                         <button 
                            key={i} 
                            onClick={() => handleSend(item.text)}
-                           className="text-left p-6 bg-[#1e1f20] hover:bg-[#282a2d] rounded-2xl transition-all group flex flex-col justify-between h-48 border border-white/5"
+                           className={`
+                              group relative p-5 text-left rounded-2xl border transition-all duration-300
+                              ${item.bg} hover:border-opacity-40 hover:bg-opacity-20
+                           `}
                         >
-                           <p className="text-base text-[#C4C7C5] group-hover:text-white leading-relaxed">{item.text}</p>
-                           <div className={`w-10 h-10 rounded-full bg-black/20 flex items-center justify-center ${item.color}`}>
-                              <item.icon size={20} />
+                           <div className="flex items-start justify-between mb-2">
+                              <item.icon size={20} className={item.color} />
+                              <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 group-hover:-translate-y-1 group-hover:translate-x-1 transition-all text-slate-400" />
                            </div>
+                           <div className={`text-xs font-bold uppercase tracking-widest mb-1 ${item.color}`}>{item.label}</div>
+                           <p className="text-sm text-slate-300 group-hover:text-white transition-colors">{item.text}</p>
                         </button>
                       ))}
                    </div>
                 </div>
               ) : (
-                <div className="space-y-10 pb-10">
+                <div className="space-y-8">
                    {messages.map((msg, i) => (
-                     <div key={i} className="flex gap-6 items-start animate-in fade-in slide-in-from-bottom-2 duration-500">
-                        <div className={`message-icon shrink-0 mt-1 ${msg.role === 'user' ? 'bg-[#37393b]' : 'bg-transparent text-blue-400'}`}>
-                           {msg.role === 'user' ? <UserCircle2 size={24} /> : <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#1a73e8] to-[#69b1ff] flex items-center justify-center text-white"><Bot size={18} /></div>}
-                        </div>
-                        <div className="flex-1">
-                           <div className="text-[17px] leading-relaxed text-[#E3E3E3] font-normal whitespace-pre-wrap">
-                              {msg.text}
-                           </div>
-                           {msg.sources && msg.sources.length > 0 && (
-                             <div className="flex flex-wrap gap-2 mt-6">
-                                {msg.sources.map((s: any, j: number) => (
-                                  <a key={j} href={s.uri} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-1.5 bg-[#1e1f20] border border-white/10 rounded-lg text-[11px] font-medium text-[#C4C7C5] hover:bg-[#282a2d] transition-colors">
-                                     <ExternalLink size={12} />
-                                     {s.title}
-                                  </a>
-                                ))}
-                             </div>
-                           )}
-                        </div>
-                     </div>
+                      <div key={i} className={`flex gap-4 md:gap-6 ${msg.role === 'user' ? 'flex-row-reverse' : ''} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
+                         
+                         {/* Icon */}
+                         <div className={`
+                            shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-lg
+                            ${msg.role === 'user' ? 'bg-slate-700 text-white' : 'bg-gradient-to-br from-indigo-500 to-blue-600 text-white'}
+                         `}>
+                            {msg.role === 'user' ? <UserCircle2 size={20} /> : <Bot size={20} />}
+                         </div>
+
+                         {/* Bubble */}
+                         <div className={`
+                            max-w-[85%] md:max-w-[75%] p-5 md:p-6 rounded-3xl text-[15px] md:text-base leading-relaxed shadow-sm
+                            ${msg.role === 'user' ? 'message-bubble-user text-white rounded-tr-none' : 'message-bubble-ai text-slate-200 rounded-tl-none'}
+                         `}>
+                            <div className="whitespace-pre-wrap">{msg.text}</div>
+                            
+                            {/* Sources / Metadata */}
+                            {msg.role === 'model' && msg.sources && msg.sources.length > 0 && (
+                               <div className="mt-4 pt-4 border-t border-white/10 flex flex-wrap gap-2">
+                                  {msg.sources.map((s: any, j: number) => (
+                                     <a key={j} href={s.uri} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/20 hover:bg-black/40 border border-white/10 hover:border-blue-500/30 transition-all text-xs text-blue-300">
+                                        <ExternalLink size={10} /> {s.title}
+                                     </a>
+                                  ))}
+                               </div>
+                            )}
+                         </div>
+                      </div>
                    ))}
+
+                   {/* Loading State */}
                    {isLoading && (
-                     <div className="flex gap-6 items-start">
-                        <div className="message-icon shrink-0 mt-1 text-blue-400 ai-loading-glow">
-                           <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#1a73e8] to-[#69b1ff] flex items-center justify-center text-white"><Bot size={18} /></div>
-                        </div>
-                        <div className="flex-1 pt-2">
-                           <div className="flex flex-col gap-2">
-                              <div className="h-4 w-3/4 bg-[#1e1f20] rounded animate-pulse"></div>
-                              <div className="h-4 w-1/2 bg-[#1e1f20] rounded animate-pulse"></div>
-                           </div>
-                        </div>
-                     </div>
+                      <div className="flex gap-6 animate-in fade-in duration-300">
+                         <div className="shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+                            <Bot size={20} />
+                         </div>
+                         <div className="message-bubble-ai p-6 rounded-3xl rounded-tl-none flex items-center gap-1.5">
+                            <div className="typing-dot"></div>
+                            <div className="typing-dot"></div>
+                            <div className="typing-dot"></div>
+                         </div>
+                      </div>
                    )}
-                   <div ref={messagesEndRef} />
+                   <div ref={messagesEndRef} className="h-4" />
                 </div>
               )}
            </div>
         </div>
 
-        {/* Input Control Center */}
-        <div className="absolute bottom-0 left-0 w-full gemini-gradient pb-8 pt-4">
-           <div className="max-w-3xl mx-auto px-6">
-              <div className="gemini-input-wrapper flex flex-col p-4 shadow-xl">
+        {/* Input Dock */}
+        <div className="absolute bottom-0 left-0 w-full p-4 md:p-6 bg-gradient-to-t from-[#09090b] via-[#09090b] to-transparent z-40">
+           <div className="max-w-3xl mx-auto relative">
+              <div className="input-glow rounded-[2rem] border border-white/10 p-2 flex flex-col transition-all duration-300">
                  <textarea 
                     rows={Math.min(5, input.split('\n').length)}
                     value={input}
@@ -279,32 +332,45 @@ const HealthfloAiPage = () => {
                         handleSend();
                       }
                     }}
-                    placeholder="Enter a prompt here..."
-                    className="bg-transparent w-full outline-none text-base text-[#E3E3E3] placeholder-[#8E918F] resize-none px-2 mb-2 no-scrollbar"
+                    placeholder="Type your health query..."
+                    className="w-full bg-transparent text-slate-200 placeholder-slate-500 px-4 py-3 focus:outline-none resize-none no-scrollbar text-base"
                  />
-                 <div className="flex items-center justify-between">
+                 
+                 <div className="flex items-center justify-between px-2 pb-1">
                     <div className="flex items-center gap-1">
-                       <button className="p-2 hover:bg-white/5 rounded-full text-[#C4C7C5] transition-colors"><ImageIcon size={18} /></button>
-                       <button onClick={toggleListening} className={`p-2 rounded-full transition-colors ${isListening ? 'bg-red-500 text-white' : 'hover:bg-white/5 text-[#C4C7C5]'}`}>
+                       <button className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-full transition-colors" title="Upload Image (Demo)">
+                          <ImageIcon size={18} />
+                       </button>
+                       <button 
+                          onClick={toggleListening} 
+                          className={`p-2 rounded-full transition-all duration-300 ${isListening ? 'bg-rose-500/20 text-rose-500 animate-pulse' : 'text-slate-400 hover:text-white hover:bg-white/10'}`}
+                          title="Voice Input"
+                       >
                           {isListening ? <MicOff size={18} /> : <Mic size={18} />}
                        </button>
                     </div>
-                    <div className="flex items-center gap-2">
-                       <button 
-                          onClick={() => handleSend()} 
-                          disabled={!input.trim() || isLoading}
-                          className={`p-2 rounded-full transition-all ${input.trim() && !isLoading ? 'text-blue-400 hover:bg-white/5' : 'text-[#444746] cursor-not-allowed'}`}
-                       >
-                          <Send size={20} />
-                       </button>
-                    </div>
+
+                    <button 
+                       onClick={() => handleSend()}
+                       disabled={!input.trim() || isLoading}
+                       className={`
+                          p-2.5 rounded-xl flex items-center justify-center transition-all duration-300
+                          ${input.trim() && !isLoading 
+                             ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 hover:scale-105 active:scale-95' 
+                             : 'bg-white/5 text-slate-500 cursor-not-allowed'}
+                       `}
+                    >
+                       <Send size={18} className={input.trim() && !isLoading ? 'ml-0.5' : ''} />
+                    </button>
                  </div>
               </div>
-              <p className="mt-3 text-[11px] text-center text-[#8E918F]">
-                Healthflo Dental OS may display inaccurate clinical info. Verify critical diagnoses with Noble Dental surgeons.
+              
+              <p className="text-[10px] text-center text-slate-500 mt-4 flex items-center justify-center gap-1.5 opacity-60">
+                 <ShieldCheck size={10} /> Encrypted Healthflo HIPAA-Compliant Session
               </p>
            </div>
         </div>
+
       </main>
     </div>
   );
