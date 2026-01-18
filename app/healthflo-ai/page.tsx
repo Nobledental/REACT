@@ -1,51 +1,32 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation'; // Added for navigation
+import { useRouter } from 'next/navigation';
 import { 
-  Bot, Send, User, Smartphone, AlertCircle, Phone, Download, 
-  Calendar, Clock, Wind, Sun, Cloud, Shield, Heart, 
-  ArrowLeft, Search, Sparkles, MapPin, Activity, 
-  History, Thermometer, Droplets, CreditCard, ExternalLink, X,
-  Stethoscope, Info, Mic, MicOff, Plus, LayoutGrid, Home, SquarePen,
-  ChevronDown, Image as ImageIcon, Laptop, FileText, MoreHorizontal, UserCircle2,
-  Layers, CheckCircle2, MessageSquare, RefreshCcw, Microscope
+  Bot, Send, ArrowLeft, Mic, MicOff, Image as ImageIcon, 
+  Sparkles, ExternalLink, Plus, Info, Activity, UserCircle2
 } from 'lucide-react';
 import { sendMessageToAssistant } from '@/services/geminiService';
 import { ChatMessage } from '@/types';
-import { RevealOnScroll } from '@/components/RevealOnScroll';
-
-// Removed "HealthfloAiPageProps" because Page files cannot have custom props.
 
 export default function HealthfloAiPage() {
-  const router = useRouter(); // Initialize Router
+  const router = useRouter();
   
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [greeting, setGreeting] = useState('');
    
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
 
-  // -- Navigation Handlers --
+  // -- Navigation --
   const handleBack = () => {
-    // If there is history, go back. Otherwise go to home.
-    if (window.history.length > 2) {
-        router.back();
-    } else {
-        router.push('/');
-    }
+    if (window.history.length > 2) router.back();
+    else router.push('/');
   };
 
-  useEffect(() => {
-    const hour = new Date().getHours();
-    if (hour < 12) setGreeting('Good morning');
-    else if (hour < 17) setGreeting('Good afternoon');
-    else setGreeting('Good evening');
-  }, []);
-
+  // -- Speech Recognition Setup --
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -54,18 +35,17 @@ export default function HealthfloAiPage() {
         recognitionRef.current.continuous = false;
         recognitionRef.current.interimResults = false;
         recognitionRef.current.lang = 'en-IN';
-
         recognitionRef.current.onresult = (event: any) => {
           const transcript = event.results[0][0].transcript;
           setInput(prev => prev + (prev ? ' ' : '') + transcript);
           setIsListening(false);
         };
-
         recognitionRef.current.onend = () => setIsListening(false);
       }
     }
   }, []);
 
+  // -- Auto Scroll --
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
@@ -77,11 +57,6 @@ export default function HealthfloAiPage() {
       setIsListening(true);
       recognitionRef.current?.start();
     }
-  };
-
-  const resetChat = () => {
-    setMessages([]);
-    setInput('');
   };
 
   const handleSend = async (customMessage?: string) => {
@@ -110,7 +85,7 @@ export default function HealthfloAiPage() {
     } catch (error) {
       setMessages(prev => [...prev, { 
         role: 'model', 
-        text: "I'm sorry, I'm experiencing a high load. Please try again or call our clinic directly.", 
+        text: "I'm experiencing high traffic. Please try again shortly.", 
         timestamp: Date.now() 
       }]);
     } finally {
@@ -119,220 +94,199 @@ export default function HealthfloAiPage() {
   };
 
   return (
-    <div className="fixed inset-0 z-[150] bg-[#131314] text-[#E3E3E3] flex font-sans overflow-hidden">
+    <div className="relative min-h-screen bg-[#dcebf5] text-slate-800 font-sans overflow-hidden selection:bg-blue-200">
+      
+      {/* --- CUSTOM STYLES FOR THE "SCULPT" LOOK --- */}
       <style>{`
-        .gemini-gradient {
-          background: linear-gradient(180deg, rgba(19, 19, 20, 0) 0%, #131314 100%);
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap');
+        
+        .font-sculpt { font-family: 'Nunito', sans-serif; }
+        
+        .bg-cloud-gradient {
+          background: radial-gradient(circle at 50% 50%, #ffffff 0%, #d6e8f5 100%);
         }
-        .gemini-sidebar {
-          background: #1e1f20;
-          border-right: 1px solid rgba(255, 255, 255, 0.05);
+        
+        .giant-text {
+          font-size: 30vw;
+          line-height: 0.8;
+          font-weight: 900;
+          color: white;
+          opacity: 0.6;
+          text-shadow: 0 10px 30px rgba(0,0,0,0.05);
+          user-select: none;
         }
-        .gemini-input-wrapper {
-          background: #1e1f20;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 2rem;
-          transition: all 0.2s ease;
+
+        .glass-pill {
+          background: rgba(255, 255, 255, 0.85);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.5);
+          box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
         }
-        .gemini-input-wrapper:focus-within {
-          background: #282a2d;
-          border-color: #4b90ff;
+
+        .character-float {
+          animation: float 6s ease-in-out infinite;
         }
-        .message-icon {
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(2deg); }
         }
+
+        .bot-glow {
+          filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.5));
+        }
+        
+        /* Hide scrollbar for clean look */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        @keyframes subtle-pulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.7; transform: scale(0.95); }
-        }
-        .ai-loading-glow {
-          animation: subtle-pulse 2s infinite ease-in-out;
-        }
       `}</style>
 
-      {/* Left Sidebar - Gemini Style */}
-      <aside className="hidden md:flex w-64 flex-col gemini-sidebar">
-        <div className="p-4 flex flex-col gap-4">
-          {/* Back Button now uses Router */}
-          <button onClick={handleBack} className="p-2 hover:bg-white/5 rounded-full w-fit transition-colors">
-            <ArrowLeft size={20} />
-          </button>
-          
-          <button onClick={resetChat} className="flex items-center gap-3 px-4 py-3 bg-white/5 hover:bg-white/10 rounded-full transition-all text-sm font-medium">
-            <Plus size={20} />
-            <span>New Chat</span>
-          </button>
+      {/* BACKGROUND GIANT TEXT (Like the '404') */}
+      <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none overflow-hidden">
+        <span className="giant-text tracking-tighter">AI</span>
+      </div>
+
+      {/* --- TOP NAVIGATION --- */}
+      <nav className="absolute top-0 left-0 w-full p-6 z-50 flex justify-between items-center">
+        <div className="flex items-center gap-2 cursor-pointer group" onClick={handleBack}>
+           <Sparkles className="text-blue-500 fill-blue-500" size={24} />
+           <span className="font-sculpt font-bold text-xl text-slate-700 group-hover:text-blue-600 transition-colors">Healthflo</span>
         </div>
+        
+        <button onClick={() => window.location.reload()} className="px-6 py-2 bg-white text-sm font-bold text-slate-600 rounded-full shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
+           Reset Chat
+        </button>
+      </nav>
 
-        <div className="flex-1 overflow-y-auto px-2 py-4 no-scrollbar">
-          <div className="px-4 mb-4">
-            <h3 className="text-[11px] font-bold text-[#8E918F] uppercase tracking-wider">Recent Analysis</h3>
-          </div>
-          <div className="space-y-1">
-            {messages.length > 0 ? (
-              <div className="px-4 py-2 bg-white/5 rounded-lg text-sm truncate text-[#C4C7C5] cursor-pointer">
-                Current Dental Case
-              </div>
-            ) : (
-              <p className="px-4 py-2 text-[11px] text-[#8E918F] italic">Logs populate as you chat...</p>
-            )}
-          </div>
-        </div>
-
-        <div className="p-4 flex flex-col gap-2">
-          <button className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 rounded-full transition-colors text-sm text-[#C4C7C5]">
-            <Info size={18} />
-            <span>Help</span>
-          </button>
-          <button className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 rounded-full transition-colors text-sm text-[#C4C7C5]">
-            <Activity size={18} />
-            <span>Activity</span>
-          </button>
-          <div className="pt-2 border-t border-white/5">
-              <div className="flex items-center gap-3 px-4 py-3 text-sm">
-                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-[10px] font-bold">PT</div>
-                <span>Patient Guest</span>
-              </div>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Container */}
-      <main className="flex-1 flex flex-col relative bg-[#131314]">
-        {/* Mobile Header */}
-        <header className="md:hidden flex items-center justify-between p-4 bg-[#1e1f20]">
-           <button onClick={handleBack} className="p-2"><ArrowLeft size={20}/></button>
-           <span className="font-bold text-sm tracking-tight">Healthflo OS</span>
-           <button onClick={resetChat} className="p-2"><RefreshCcw size={18}/></button>
-        </header>
-
-        {/* Message Viewport */}
-        <div className="flex-1 overflow-y-auto no-scrollbar pt-12 pb-32">
-           <div className="max-w-3xl mx-auto px-6 w-full">
-              {messages.length === 0 ? (
-                <div className="pt-20 flex flex-col">
-                    <RevealOnScroll>
-                      <h1 className="text-4xl md:text-5xl font-medium mb-2 text-transparent bg-clip-text bg-gradient-to-r from-[#4b90ff] to-[#ff5546]">
-                        Hello, Noble Patient
-                      </h1>
-                      <h2 className="text-3xl md:text-4xl font-medium text-[#444746] mb-12">
-                        How can I assist with your dental health today?
-                      </h2>
-                    </RevealOnScroll>
-
-                    {/* Suggestion Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-12">
-                      {[
-                        { text: "Analyze my sharp tooth pain", icon: AlertCircle, color: "text-red-400" },
-                        { text: "Explain Micro-RCT procedure", icon: Microscope, color: "text-blue-400" },
-                        { text: "Estimate Invisalign treatment cost", icon: CreditCard, color: "text-teal-400" },
-                        { text: "Post-extraction care instructions", icon: FileText, color: "text-purple-400" }
-                      ].map((item, i) => (
-                        <button 
-                           key={i} 
-                           onClick={() => handleSend(item.text)}
-                           className="text-left p-6 bg-[#1e1f20] hover:bg-[#282a2d] rounded-2xl transition-all group flex flex-col justify-between h-48 border border-white/5"
-                        >
-                           <p className="text-base text-[#C4C7C5] group-hover:text-white leading-relaxed">{item.text}</p>
-                           <div className={`w-10 h-10 rounded-full bg-black/20 flex items-center justify-center ${item.color}`}>
-                              <item.icon size={20} />
-                           </div>
-                        </button>
-                      ))}
-                    </div>
+      {/* --- MAIN CONTENT AREA --- */}
+      <main className="relative z-10 w-full h-screen flex flex-col items-center justify-center pt-10 pb-24 px-4">
+        
+        {messages.length === 0 ? (
+          /* EMPTY STATE - REPLICATING THE IMAGE */
+          <div className="text-center flex flex-col items-center max-w-2xl animate-in fade-in zoom-in duration-700">
+             
+             {/* The Character (Replacing the Blue Monster) */}
+             <div className="character-float relative mb-8">
+                <div className="w-48 h-48 bg-gradient-to-tr from-blue-500 to-cyan-400 rounded-[3rem] shadow-2xl flex items-center justify-center relative z-10 border-4 border-white/20">
+                    <Bot size={100} className="text-white drop-shadow-md" strokeWidth={1.5} />
+                    {/* Eyes/Face Details */}
+                    <div className="absolute top-14 left-12 w-3 h-3 bg-white rounded-full opacity-80 animate-pulse"></div>
                 </div>
-              ) : (
-                <div className="space-y-10 pb-10">
-                   {messages.map((msg, i) => (
-                      <div key={i} className="flex gap-6 items-start animate-in fade-in slide-in-from-bottom-2 duration-500">
-                        <div className={`message-icon shrink-0 mt-1 ${msg.role === 'user' ? 'bg-[#37393b]' : 'bg-transparent text-blue-400'}`}>
-                           {msg.role === 'user' ? <UserCircle2 size={24} /> : <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#1a73e8] to-[#69b1ff] flex items-center justify-center text-white"><Bot size={18} /></div>}
-                        </div>
-                        <div className="flex-1">
-                           <div className="text-[17px] leading-relaxed text-[#E3E3E3] font-normal whitespace-pre-wrap">
-                              {msg.text}
-                           </div>
-                           {msg.sources && msg.sources.length > 0 && (
-                             <div className="flex flex-wrap gap-2 mt-6">
-                                {msg.sources.map((s: any, j: number) => (
-                                  <a key={j} href={s.uri} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-1.5 bg-[#1e1f20] border border-white/10 rounded-lg text-[11px] font-medium text-[#C4C7C5] hover:bg-[#282a2d] transition-colors">
-                                     <ExternalLink size={12} />
-                                     {s.title}
-                                  </a>
-                                ))}
-                             </div>
-                           )}
-                        </div>
-                      </div>
-                   ))}
-                   {isLoading && (
-                      <div className="flex gap-6 items-start">
-                        <div className="message-icon shrink-0 mt-1 text-blue-400 ai-loading-glow">
-                           <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#1a73e8] to-[#69b1ff] flex items-center justify-center text-white"><Bot size={18} /></div>
-                        </div>
-                        <div className="flex-1 pt-2">
-                           <div className="flex flex-col gap-2">
-                              <div className="h-4 w-3/4 bg-[#1e1f20] rounded animate-pulse"></div>
-                              <div className="h-4 w-1/2 bg-[#1e1f20] rounded animate-pulse"></div>
-                           </div>
-                        </div>
-                      </div>
+                {/* Shadow underneath */}
+                <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-32 h-4 bg-blue-900/20 rounded-[100%] blur-md"></div>
+             </div>
+
+             {/* Headline */}
+             <h1 className="font-sculpt text-4xl md:text-5xl font-black text-slate-800 mb-4 tracking-tight">
+               Oops, I think we're smart.
+             </h1>
+             
+             {/* Subtext */}
+             <p className="font-sculpt text-lg text-slate-500 max-w-md mx-auto leading-relaxed">
+               I'm your AI dental assistant. Ask me about treatments, costs, or that sharp pain you're feeling.
+             </p>
+          </div>
+        ) : (
+          /* ACTIVE CHAT STATE */
+          <div className="flex-1 w-full max-w-4xl overflow-y-auto no-scrollbar px-4 pt-4 pb-4 space-y-6">
+             {messages.map((msg, i) => (
+                <div key={i} className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2`}>
+                   {msg.role !== 'user' && (
+                     <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center text-white shrink-0 shadow-lg">
+                        <Bot size={20} />
+                     </div>
                    )}
-                   <div ref={messagesEndRef} />
+                   
+                   <div className={`max-w-[80%] p-5 rounded-3xl shadow-sm ${
+                      msg.role === 'user' 
+                      ? 'bg-blue-600 text-white rounded-tr-none' 
+                      : 'bg-white text-slate-700 rounded-tl-none border border-slate-100'
+                   }`}>
+                      <p className="text-[15px] leading-relaxed whitespace-pre-wrap font-medium">
+                        {msg.text}
+                      </p>
+                      
+                      {msg.sources && msg.sources.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-black/5">
+                           {msg.sources.map((s: any, j: number) => (
+                             <a key={j} href={s.uri} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 bg-black/5 rounded-lg text-xs font-bold hover:bg-black/10 transition-colors">
+                                <ExternalLink size={10} /> {s.title}
+                             </a>
+                           ))}
+                        </div>
+                      )}
+                   </div>
+
+                   {msg.role === 'user' && (
+                     <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 shrink-0">
+                        <UserCircle2 size={24} />
+                     </div>
+                   )}
                 </div>
-              )}
+             ))}
+             
+             {isLoading && (
+               <div className="flex gap-4">
+                 <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center text-white shrink-0">
+                    <Bot size={20} className="animate-spin" />
+                 </div>
+                 <div className="bg-white px-6 py-4 rounded-3xl rounded-tl-none shadow-sm flex gap-2 items-center">
+                    <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></span>
+                    <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-75"></span>
+                    <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-150"></span>
+                 </div>
+               </div>
+             )}
+             <div ref={messagesEndRef} />
+          </div>
+        )}
+
+        {/* --- INPUT AREA (FLOATING PILL) --- */}
+        <div className="fixed bottom-8 w-full px-6 z-40 flex justify-center">
+           <div className="glass-pill w-full max-w-2xl p-2 rounded-[2rem] flex items-center gap-2 transition-all duration-300 focus-within:scale-[1.01] focus-within:shadow-xl focus-within:border-blue-300">
+              
+              <button className="p-3 rounded-full hover:bg-slate-100 text-slate-400 hover:text-blue-500 transition-colors">
+                 <Plus size={20} />
+              </button>
+              
+              <input 
+                 value={input}
+                 onChange={(e) => setInput(e.target.value)}
+                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                 placeholder="Type your question here..."
+                 className="flex-1 bg-transparent border-none outline-none text-slate-700 placeholder:text-slate-400 font-medium h-full py-3"
+              />
+              
+              <button 
+                 onClick={toggleListening} 
+                 className={`p-3 rounded-full transition-all duration-300 ${
+                    isListening ? 'bg-red-50 text-red-500' : 'hover:bg-slate-100 text-slate-400'
+                 }`}
+              >
+                 {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+              </button>
+
+              <button 
+                 onClick={() => handleSend()}
+                 disabled={!input.trim()}
+                 className={`p-3 rounded-full transition-all duration-300 ${
+                    input.trim() 
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30 scale-100' 
+                    : 'bg-slate-200 text-slate-400 scale-90 cursor-not-allowed'
+                 }`}
+              >
+                 <Send size={18} fill="currentColor" />
+              </button>
            </div>
+        </div>
+        
+        {/* Helper Footer Text */}
+        <div className="fixed bottom-2 w-full text-center z-30 pointer-events-none">
+           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest opacity-60">
+             Healthflo AI • Beta
+           </span>
         </div>
 
-        {/* Input Control Center - Floating Gemini Style */}
-        <div className="absolute bottom-0 left-0 w-full gemini-gradient pb-8 pt-4">
-           <div className="max-w-3xl mx-auto px-6">
-              <div className="gemini-input-wrapper flex flex-col p-4 shadow-xl">
-                 <textarea 
-                    rows={Math.min(5, input.split('\n').length)}
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSend();
-                      }
-                    }}
-                    placeholder="Enter a prompt here..."
-                    className="bg-transparent w-full outline-none text-base text-[#E3E3E3] placeholder-[#8E918F] resize-none px-2 mb-2 no-scrollbar"
-                 />
-                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                       <button className="p-2 hover:bg-white/5 rounded-full text-[#C4C7C5] transition-colors"><ImageIcon size={18} /></button>
-                       <button onClick={toggleListening} className={`p-2 rounded-full transition-colors ${isListening ? 'bg-red-500 text-white' : 'hover:bg-white/5 text-[#C4C7C5]'}`}>
-                          {isListening ? <MicOff size={18} /> : <Mic size={18} />}
-                       </button>
-                    </div>
-                    <div className="flex items-center gap-2">
-                       <button 
-                          onClick={() => handleSend()} 
-                          disabled={!input.trim() || isLoading}
-                          className={`p-2 rounded-full transition-all ${input.trim() && !isLoading ? 'text-blue-400 hover:bg-white/5' : 'text-[#444746] cursor-not-allowed'}`}
-                       >
-                          <Send size={20} />
-                       </button>
-                    </div>
-                 </div>
-              </div>
-              <p className="mt-3 text-[11px] text-center text-[#8E918F]">
-                Healthflo Dental OS may display inaccurate clinical info. Verify critical diagnoses with Noble Dental surgeons.
-              </p>
-           </div>
-        </div>
       </main>
     </div>
   );
-};
+}
