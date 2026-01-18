@@ -42,7 +42,7 @@ const HealthfloAiPage = () => {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, isLoading]);
 
   const toggleListening = () => {
     if (isListening) {
@@ -170,10 +170,10 @@ const HealthfloAiPage = () => {
             <span>Activity</span>
           </button>
           <div className="pt-2 border-t border-white/5">
-             <div className="flex items-center gap-3 px-4 py-3 text-sm">
+              <div className="flex items-center gap-3 px-4 py-3 text-sm">
                 <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-[10px] font-bold">PT</div>
                 <span>Patient Guest</span>
-             </div>
+              </div>
           </div>
         </div>
       </aside>
@@ -225,7 +225,7 @@ const HealthfloAiPage = () => {
               ) : (
                 <div className="space-y-10 pb-10">
                    {messages.map((msg, i) => (
-                     <div key={i} className="flex gap-6 items-start animate-in fade-in slide-in-from-bottom-2 duration-500">
+                      <div key={i} className="flex gap-6 items-start animate-in fade-in slide-in-from-bottom-2 duration-500">
                         <div className={`message-icon shrink-0 mt-1 ${msg.role === 'user' ? 'bg-[#37393b]' : 'bg-transparent text-blue-400'}`}>
                            {msg.role === 'user' ? <UserCircle2 size={24} /> : <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#1a73e8] to-[#69b1ff] flex items-center justify-center text-white"><Bot size={18} /></div>}
                         </div>
@@ -244,10 +244,10 @@ const HealthfloAiPage = () => {
                              </div>
                            )}
                         </div>
-                     </div>
+                      </div>
                    ))}
                    {isLoading && (
-                     <div className="flex gap-6 items-start">
+                      <div className="flex gap-6 items-start">
                         <div className="message-icon shrink-0 mt-1 text-blue-400 ai-loading-glow">
                            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#1a73e8] to-[#69b1ff] flex items-center justify-center text-white"><Bot size={18} /></div>
                         </div>
@@ -257,7 +257,7 @@ const HealthfloAiPage = () => {
                               <div className="h-4 w-1/2 bg-[#1e1f20] rounded animate-pulse"></div>
                            </div>
                         </div>
-                     </div>
+                      </div>
                    )}
                    <div ref={messagesEndRef} />
                 </div>
@@ -265,7 +265,7 @@ const HealthfloAiPage = () => {
            </div>
         </div>
 
-        {/* Input Control Center */}
+        {/* Input Control Center - Floating Gemini Style */}
         <div className="absolute bottom-0 left-0 w-full gemini-gradient pb-8 pt-4">
            <div className="max-w-3xl mx-auto px-6">
               <div className="gemini-input-wrapper flex flex-col p-4 shadow-xl">
