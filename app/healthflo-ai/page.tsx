@@ -4,23 +4,25 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Bot, Send, ArrowLeft, Mic, MicOff, Sparkles, 
-  ExternalLink, Plus, UserCircle2, Flame, Zap
+  ExternalLink, Plus, UserCircle2, Flame, Zap,
+  FileText, Calendar, ShieldAlert, X
 } from 'lucide-react';
 import { sendMessageToAssistant } from '@/services/geminiService';
 import { ChatMessage } from '@/types';
 
-export default function HealthfloAiPage() {
+export default function NeoCompanionPage() {
   const router = useRouter();
   
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [typedText, setTypedText] = useState(''); // For Neo's typewriter effect
+  const [typedText, setTypedText] = useState('');
+  const [showMenu, setShowMenu] = useState(false); // New Quick Menu State
    
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
-  const fullIntroText = "I am Neo. Your dental intelligence architect.";
+  const fullIntroText = "I am Neo. Your dental care companion.";
 
   // -- Navigation --
   const handleBack = () => {
@@ -28,7 +30,7 @@ export default function HealthfloAiPage() {
     else router.push('/');
   };
 
-  // -- Typewriter Effect for Intro --
+  // -- Typewriter Effect --
   useEffect(() => {
     if (messages.length === 0) {
       let i = 0;
@@ -60,10 +62,12 @@ export default function HealthfloAiPage() {
     }
   }, []);
 
-  // -- Auto Scroll --
+  // -- Auto Scroll (Advanced) --
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isLoading]);
+    if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+  }, [messages, isLoading, input]); // Trigger on input too to keep focus
 
   const toggleListening = () => {
     if (isListening) {
@@ -78,6 +82,9 @@ export default function HealthfloAiPage() {
     const textToSend = customMessage || input;
     if (!textToSend.trim() || isLoading) return;
     
+    // Close menu if open
+    setShowMenu(false);
+
     const userMsg: ChatMessage = { role: 'user', text: textToSend, timestamp: Date.now() };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
@@ -100,7 +107,7 @@ export default function HealthfloAiPage() {
     } catch (error) {
       setMessages(prev => [...prev, { 
         role: 'model', 
-        text: "System overload. Please re-engage shortly.", 
+        text: "Connection interrupted. Please re-engage.", 
         timestamp: Date.now() 
       }]);
     } finally {
@@ -108,228 +115,242 @@ export default function HealthfloAiPage() {
     }
   };
 
+  // -- Quick Actions --
+  const quickActions = [
+    { label: "Post-Op Guides", query: "Show me post-operation care instructions for tooth extraction and root canal", icon: FileText, color: "text-blue-400" },
+    { label: "Cost Estimator", query: "What are the approximate costs for dental implants and veneers?", icon: Sparkles, color: "text-yellow-400" },
+    { label: "Book Visit", query: "I would like to schedule an appointment", icon: Calendar, color: "text-green-400" },
+    { label: "Emergency", query: "I have a dental emergency, what should I do?", icon: ShieldAlert, color: "text-red-500" },
+  ];
+
   return (
-    <div className="relative min-h-screen bg-white dark:bg-black text-slate-900 dark:text-white font-sans overflow-hidden transition-colors duration-500">
+    <div className="relative min-h-screen bg-[#050505] text-slate-200 font-sans overflow-hidden transition-colors duration-500">
       
-      {/* --- CINEMATIC STYLES --- */}
+      {/* --- STYLES --- */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;900&display=swap');
         
         .font-neo { font-family: 'Montserrat', sans-serif; }
         
-        /* Netflix-like Background Gradient */
-        .cinematic-bg {
-          background: radial-gradient(circle at 50% -20%, rgba(220, 38, 38, 0.15), rgba(0, 0, 0, 0) 50%);
+        .cinematic-gradient {
+          background: radial-gradient(circle at 50% -20%, rgba(220, 38, 38, 0.15), rgba(0, 0, 0, 0) 60%);
         }
-        .dark .cinematic-bg {
-          background: radial-gradient(circle at 50% -20%, rgba(229, 9, 20, 0.25), rgba(0, 0, 0, 0) 60%);
-        }
-
-        /* Animated Grain for Texture */
+        
         .bg-grain {
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-          opacity: 0.4;
-        }
-
-        .neo-glow {
-          box-shadow: 0 0 20px rgba(220, 38, 38, 0.4);
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
         }
 
         .glass-panel {
-          background: rgba(255, 255, 255, 0.8);
-          backdrop-filter: blur(12px);
-          border: 1px solid rgba(0,0,0,0.05);
-        }
-        .dark .glass-panel {
-          background: rgba(20, 20, 20, 0.6);
-          backdrop-filter: blur(16px);
-          border: 1px solid rgba(255,255,255,0.1);
+          background: rgba(20, 20, 20, 0.7);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255,255,255,0.08);
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         }
 
-        .animate-float { animation: float 6s ease-in-out infinite; }
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-15px); }
+        .glass-menu {
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .cursor-blink { animation: blink 1s step-end infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
+        .orb-pulse {
+          box-shadow: 0 0 40px rgba(220, 38, 38, 0.2);
+          animation: orb-breathe 4s infinite ease-in-out;
+        }
+        @keyframes orb-breathe {
+          0%, 100% { box-shadow: 0 0 40px rgba(220, 38, 38, 0.2); transform: scale(1); }
+          50% { box-shadow: 0 0 70px rgba(220, 38, 38, 0.5); transform: scale(1.02); }
+        }
 
-        /* Hide scrollbar */
+        .typing-dot {
+          animation: typing 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes typing {
+          0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+          40% { transform: scale(1); opacity: 1; }
+        }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
 
-      {/* BACKGROUND LAYERS */}
+      {/* BACKGROUND */}
       <div className="absolute inset-0 bg-grain pointer-events-none z-10"></div>
-      <div className="absolute inset-0 cinematic-bg pointer-events-none z-0"></div>
+      <div className="absolute inset-0 cinematic-gradient pointer-events-none z-0"></div>
 
-      {/* --- TOP NAV --- */}
+      {/* --- HEADER --- */}
       <nav className="absolute top-0 left-0 w-full p-6 z-50 flex justify-between items-center">
-        <div onClick={handleBack} className="flex items-center gap-3 cursor-pointer group opacity-80 hover:opacity-100 transition-opacity">
-           <div className="p-2 rounded-full bg-slate-100 dark:bg-white/10 group-hover:bg-slate-200 dark:group-hover:bg-white/20 transition-colors">
-              <ArrowLeft size={20} />
+        <div onClick={handleBack} className="flex items-center gap-3 cursor-pointer group opacity-70 hover:opacity-100 transition-all">
+           <div className="p-2 rounded-full bg-white/5 border border-white/5 group-hover:bg-white/10 transition-colors">
+              <ArrowLeft size={18} />
            </div>
-           <span className="font-neo font-bold text-sm tracking-[0.2em] uppercase">Return</span>
+           <span className="font-neo font-bold text-xs tracking-[0.2em] uppercase text-slate-300">Return</span>
         </div>
         
-        <div className="flex items-center gap-2">
-           <div className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></div>
-           <span className="font-neo text-xs font-bold text-red-600 dark:text-red-500 uppercase tracking-widest">Live</span>
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/30 border border-red-900/50">
+           <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
+           <span className="font-neo text-[10px] font-bold text-red-500 uppercase tracking-widest">Neo Active</span>
         </div>
       </nav>
 
-      {/* --- MAIN STAGE --- */}
-      <main className="relative z-20 w-full h-screen flex flex-col items-center justify-center pt-20 pb-28 px-4">
+      {/* --- MAIN INTERFACE --- */}
+      <main className="relative z-20 w-full h-screen flex flex-col items-center justify-center pt-20 pb-24 px-4">
         
         {messages.length === 0 ? (
-          /* NEO HERO STATE */
-          <div className="text-center flex flex-col items-center max-w-3xl animate-in fade-in zoom-in duration-1000">
+          /* HERO STATE */
+          <div className="text-center flex flex-col items-center max-w-3xl animate-in fade-in duration-700 w-full">
              
-             {/* The "Neo" Avatar - Abstract Glowing Orb */}
-             <div className="animate-float mb-12 relative group cursor-pointer" onClick={() => handleSend("Hello Neo")}>
-                <div className="w-40 h-40 rounded-full bg-gradient-to-b from-slate-200 to-slate-400 dark:from-zinc-800 dark:to-black relative z-10 flex items-center justify-center border border-white/50 dark:border-white/10 shadow-2xl neo-glow transition-transform duration-500 group-hover:scale-105">
-                   <Flame size={64} className="text-slate-800 dark:text-red-600 transition-colors duration-500" strokeWidth={1} />
+             {/* The "Neo" Avatar */}
+             <div className="mb-10 relative group">
+                <div className="w-32 h-32 rounded-full bg-gradient-to-b from-zinc-800 to-black relative z-10 flex items-center justify-center border border-white/10 orb-pulse">
+                   <Flame size={48} className="text-red-600 drop-shadow-[0_0_15px_rgba(220,38,38,0.8)]" strokeWidth={1.5} />
                 </div>
-                {/* Orbital Rings */}
-                <div className="absolute inset-0 rounded-full border border-slate-300 dark:border-red-900/30 scale-125 animate-spin duration-[10s]"></div>
-                <div className="absolute inset-0 rounded-full border border-slate-300 dark:border-red-900/20 scale-150 animate-spin duration-[15s] direction-reverse"></div>
+                {/* Spinning Rings */}
+                <div className="absolute inset-0 rounded-full border border-white/5 scale-125 animate-spin duration-[20s] opacity-50"></div>
+                <div className="absolute inset-0 rounded-full border border-red-500/10 scale-150 animate-spin duration-[30s] direction-reverse"></div>
              </div>
 
-             {/* Typewriter Headline */}
-             <h1 className="font-neo text-4xl md:text-6xl font-black mb-6 tracking-tight min-h-[4rem]">
-               {typedText}<span className="cursor-blink text-red-600">_</span>
+             {/* Dynamic Intro */}
+             <h1 className="font-neo text-3xl md:text-5xl font-black mb-4 tracking-tight min-h-[3rem] text-white">
+               {typedText}<span className="animate-pulse text-red-600">_</span>
              </h1>
              
-             {/* Cinematic Subtext */}
-             <p className="font-neo text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-lg mx-auto leading-relaxed opacity-0 animate-in fade-in slide-in-from-bottom-4 delay-1000 fill-mode-forwards">
-               Ask me about your symptoms, treatment costs, or the future of your smile.
+             <p className="font-neo text-sm md:text-base text-zinc-400 max-w-md mx-auto leading-relaxed mb-12">
+               Advanced diagnostics, immediate care guides, and seamless scheduling.
              </p>
 
-             {/* Quick Actions (Netflix Style Buttons) */}
-             <div className="mt-12 flex flex-wrap justify-center gap-4 opacity-0 animate-in fade-in slide-in-from-bottom-8 delay-[1500ms] fill-mode-forwards">
-                {[
-                  { label: "Analyze Pain", icon: Zap },
-                  { label: "Cost Estimate", icon: Sparkles },
-                  { label: "My History", icon: ExternalLink }
-                ].map((action, idx) => (
+             {/* Quick Actions Grid */}
+             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full max-w-2xl opacity-0 animate-in fade-in slide-in-from-bottom-8 delay-500 fill-mode-forwards">
+                {quickActions.map((action, idx) => (
                   <button 
                     key={idx}
-                    onClick={() => handleSend(action.label)}
-                    className="flex items-center gap-3 px-6 py-3 rounded-md bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/5 hover:bg-slate-200 dark:hover:bg-white/20 transition-all font-bold text-sm tracking-wide"
+                    onClick={() => handleSend(action.query)}
+                    className="flex flex-col items-center justify-center gap-3 p-4 rounded-xl bg-zinc-900/50 border border-white/5 hover:border-red-500/30 hover:bg-zinc-800 transition-all group"
                   >
-                    <action.icon size={16} className="text-red-600" />
-                    {action.label}
+                    <div className={`p-3 rounded-full bg-white/5 group-hover:scale-110 transition-transform ${action.color}`}>
+                       <action.icon size={20} />
+                    </div>
+                    <span className="font-neo text-xs font-bold uppercase tracking-wider text-zinc-400 group-hover:text-white">{action.label}</span>
                   </button>
                 ))}
              </div>
           </div>
         ) : (
           /* CHAT STREAM */
-          <div className="flex-1 w-full max-w-5xl overflow-y-auto no-scrollbar px-2 space-y-8">
+          <div className="flex-1 w-full max-w-4xl overflow-y-auto no-scrollbar px-2 space-y-6 pb-4">
              {messages.map((msg, i) => (
-                <div key={i} className={`flex gap-6 ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
+                <div key={i} className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
                    
                    {msg.role !== 'user' && (
-                     <div className="w-12 h-12 rounded-full border border-slate-200 dark:border-white/10 flex items-center justify-center bg-slate-50 dark:bg-black shrink-0">
-                        <Flame size={20} className="text-red-600" />
+                     <div className="w-8 h-8 rounded-full border border-red-500/20 flex items-center justify-center bg-black shrink-0 mt-1">
+                        <Flame size={14} className="text-red-600" />
                      </div>
                    )}
                    
-                   <div className={`max-w-[85%] md:max-w-[70%] p-6 md:p-8 rounded-2xl shadow-xl backdrop-blur-md ${
+                   <div className={`max-w-[85%] p-5 rounded-2xl backdrop-blur-md ${
                       msg.role === 'user' 
-                      ? 'bg-slate-900 dark:bg-red-600 text-white rounded-tr-sm' 
-                      : 'glass-panel text-slate-800 dark:text-slate-200 rounded-tl-sm'
+                      ? 'bg-red-600/90 text-white rounded-tr-sm shadow-[0_0_20px_rgba(220,38,38,0.2)]' 
+                      : 'glass-panel text-zinc-200 rounded-tl-sm'
                    }`}>
                       {msg.role !== 'user' && (
-                        <div className="text-[10px] font-bold uppercase tracking-widest text-red-600 mb-2 opacity-80">
-                           Neo Intelligence
+                        <div className="text-[9px] font-bold uppercase tracking-widest text-red-500 mb-2 opacity-70">
+                           Neo Companion
                         </div>
                       )}
                       
-                      <p className="text-base md:text-lg leading-relaxed font-medium whitespace-pre-wrap">
+                      <p className="text-sm md:text-base leading-relaxed whitespace-pre-wrap font-medium">
                         {msg.text}
                       </p>
                       
                       {msg.sources && msg.sources.length > 0 && (
-                        <div className="flex flex-wrap gap-3 mt-6 pt-4 border-t border-black/10 dark:border-white/10">
+                        <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-white/5">
                            {msg.sources.map((s: any, j: number) => (
-                             <a key={j} href={s.uri} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-1 bg-black/5 dark:bg-white/10 rounded-sm text-[10px] font-bold hover:bg-black/10 dark:hover:bg-white/20 transition-colors uppercase tracking-wider">
+                             <a key={j} href={s.uri} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-2 py-1 bg-white/5 rounded text-[9px] font-bold hover:bg-white/10 transition-colors uppercase tracking-wider text-zinc-400 hover:text-white">
                                 <ExternalLink size={10} /> {s.title}
                              </a>
                            ))}
                         </div>
                       )}
                    </div>
-
-                   {msg.role === 'user' && (
-                     <div className="w-12 h-12 rounded-full bg-slate-200 dark:bg-white/10 flex items-center justify-center shrink-0">
-                        <UserCircle2 size={24} className="text-slate-500 dark:text-white/50" />
-                     </div>
-                   )}
                 </div>
              ))}
              
              {isLoading && (
-               <div className="flex gap-6">
-                 <div className="w-12 h-12 rounded-full border border-red-500/30 flex items-center justify-center bg-black shrink-0 animate-pulse">
-                    <Flame size={20} className="text-red-600" />
+               <div className="flex gap-4 items-center">
+                 <div className="w-8 h-8 rounded-full border border-red-500/20 flex items-center justify-center bg-black shrink-0">
+                    <Flame size={14} className="text-red-600 animate-pulse" />
                  </div>
-                 <div className="glass-panel px-8 py-6 rounded-2xl rounded-tl-sm flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-red-600 rounded-full animate-bounce"></span>
-                    <span className="w-1.5 h-1.5 bg-red-600 rounded-full animate-bounce delay-100"></span>
-                    <span className="w-1.5 h-1.5 bg-red-600 rounded-full animate-bounce delay-200"></span>
+                 <div className="glass-panel px-4 py-3 rounded-xl rounded-tl-sm flex items-center gap-1">
+                    <div className="w-1.5 h-1.5 bg-red-500 rounded-full typing-dot"></div>
+                    <div className="w-1.5 h-1.5 bg-red-500 rounded-full typing-dot"></div>
+                    <div className="w-1.5 h-1.5 bg-red-500 rounded-full typing-dot"></div>
                  </div>
                </div>
              )}
-             <div ref={messagesEndRef} />
+             <div ref={messagesEndRef} className="h-4" />
           </div>
         )}
 
-        {/* --- INPUT BAR (The "Netflix Search" feel) --- */}
-        <div className="fixed bottom-0 left-0 w-full p-6 z-40 bg-gradient-to-t from-white dark:from-black via-white dark:via-black to-transparent pt-20">
-           <div className="max-w-3xl mx-auto relative">
-              <div className="glass-panel w-full p-1.5 rounded-full flex items-center transition-all duration-300 focus-within:ring-2 focus-within:ring-red-500/50 shadow-2xl">
-                 
-                 <div className="pl-4 pr-2">
-                   <Plus size={20} className="text-slate-400 cursor-pointer hover:text-red-500 transition-colors" />
-                 </div>
-                 
-                 <input 
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                    placeholder="Ask Neo..."
-                    className="flex-1 bg-transparent border-none outline-none text-slate-900 dark:text-white placeholder:text-slate-400 font-medium h-12 px-2 text-lg"
-                 />
-                 
-                 <button 
-                    onClick={toggleListening} 
-                    className={`p-3 rounded-full transition-all duration-300 mr-1 ${
-                       isListening ? 'bg-red-600 text-white animate-pulse' : 'hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400'
-                    }`}
-                 >
-                    {isListening ? <MicOff size={20} /> : <Mic size={20} />}
-                 </button>
+        {/* --- FLOATING COMMAND BAR --- */}
+        <div className="fixed bottom-6 w-full px-4 z-40 max-w-3xl">
+           
+           {/* Pop-up Quick Menu */}
+           {showMenu && (
+             <div className="absolute bottom-full left-4 mb-4 glass-menu rounded-2xl p-2 animate-in slide-in-from-bottom-2 fade-in zoom-in shadow-2xl flex flex-col gap-1 min-w-[200px]">
+                {quickActions.map((action, i) => (
+                  <button 
+                    key={i}
+                    onClick={() => handleSend(action.query)}
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl text-left transition-colors group"
+                  >
+                    <action.icon size={16} className={`${action.color}`} />
+                    <span className="text-sm font-medium text-zinc-300 group-hover:text-white">{action.label}</span>
+                  </button>
+                ))}
+             </div>
+           )}
 
-                 <button 
-                    onClick={() => handleSend()}
-                    disabled={!input.trim()}
-                    className={`p-3 rounded-full transition-all duration-300 ${
-                       input.trim() 
-                       ? 'bg-red-600 text-white hover:scale-105 shadow-lg shadow-red-600/30' 
-                       : 'bg-slate-100 dark:bg-white/5 text-slate-300 dark:text-white/20 cursor-not-allowed'
-                    }`}
-                 >
-                    <Send size={18} fill="currentColor" />
-                 </button>
-              </div>
+           <div className="glass-panel w-full p-2 rounded-full flex items-center transition-all duration-300 focus-within:border-red-500/50 focus-within:shadow-[0_0_30px_rgba(220,38,38,0.15)] relative">
               
-              <div className="text-center mt-3">
-                 <span className="text-[9px] font-bold text-slate-400 dark:text-white/30 uppercase tracking-[0.2em]">
-                   Neo System V2.0 • Encryption Active
-                 </span>
-              </div>
+              {/* Menu Toggle */}
+              <button 
+                onClick={() => setShowMenu(!showMenu)}
+                className={`p-3 rounded-full transition-all duration-300 ${showMenu ? 'bg-zinc-800 text-white rotate-45' : 'hover:bg-white/5 text-zinc-400'}`}
+              >
+                {showMenu ? <Plus size={20} /> : <Plus size={20} />}
+              </button>
+              
+              <input 
+                 value={input}
+                 onChange={(e) => setInput(e.target.value)}
+                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                 placeholder="Message Neo..."
+                 className="flex-1 bg-transparent border-none outline-none text-white placeholder:text-zinc-600 font-medium h-10 px-2 text-base"
+              />
+              
+              <button 
+                 onClick={toggleListening} 
+                 className={`p-3 rounded-full transition-all duration-300 mr-1 ${
+                    isListening ? 'bg-red-600 text-white animate-pulse' : 'hover:bg-white/5 text-zinc-500 hover:text-zinc-300'
+                 }`}
+              >
+                 {isListening ? <MicOff size={18} /> : <Mic size={18} />}
+              </button>
+
+              <button 
+                 onClick={() => handleSend()}
+                 disabled={!input.trim()}
+                 className={`p-3 rounded-full transition-all duration-300 ${
+                    input.trim() 
+                    ? 'bg-red-600 text-white hover:scale-105 shadow-lg shadow-red-600/30' 
+                    : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
+                 }`}
+              >
+                 <Send size={18} fill="currentColor" />
+              </button>
            </div>
         </div>
 
