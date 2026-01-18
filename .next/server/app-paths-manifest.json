@@ -1,0 +1,15 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/gallery/page": "app/gallery/page.js",
+  "/credentials-page/page": "app/credentials-page/page.js",
+  "/healthflo-ai/page": "app/healthflo-ai/page.js",
+  "/page": "app/page.js",
+  "/team/page": "app/team/page.js",
+  "/treatments/braces/page": "app/treatments/braces/page.js",
+  "/products/page": "app/products/page.js",
+  "/treatments/page": "app/treatments/page.js",
+  "/treatments/root-canal/page": "app/treatments/root-canal/page.js",
+  "/treatments/dental-implants/page": "app/treatments/dental-implants/page.js",
+  "/treatments/veneers/page": "app/treatments/veneers/page.js",
+  "/treatments/[slug]/page": "app/treatments/[slug]/page.js"
+}
