@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation'; // Added for navigation
 import { 
   Bot, Send, User, Smartphone, AlertCircle, Phone, Download, 
   Calendar, Clock, Wind, Sun, Cloud, Shield, Heart, 
@@ -14,20 +15,29 @@ import { sendMessageToAssistant } from '@/services/geminiService';
 import { ChatMessage } from '@/types';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
 
-interface HealthfloAiPageProps {
-  onBack?: () => void;
-  onBookClick?: () => void;
-}
+// Removed "HealthfloAiPageProps" because Page files cannot have custom props.
 
-const HealthfloAiPage: React.FC<HealthfloAiPageProps> = ({ onBack, onBookClick }) => {
+export default function HealthfloAiPage() {
+  const router = useRouter(); // Initialize Router
+  
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [greeting, setGreeting] = useState('');
-  
+   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
+
+  // -- Navigation Handlers --
+  const handleBack = () => {
+    // If there is history, go back. Otherwise go to home.
+    if (window.history.length > 2) {
+        router.back();
+    } else {
+        router.push('/');
+    }
+  };
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -151,7 +161,8 @@ const HealthfloAiPage: React.FC<HealthfloAiPageProps> = ({ onBack, onBookClick }
       {/* Left Sidebar - Gemini Style */}
       <aside className="hidden md:flex w-64 flex-col gemini-sidebar">
         <div className="p-4 flex flex-col gap-4">
-          <button onClick={onBack} className="p-2 hover:bg-white/5 rounded-full w-fit transition-colors">
+          {/* Back Button now uses Router */}
+          <button onClick={handleBack} className="p-2 hover:bg-white/5 rounded-full w-fit transition-colors">
             <ArrowLeft size={20} />
           </button>
           
@@ -198,7 +209,7 @@ const HealthfloAiPage: React.FC<HealthfloAiPageProps> = ({ onBack, onBookClick }
       <main className="flex-1 flex flex-col relative bg-[#131314]">
         {/* Mobile Header */}
         <header className="md:hidden flex items-center justify-between p-4 bg-[#1e1f20]">
-           <button onClick={onBack} className="p-2"><ArrowLeft size={20}/></button>
+           <button onClick={handleBack} className="p-2"><ArrowLeft size={20}/></button>
            <span className="font-bold text-sm tracking-tight">Healthflo OS</span>
            <button onClick={resetChat} className="p-2"><RefreshCcw size={18}/></button>
         </header>
@@ -208,17 +219,17 @@ const HealthfloAiPage: React.FC<HealthfloAiPageProps> = ({ onBack, onBookClick }
            <div className="max-w-3xl mx-auto px-6 w-full">
               {messages.length === 0 ? (
                 <div className="pt-20 flex flex-col">
-                   <RevealOnScroll>
+                    <RevealOnScroll>
                       <h1 className="text-4xl md:text-5xl font-medium mb-2 text-transparent bg-clip-text bg-gradient-to-r from-[#4b90ff] to-[#ff5546]">
                         Hello, Noble Patient
                       </h1>
                       <h2 className="text-3xl md:text-4xl font-medium text-[#444746] mb-12">
                         How can I assist with your dental health today?
                       </h2>
-                   </RevealOnScroll>
+                    </RevealOnScroll>
 
-                   {/* Suggestion Grid */}
-                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-12">
+                    {/* Suggestion Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-12">
                       {[
                         { text: "Analyze my sharp tooth pain", icon: AlertCircle, color: "text-red-400" },
                         { text: "Explain Micro-RCT procedure", icon: Microscope, color: "text-blue-400" },
@@ -236,7 +247,7 @@ const HealthfloAiPage: React.FC<HealthfloAiPageProps> = ({ onBack, onBookClick }
                            </div>
                         </button>
                       ))}
-                   </div>
+                    </div>
                 </div>
               ) : (
                 <div className="space-y-10 pb-10">
@@ -325,5 +336,3 @@ const HealthfloAiPage: React.FC<HealthfloAiPageProps> = ({ onBack, onBookClick }
     </div>
   );
 };
-
-export default HealthfloAiPage;
