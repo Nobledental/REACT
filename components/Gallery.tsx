@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   ArrowRight, Play, Pause, SkipBack, SkipForward, Heart, Share2, 
-  Sparkles, Activity, Volume2, VolumeX, ListMusic, Dna, Scan, Heart as HeartIcon // Renamed to avoid conflict
+  Sparkles, Activity, Volume2, VolumeX, ListMusic, Dna, Scan, Heart as HeartIcon 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
@@ -54,7 +54,6 @@ const wideCardStyles = `
     position: relative;
   }
   
-  /* Playlist Overlay Styles */
   .playlist-overlay {
     position: absolute;
     inset: 0;
@@ -68,7 +67,7 @@ const wideCardStyles = `
   }
 `;
 
-// --- ANIMATION COMPONENTS (Kept the same) ---
+// --- ANIMATION COMPONENTS ---
 const ImplantsAnim = () => (
   <div className="relative w-full h-full flex items-center justify-center">
     <motion.div 
@@ -153,7 +152,7 @@ export default function Gallery() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressRef = useRef<HTMLDivElement | null>(null);
 
-  // --- PLAYLIST ---
+  // --- PLAYLIST (WIRED WITH WORKING DEMO URLs) ---
   const playlist = [
     {
       type: "audio",
@@ -161,7 +160,8 @@ export default function Gallery() {
       artist: "Clinical Engineering",
       description: "Why titanium implants are the only permanent solution for bone loss.",
       component: <ImplantsAnim />, 
-      audio: "/audio/implants.mp3",
+      // Using reliable SoundHelix test audio. Replace with your 'implants.mp3' later.
+      audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
       category: "Surgery",
       tags: ['Implants', 'Biology']
     },
@@ -171,7 +171,7 @@ export default function Gallery() {
       artist: "Dr. Deepak",
       description: "Are veneers worth it? Avoiding the 'Chiclet' look.",
       component: <EthicsAnim />,
-      audio: "/audio/ethics.mp3", 
+      audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", 
       category: "Ethics",
       tags: ['Veneers', 'Truth']
     },
@@ -181,7 +181,7 @@ export default function Gallery() {
       artist: "Systemic Health",
       description: "The proven link between bleeding gums and heart disease.",
       component: <HealthAnim />,
-      audio: "/audio/safety.mp3",
+      audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
       category: "Health",
       tags: ['Wellness', 'Risk']
     },
@@ -191,7 +191,7 @@ export default function Gallery() {
       artist: "Tech Analysis",
       description: "How AI scanners detect decay 3 years before it becomes visible.",
       component: <TechAnim />,
-      audio: "/audio/ai.mp3", 
+      audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3", 
       category: "Technology",
       tags: ['AI', 'Laser']
     },
@@ -201,7 +201,7 @@ export default function Gallery() {
       artist: "Aligner Tech",
       description: "The engineering behind clear plastic pushing teeth.",
       component: <OrthoAnim />,
-      audio: "/audio/ortho.mp3",
+      audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3",
       category: "Ortho",
       tags: ['Physics', 'Aligners']
     }
@@ -211,6 +211,7 @@ export default function Gallery() {
 
   // --- HELPERS ---
   const formatTime = (seconds: number) => {
+    if (!seconds) return "0:00";
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
@@ -234,7 +235,6 @@ export default function Gallery() {
 
     const handleEnded = () => handleNext();
     
-    // Add event listeners
     audio.addEventListener('timeupdate', updateProgress);
     audio.addEventListener('loadedmetadata', updateProgress);
     audio.addEventListener('ended', handleEnded);
