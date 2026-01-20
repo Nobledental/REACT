@@ -23,9 +23,18 @@ export interface Source {
   uri: string;
 }
 
+export interface Possibility {
+  title: string;
+  description: string;
+  likelihood: 'High' | 'Moderate' | 'Low';
+  action: string;
+  relatedSlug?: string;
+}
+
 export interface ChatMessage {
   role: 'user' | 'model';
   text: string;
   timestamp: number;
   sources?: Source[];
+  possibilities?: Possibility[];
 }
